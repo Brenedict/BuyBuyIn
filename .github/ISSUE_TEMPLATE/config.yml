@@ -1,0 +1,6 @@
+# When new issues are created, show a dropdown menu to choose between these templates
+blank_issues_enabled: false
+contact_links:
+  - name: Community Discussion
+    url: https://github.com/kennethpabillo/QC-PESO-PEDRO/discussions
+    about: For general questions and community discussions, please use the Discussions tab.

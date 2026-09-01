@@ -1,0 +1,34 @@
+{
+    "name": "@buybuyin/root",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "server/",
+        "shared/"
+    ],
+    "scripts": {
+        "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+        "dev:client": "npm run dev -w client/",
+        "dev:server": "npm run dev -w server/",
+        "test:server": "npm test -w server/",
+        "mig:prisma": "npm run mig:prisma -w server/",
+        "res:prisma": "npm run res:prisma -w server/",
+        "gen:prisma": "npm run gen:prisma -w server/",
+        "seed:prisma": "npm run seed:prisma -w server/",
+        "gensql:prisma": "npm run gensql:prisma -w server/",
+        "create:prisma": "npm run create:prisma -w server/",
+        "studio:prisma": "npm run studio:prisma -w server/",
+        "pull:prisma": "npm run pull:prisma -w server/"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    },
+    "allowScripts": {
+        "@prisma/engines@7.9.1": true,
+        "core-js@3.50.0": true,
+        "esbuild@0.28.2": true,
+        "prisma@7.9.1": true,
+        "unrs-resolver@1.12.2": true,
+        "prisma-zod-generator@3.1.0": true
+    }
+}

@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+    provider               = "prisma-client"
+    output                 = "../../shared/prisma"
+    previewFeatures        = ["typedSql"]
+    generatedFileExtension = "ts"
+    importFileExtension    = "ts"
+    moduleFormat           = "esm"
+}
+
+generator zod {
+    provider         = "prisma-zod-generator"
+    output           = "../../shared/zod"
+    prismaClientPath = "../../shared/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model User {
+    id Int @id @default(autoincrement())
+
+    /// @zod.string()
+    username String @unique @db.VarChar(256)
+
+    /// @zod.string()
+    password String @db.VarChar(256)
+
+    /// @zod.string.min(1, { message: "Email cannot be empty" }).max(256)
+    email String @unique @db.VarChar(256)
+
+    /// @zod.string.min(1, { message: "First Name cannot be empty" }).max(256)
+    firstName String @db.VarChar(256)
+
+    /// @zod.string.min(1, { message: "Last Name cannot be empty" }).max(256)
+    lastName String @db.VarChar(256)
+
+    createdAt DateTime @default(now()) @db.Timestamptz(0)
+    updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+    fullName  String?  @default(dbgenerated()) @db.VarChar(256)
+
+    @@index([fullName])
+    @@index([createdAt(sort: Desc)])
+}

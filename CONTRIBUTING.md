@@ -81,9 +81,11 @@ git push origin feat/#42-user-authentication
 ### 6. Pull Request Semantics & Linking
 
 - When you successfully push, you should be prompted with this
-  ![Pull Request Prompt](image.png)
+  <img width="1554" height="85" alt="image" src="https://github.com/user-attachments/assets/2031addc-f33c-4222-9916-92bba68af7d9" />
+
 - Create your own new pull request where: `base: development` and `compare: <your-branch>`.
-  ![Pull Request Prompt](image.png)
+  <img width="1395" height="599" alt="image" src="https://github.com/user-attachments/assets/1d3a85e4-8555-4784-bcde-1330b6d366a9" />
+
 - You should see a template for your PR that you can fill up. Remove all placeholder texts enclosed in angle brackets `< >`.
 
 ```markdown

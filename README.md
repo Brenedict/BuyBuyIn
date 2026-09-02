@@ -15,6 +15,17 @@ This repository is an npm-workspaces monorepo split into three packages:
 
 ---
 
+## Prerequisites
+
+Ensure you have the following installed locally on your machine before setup:
+
+- **[Node.js](https://nodejs.org/)** (v24.x or higher)
+- **[npm](https://www.npmjs.com/)** (comes bundled with Node.js)
+- **[Git](https://git-scm.com/)**
+- **[PostgreSQL](https://www.postgresql.org/download/)** — or **[Docker](https://www.docker.com/)** to run Postgres via the included `docker-compose.yml`
+
+---
+
 ## Project Structure
 
 **Frontend Developers Main Directory:**
@@ -83,17 +94,6 @@ BuyBuyIn/
 ├── .gitignore
 └── package.json                        # Root workspace (npm workspaces: client, server, shared)
 ```
-
----
-
-## Prerequisites
-
-Ensure you have the following installed locally on your machine before setup:
-
-- **[Node.js](https://nodejs.org/)** (v24.x or higher)
-- **[npm](https://www.npmjs.com/)** (comes bundled with Node.js)
-- **[Git](https://git-scm.com/)**
-- **[PostgreSQL](https://www.postgresql.org/download/)** — or **[Docker](https://www.docker.com/)** to run Postgres via the included `docker-compose.yml`
 
 ---
 

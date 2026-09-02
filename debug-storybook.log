@@ -1,0 +1,11 @@
+[10:33:05.505] [INFO] [36mInitializing Storybook[39m
+[10:33:05.734] [DEBUG] Getting package.json info for /home/Romir/Projects/BuyBuyIn/package.json...
+[10:33:05.734] [INFO] Package manager: npm
+[10:33:05.740] [ERROR] [38;2;241;97;97mError: ENOENT: no such file or directory, open './package.json'[39m
+    at readFileSync (node:fs:539:20)
+    at _JsPackageManager.getPackageJson (file:///home/Romir/.npm/_npx/05823ecb1a3a987d/node_modules/storybook/dist/_node-chunks/chunk-OKMX43Z2.js:14146:23)
+    at get packageJson (file:///home/Romir/.npm/_npx/05823ecb1a3a987d/node_modules/storybook/dist/_node-chunks/chunk-OKMX43Z2.js:14510:34)
+    at PreflightCheckCommand.checkPackageNameConflict (file:///home/Romir/.npm/_npx/05823ecb1a3a987d/node_modules/create-storybook/dist/_node-chunks/chunk-KQWCXKNP.js:669:39)
+    at PreflightCheckCommand.execute (file:///home/Romir/.npm/_npx/05823ecb1a3a987d/node_modules/create-storybook/dist/_node-chunks/chunk-KQWCXKNP.js:648:14)
+[10:33:12.463] [PROMPT] Would you like to send anonymous crash reports to improve Storybook and fix bugs faster? {"choice":false}
+[10:33:12.468] [INFO] Storybook collects completely anonymous usage telemetry. We use it to shape Storybook's roadmap and prioritize features. You can learn more, including how to opt out, at https://storybook.js.org/telemetry

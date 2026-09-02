@@ -12,6 +12,8 @@
         "dev:client": "npm run dev -w client/",
         "dev:server": "npm run dev -w server/",
         "test:server": "npm test -w server/",
+        "storybook:client": "npm run storybook -w client/",
+        "sb:client": "npm run sb -w client/",
         "mig:prisma": "npm run mig:prisma -w server/",
         "res:prisma": "npm run res:prisma -w server/",
         "gen:prisma": "npm run gen:prisma -w server/",

@@ -14,6 +14,7 @@ const ButtonColorClasses = {
         button:"bg-cream text-black border-2 border-black font-bold hover:bg-brown hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-brown active:text-cream active:border-cream",
         icon: "black"
     },
+    //TODO: Make custom styling for the main Login button
     login : {
         button:"bg-crimson text-cream font-bold",
         icon: "cream"

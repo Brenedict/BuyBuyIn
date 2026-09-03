@@ -37,7 +37,7 @@ function CardContainer({
     return (
         <div
             onClick={onClick}
-            className={`border-[0.1px] border-brown/50 rounded-2xl overflow-clip ${dropShadow ? "drop-shadow-sm" : ""}  ${className} `}
+            className={`border-[0.1px] border-slate-dark rounded-2xl overflow-clip ${dropShadow ? "drop-shadow-sm" : ""}  ${className} `}
             {...props}
         >
             {children}
@@ -48,7 +48,7 @@ function CardContainer({
 function Header({
     children,
     variant = "solid",
-    bordered = true,
+    bordered = false,
     className,
     centerContent = false,
     toggleRightButton = false,

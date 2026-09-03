@@ -2,11 +2,11 @@
 import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type RouteObject } from "react-router";
 
 // Static Layout Page
-import DashboardLayout from "../pages/DashboardLayout";
+import StaticLayout from "../pages/StaticLayout";
 
 // Pages
 import { AccessValidator } from "../pages/AccessValidator";
-import { Page1 } from "../pages/Page1";
+import { BranchWideOffers } from "../pages/branch-manager/BranchWideOffers";
 import { Page2 } from "../pages/Page2";
 
 export const protectedRoutes: RouteObject[] = [
@@ -17,11 +17,11 @@ export const protectedRoutes: RouteObject[] = [
         children: [
             {
                 path: "",
-                element: <DashboardLayout />,
+                element: <StaticLayout />,
                 children: [
                     {
-                        path: "/page1",
-                        element: <Page1 />,
+                        path: "/branch-wide-offers",
+                        element: <BranchWideOffers />,
                     },
                     {
                         path: "/page2",

@@ -37,7 +37,7 @@ export type SizeVariant = keyof typeof SizeClasses;
 // ------------------------ FIXED Text Weight Classes and Type ------------------------
 
 export const WeightClasses = {
-    black: "font-black",
+    extraBold: "font-extra-bold",
     bold: "font-bold",
     medium: "font-medium",
     regular: "font-regular",
@@ -59,6 +59,7 @@ export const ColorClasses = {
     maroon: { bg: "bg-maroon", text: "text-maroon" },
     crimson: { bg: "bg-crimson", text: "text-crimson" },
     "crimson-muted": { bg: "bg-crimson-muted", text: "text-crimson-muted" },
+    coral: { bg: "bg-coral", text: "text-coral" },
     "off-white": { bg: "bg-off-white", text: "text-off-white" },
     cream: { bg: "bg-cream", text: "text-cream" },
     "cream-muted": { bg: "bg-cream-muted", text: "text-cream-muted" },

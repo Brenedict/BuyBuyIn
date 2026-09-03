@@ -2,16 +2,18 @@
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { PageHeader } from "../../components/PageHeader";
+import { Button } from "../../components/Button";
 
 // Material UI Icons
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 // Types
 import type { MaterialIcon } from "../../types/common";
 
 function OfferSummaryCard({ title, icon, value }: { title: string; icon?: MaterialIcon; value: number | string }) {
     return (
-        <Card>
+        <Card isGlass={false}>
             <Card.Body>
                 <Text variant="maroon">{title}</Text>
                 <Text
@@ -30,14 +32,20 @@ function OfferItemsCard({ title, startDate, endDate }: { title: string; startDat
     const dateRangeText = endDate === "" || endDate == undefined ? startDate : `${startDate} - ${endDate}`;
 
     return (
-        <Card>
-            <Card.Body>
+        <Card isGlass={false}>
+            <Card.Body className="flex flex-col gap-2">
                 <Text size="big" weight="extraBold">
                     {title}
                 </Text>
                 <Text variant="maroon" size="small">
                     {dateRangeText}
                 </Text>
+                <div className="flex gap-2">
+                    <Button size="small" className="flex-1">
+                        View
+                    </Button>
+                    <Button size="small" variant="secondary" leftIcon={DeleteIcon} className="flex-1"></Button>
+                </div>
             </Card.Body>
         </Card>
     );
@@ -46,7 +54,7 @@ function OfferItemsCard({ title, startDate, endDate }: { title: string; startDat
 function OffersSection() {
     return (
         <Card>
-            <Card.Body>
+            <Card.Body className="flex flex-col gap-2">
                 <Text size="bigger" weight="extraBold">
                     Offers
                 </Text>
@@ -56,6 +64,7 @@ function OffersSection() {
                     <OfferItemsCard title="Summer Sale 2026" startDate="May 1" endDate="June 30" />
                     <OfferItemsCard title="Summer Sale 2026" startDate="May 1" endDate="June 30" />
                 </section>
+                <br />
             </Card.Body>
         </Card>
     );
@@ -70,7 +79,7 @@ export function BranchWideOffers() {
                     descriptionText="Manage ongoing business offers, bundles, and discounts."
                 />
             </Card.Header>
-            <Card.Body>
+            <Card.Body className="flex flex-col gap-6">
                 <section className="grid grid-cols-4 gap-6">
                     <OfferSummaryCard title="TOTAL OFFERS IN THIS BRANCH" icon={LocalOfferIcon} value={4} />
                     <OfferSummaryCard title="ACTIVE OFFERS" icon={LocalOfferIcon} value={4} />
@@ -79,6 +88,7 @@ export function BranchWideOffers() {
                 </section>
                 <OffersSection />
             </Card.Body>
+            <Card.Footer></Card.Footer>
         </Card>
     );
 }

@@ -7,6 +7,9 @@ import { Button } from "../../components/Button";
 // Material UI Icons
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import StorefrontIcon from "@mui/icons-material/Storefront";
 
 // Types
 import type { MaterialIcon } from "../../types/common";
@@ -60,9 +63,9 @@ function OffersSection() {
                 </Text>
                 <section className="grid grid-cols-4 gap-6">
                     <OfferItemsCard title="Summer Sale 2026" startDate="May 1" endDate="June 30" />
-                    <OfferItemsCard title="Summer Sale 2026" startDate="May 1" endDate="June 30" />
-                    <OfferItemsCard title="Summer Sale 2026" startDate="May 1" endDate="June 30" />
-                    <OfferItemsCard title="Summer Sale 2026" startDate="May 1" endDate="June 30" />
+                    <OfferItemsCard title="Independence Day" startDate="June 12" endDate="June 15" />
+                    <OfferItemsCard title="Black Friday" startDate="Nov 24" endDate="Nov 30" />
+                    <OfferItemsCard title="Christmas Sale" startDate="Dec 25" endDate="Dec 30" />
                 </section>
                 <br />
             </Card.Body>
@@ -82,9 +85,9 @@ export function BranchWideOffers() {
             <Card.Body className="flex flex-col gap-6">
                 <section className="grid grid-cols-4 gap-6">
                     <OfferSummaryCard title="TOTAL OFFERS IN THIS BRANCH" icon={LocalOfferIcon} value={4} />
-                    <OfferSummaryCard title="ACTIVE OFFERS" icon={LocalOfferIcon} value={4} />
-                    <OfferSummaryCard title="INACTIVE/EXPIRED" icon={LocalOfferIcon} value={4} />
-                    <OfferSummaryCard title="TOTAL BRANCHES" icon={LocalOfferIcon} value={4} />
+                    <OfferSummaryCard title="ACTIVE OFFERS" icon={ThumbUpAltIcon} value={2} />
+                    <OfferSummaryCard title="INACTIVE/EXPIRED" icon={ThumbDownIcon} value={1} />
+                    <OfferSummaryCard title="TOTAL BRANCHES" icon={StorefrontIcon} value={5} />
                 </section>
                 <OffersSection />
             </Card.Body>

@@ -270,8 +270,8 @@ export const DifferentCardSizes: Story = {
             description: {
                 story: `The card component does not have a fix sized. You can use the \`className\` attirbute to add your own TailwindCSS styles.
 \`\`\`tsx
-# If your styles don't seem to reflect try adding an exclamation mark (ex: w-full!)
-<Card className="w-full">
+# If your styles don't seem to reflect try adding an exclamation mark (ex: w-1/2!)
+<Card className="w-1/2">
     <Card.Body>
         <Text>Body Content</Text>
     </Card.Body>

@@ -8,10 +8,15 @@
 */
 
 /* PLACEHOLDER: Update this if needed */
-/* @font-face {
-    font-family: "Inter";
-    src: url("./assets/inter.ttf") format("truetype");
-} */
+@font-face {
+    font-family: "Google Sans Flex";
+    src: url("./assets/google-sans-flex.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Inconsolata";
+    src: url("./assets/inconsolata.ttf") format("truetype");
+}
 
 @theme {
     /* ==== Inter Font ==== */

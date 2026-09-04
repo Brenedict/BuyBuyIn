@@ -22,7 +22,9 @@ function OfferSummaryCard({ title, icon, value }: { title: string; icon?: Materi
                 <Text
                     size="larger"
                     weight="extraBold"
-                    svg={{ gap: "medium", icon: icon, position: "left", size: "larger", variant: "maroon" }}
+                    {...(icon && {
+                        svg: { gap: "medium", icon, position: "left", size: "larger", variant: "maroon" },
+                    })}
                 >
                     {value}
                 </Text>

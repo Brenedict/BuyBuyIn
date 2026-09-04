@@ -2,12 +2,14 @@
 import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs, type RouteObject } from "react-router";
 
 // Static Layout Page
-import StaticLayout from "../pages/StaticLayout";
+import StaticLayout from "../pages/shared/StaticLayout";
+
+// Static Access Checker before entering any page
+import { AccessValidator } from "../pages/shared/AccessValidator";
 
 // Pages
-import { AccessValidator } from "../pages/AccessValidator";
 import { BranchWideOffers } from "../pages/branch-manager/BranchWideOffers";
-import { Page2 } from "../pages/Page2";
+import { Page2 } from "../pages/branch-manager/Page2";
 
 export const protectedRoutes: RouteObject[] = [
     {

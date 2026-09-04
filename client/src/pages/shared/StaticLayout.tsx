@@ -1,8 +1,8 @@
 // General Imports
 import { Outlet, Link } from "react-router";
-import "../index.css";
+import "../../index.css";
 
-import testBg from "../assets/testbg.png";
+import testBg from "../../assets/testbg.png";
 
 // Components
 
@@ -14,7 +14,6 @@ function StaticLayout() {
          * This is temporary just so I could test the card components look.
          * Especially the glass variant of the card component.
          * For actual implementation of the bg, if you have an idea how to do it, please raise it.
-         * I'm not frontend heavy and have no clue how to do those types of bg.  
          * */
 
         <main

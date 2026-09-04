@@ -9,7 +9,9 @@ import { TABLE_SAMPLE_USERS } from "../TESTINGDATA/tableData";
 // Custom args type
 type TableArgs = {
     // Table props
-    noCardStyle: boolean;
+    bordered: boolean;
+    rounded: boolean;
+    shadow: boolean;
     enablePagination: boolean;
     // Header props
     headerText: string;
@@ -18,11 +20,13 @@ type TableArgs = {
     headerSize: SizeVariant;
     headerStyle: "capitalize" | "uppercase";
     headerNowrap: boolean;
+    headerBorderedBottom: boolean;
     // Data props
     dataTextVariant: ColorVariant;
     dataWeight: WeightVariant;
     dataSize: SizeVariant;
     dataNowrap: boolean;
+    dataBorderedBottom: boolean;
     // Pagination props
     maxItems: number;
     borderedTop: boolean;
@@ -77,9 +81,19 @@ const meta = {
         pagination: { table: { disable: true } },
 
         // Table props
-        noCardStyle: {
+        bordered: {
             control: "boolean",
-            description: "Remove card styling",
+            description: "Enable border around the table",
+            table: { category: "Table" },
+        },
+        rounded: {
+            control: "boolean",
+            description: "Apply rounded corners to the table",
+            table: { category: "Table" },
+        },
+        shadow: {
+            control: "boolean",
+            description: "Apply shadow to the table",
             table: { category: "Table" },
         },
         enablePagination: {
@@ -122,6 +136,11 @@ const meta = {
             description: "Prevent text wrapping in headers",
             table: { category: "Header" },
         },
+        headerBorderedBottom: {
+            control: "boolean",
+            description: "Show border below header row",
+            table: { category: "Header" },
+        },
         // Data props
         dataTextVariant: {
             control: "select",
@@ -144,6 +163,11 @@ const meta = {
         dataNowrap: {
             control: "boolean",
             description: "Prevent text wrapping in data cells",
+            table: { category: "Data" },
+        },
+        dataBorderedBottom: {
+            control: "boolean",
+            description: "Show border below data rows",
             table: { category: "Data" },
         },
         // Pagination props
@@ -190,7 +214,9 @@ const meta = {
     },
     args: {
         // Table defaults
-        noCardStyle: false,
+        bordered: true,
+        rounded: true,
+        shadow: true,
         enablePagination: true,
         // Header defaults
         headerText: "Column",
@@ -199,11 +225,13 @@ const meta = {
         headerSize: "mediumBig",
         headerStyle: "capitalize",
         headerNowrap: true,
+        headerBorderedBottom: true,
         // Data defaults
         dataTextVariant: "brown",
         dataWeight: "medium",
         dataSize: "normal",
         dataNowrap: true,
+        dataBorderedBottom: true,
         // Pagination defaults
         maxItems: 5,
         borderedTop: true,
@@ -233,8 +261,8 @@ export const Default: Story = {
             : undefined;
 
         return (
-            <Table noCardStyle={args.noCardStyle} pagination={paginationConfig}>
-                <Table.Row borderedBottom>
+            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
+                <Table.Row borderedBottom={args.headerBorderedBottom}>
                     <Table.Header
                         text={args.headerText}
                         textVariant={args.headerTextVariant}
@@ -278,7 +306,7 @@ export const Default: Story = {
                 </Table.Row>
 
                 {TABLE_SAMPLE_USERS.map((user, i) => (
-                    <Table.Row key={i} borderedBottom>
+                    <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
                         <Table.Data
                             text={user.name}
                             textVariant={args.dataTextVariant}
@@ -331,10 +359,9 @@ export const Default: Story = {
 export const WithoutPagination: Story = {
     args: {
         enablePagination: false,
-        noCardStyle: false,
     },
     render: (args) => (
-        <Table noCardStyle={args.noCardStyle}>
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow}>
             <Table.Row borderedBottom>
                 <Table.Header text="Name" nowrap />
                 <Table.Header text="Contact No." nowrap />
@@ -344,7 +371,7 @@ export const WithoutPagination: Story = {
             </Table.Row>
 
             {TABLE_SAMPLE_USERS.slice(0, 5).map((user, i) => (
-                <Table.Row key={i} borderedBottom>
+                <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
                     <Table.Data text={user.name} nowrap />
                     <Table.Data text={user.contact} nowrap />
                     <Table.Data text={user.role} nowrap />
@@ -363,13 +390,15 @@ export const WithoutPagination: Story = {
     },
 };
 
-export const NoCardStyle: Story = {
+export const NoTableBorderStyle: Story = {
     args: {
         enablePagination: false,
-        noCardStyle: true,
+        bordered: false,
+        rounded: false,
+        shadow: false,
     },
     render: (args) => (
-        <Table noCardStyle={args.noCardStyle}>
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow}>
             <Table.Row>
                 <Table.Header text="Name" nowrap />
                 <Table.Header text="Contact No." nowrap />
@@ -392,7 +421,7 @@ export const NoCardStyle: Story = {
     parameters: {
         docs: {
             description: {
-                story: "Table with card styling disabled (pwede magamit sa embedded na tables like sa dialog, cards, etc.).",
+                story: "Table without any border styling (pwede magamit sa embedded na tables like sa dialog, cards, etc.).",
             },
         },
     },
@@ -407,7 +436,7 @@ export const UppercaseHeaders: Story = {
         enablePagination: false,
     },
     render: (args) => (
-        <Table noCardStyle={false}>
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow}>
             <Table.Row borderedBottom>
                 <Table.Header
                     text="Name"
@@ -452,7 +481,7 @@ export const UppercaseHeaders: Story = {
             </Table.Row>
 
             {TABLE_SAMPLE_USERS.slice(0, 5).map((user, i) => (
-                <Table.Row key={i} borderedBottom>
+                <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
                     <Table.Data text={user.name} nowrap />
                     <Table.Data text={user.contact} nowrap />
                     <Table.Data text={user.role} nowrap />
@@ -492,8 +521,8 @@ export const CustomPaginationColors: Story = {
         };
 
         return (
-            <Table pagination={paginationConfig}>
-                <Table.Row borderedBottom>
+            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
+                <Table.Row borderedBottom={args.headerBorderedBottom}>
                     <Table.Header text="Name" nowrap />
                     <Table.Header text="Contact No." nowrap />
                     <Table.Header text="Role" nowrap />
@@ -502,7 +531,7 @@ export const CustomPaginationColors: Story = {
                 </Table.Row>
 
                 {TABLE_SAMPLE_USERS.map((user, i) => (
-                    <Table.Row key={i} borderedBottom>
+                    <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
                         <Table.Data text={user.name} nowrap />
                         <Table.Data text={user.contact} nowrap />
                         <Table.Data text={user.role} nowrap />

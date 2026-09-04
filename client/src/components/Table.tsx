@@ -138,7 +138,9 @@ function PaginationControls({ page, handleLeftClick, handleRightClick, handleInp
 interface TableProps extends React.HTMLAttributes<HTMLElement> {
     children: ReactNode;
     borderVariant?: ColorVariant;
-    noCardStyle?: boolean;
+    bordered?: boolean;
+    rounded?: boolean;
+    shadow?: boolean;
     pagination?: {
         maxItems?: number;
         borderedTop?: boolean;
@@ -150,7 +152,7 @@ interface TableProps extends React.HTMLAttributes<HTMLElement> {
     };
 }
 
-function Table({ children, noCardStyle = false, pagination, ...props }: TableProps) {
+function Table({ children, pagination, bordered = true, rounded = true, shadow = true, ...props }: TableProps) {
     const [page, setPage] = useState<number>(1);
     const childrenArray = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Row);
     const header = childrenArray[0];
@@ -190,9 +192,7 @@ function Table({ children, noCardStyle = false, pagination, ...props }: TablePro
     return (
         <section
             {...props}
-            {...(!noCardStyle && {
-                className: `border border-brown rounded-2xl overflow-hidden ${props.className ?? ""} `,
-            })}
+            className={`${shadow ? "shadow-xl" : ""} ${rounded ? "rounded-2xl" : ""} ${bordered ? "border-brown border" : ""} overflow-hidden ${props.className ?? ""} `}
         >
             <table className="table-auto w-full ">
                 <thead>{header}</thead>

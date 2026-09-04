@@ -7,6 +7,7 @@ import {
     type SizeVariant,
     ColorClasses,
     type ColorVariant,
+    AlignFlexClasses,
     type AlignVariant,
     FontClasses,
     type FontVariant,
@@ -37,16 +38,10 @@ interface HeadingProp extends React.HTMLAttributes<HTMLParagraphElement> {
     className?: string;
 }
 
-const alignFlexClasses = {
-    center: "justify-center",
-    left: "justify-start",
-    right: "justify-end",
-} as const;
-
 export function Text({
     children,
     size = "normal",
-    variant = "black",
+    variant = "crimson",
     weight = "regular",
     font = "default",
     align = "left",
@@ -55,7 +50,7 @@ export function Text({
 }: HeadingProp) {
     return (
         <div
-            className={`flex items-center ${alignFlexClasses[align]} ${svg?.position === "right" ? "flex-row-reverse" : "flex-row"} ${svg ? GapClasses[svg.gap] : ""} ${className}`}
+            className={`flex items-center ${AlignFlexClasses[align]} ${svg?.position === "right" ? "flex-row-reverse" : "flex-row"} ${svg ? GapClasses[svg.gap] : ""} ${className}`}
         >
             {svg && <Icon icon={svg.icon} size={svg.size} variant={svg.variant || variant} bg={svg.bg} />}
             <p

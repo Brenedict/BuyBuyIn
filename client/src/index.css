@@ -8,10 +8,15 @@
 */
 
 /* PLACEHOLDER: Update this if needed */
-/* @font-face {
-    font-family: "Inter";
-    src: url("./assets/inter.ttf") format("truetype");
-} */
+@font-face {
+    font-family: "Google Sans Flex";
+    src: url("./assets/google-sans-flex.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Inconsolata";
+    src: url("./assets/inconsolata.ttf") format("truetype");
+}
 
 @theme {
     /* ==== Inter Font ==== */
@@ -28,6 +33,7 @@
     --color-crimson: #c83a24;
     --color-crimson-muted: #c83a244f;
     --color-coral: #fe7470;
+    --color-off-white: #fefced;
     --color-cream: #f4ede5;
     --color-cream-muted: #f4ede533;
 
@@ -45,17 +51,29 @@
     --text-smallest-description: 0.5rem; /* 8px */
 
     /* ==== Typography (Weight/Boldness) ==== */
-    --font-weight-black: 900;
+    --font-weight-extra-bold: 800;
     --font-weight-bold: 700;
     --font-weight-medium: 500;
     --font-weight-regular: 400;
-    --font-weight-light: 300;
+    --font-weight-light: 200;
 
     --shadow-default: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
 
     /* Aspect ratio for report preview*/
     --aspect-a4: 8.27 / 11.69; /* A4 Size Paper */
+
+    --background-image-hero: url("/assets/testbg.png");
 }
 
 @layer components {
+    .card-drop-shadow {
+        box-shadow: 4px 4px 10px 0px rgba(68, 45, 29, 0.6);
+    }
+
+    .card-glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 }

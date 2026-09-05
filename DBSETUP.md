@@ -54,7 +54,7 @@ CREATE DATABASE ped_system;
 5. Type `\q` and press Enter to exit.
 
 ## 6. Prisma Setup
-Navigate back to the **root** folder (`BuyBuyIn/`) and run the predefined workspace scripts to generate the client and apply your database tables:
+Navigate back to the **root** folder (`BuyBuyIn/`) and run this scripts.
 
 ```bash
 npm prisma generate
@@ -62,12 +62,11 @@ npm prisma migrate dev
 ```
 
 ## 7. Seed Data (Optional)
-To manually inspect your database or add dummy user data, open Prisma Studio from the root folder:
+To manually inspect the database or add dummy user data, open Prisma Studio from the root folder:
 
 ```bash
 npm prisma studio
 ```
-This will open a browser tab where you can click on the `user` table, click **Add Record**, fill in the required fields, and save changes.
 
 ## 8. Run and Verify
 Start both the frontend and backend servers simultaneously from the **root** folder:

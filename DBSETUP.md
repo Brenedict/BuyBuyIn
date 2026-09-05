@@ -68,7 +68,7 @@ To manually inspect the database or add dummy user data, open Prisma Studio from
 npm prisma studio
 ```
 
-## 8. Run and Verify
+## 8. Run and Verify (IMPORTANT)
 Start both the frontend and backend servers simultaneously from the **root** folder:
 
 ```bash

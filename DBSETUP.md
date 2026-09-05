@@ -83,6 +83,10 @@ cp .env.example .env
 
 Edit the `.env` file to include your database credentials. Replace `johndoe` with your PostgreSQL username (usually `postgres`) and `randompassword` with your actual password. Make sure the database name is set to `mydb`. If you plan to change the database name in the url make sure it maches with the databas you create for step 5:
 
+ **IMPORTANT: Special Characters in Passwords** If your password contains special characters (like `@`, `#`, `$`), you **must** URL-encode them in your `.env` connection string so Prisma can read it correctly. For example, use `%24` instead of `$`. > 
+ 
+ Reference: [MDN Percent-encoding Guide](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding) 
+
 ```env
 PORT=3000
 NODE_ENV=development

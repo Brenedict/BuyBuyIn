@@ -23,6 +23,8 @@ export const SizeClasses = {
     large: "text-large",
     bigger: "text-bigger",
     big: "text-big",
+    mediumBig: "text-medium-big",
+    mediumSmall: "text-medium-small",
     medium: "text-medium",
     normal: "text-normal",
     description: "text-description",
@@ -50,17 +52,17 @@ export type WeightVariant = keyof typeof WeightClasses;
 // ------------------------ FIXED Bg and Text Color Classes and Type ------------------------
 
 export const ColorClasses = {
-    black: { bg: "bg-black", text: "text-black" },
-    slate: { bg: "bg-slate", text: "text-slate" },
-    "slate-dark": { bg: "bg-slate-dark", text: "text-slate-dark" },
-    "slate-medium": { bg: "bg-slate-medium", text: "text-slate-medium" },
-    "slate-light": { bg: "bg-slate-light", text: "text-slate-light" },
-    brown: { bg: "bg-brown", text: "text-brown" },
-    maroon: { bg: "bg-maroon", text: "text-maroon" },
-    crimson: { bg: "bg-crimson", text: "text-crimson" },
-    "crimson-muted": { bg: "bg-crimson-muted", text: "text-crimson-muted" },
-    cream: { bg: "bg-cream", text: "text-cream" },
-    "cream-muted": { bg: "bg-cream-muted", text: "text-cream-muted" },
+    black: { bg: "bg-black", text: "text-black", border: "border-black" },
+    slate: { bg: "bg-slate", text: "text-slate", border: "border-slate" },
+    "slate-dark": { bg: "bg-slate-dark", text: "text-slate-dark", border: "border-slate-dark" },
+    "slate-medium": { bg: "bg-slate-medium", text: "text-slate-medium", border: "border-slate-medium" },
+    "slate-light": { bg: "bg-slate-light", text: "text-slate-light", border: "border-slate-light" },
+    brown: { bg: "bg-brown", text: "text-brown", border: "border-brown" },
+    maroon: { bg: "bg-maroon", text: "text-maroon", border: "border-maroon" },
+    crimson: { bg: "bg-crimson", text: "text-crimson", border: "border-crimson" },
+    "crimson-muted": { bg: "bg-crimson-muted", text: "text-crimson-muted", border: "border-crimson-muted" },
+    cream: { bg: "bg-cream", text: "text-cream", border: "border-cream" },
+    "cream-muted": { bg: "bg-cream-muted", text: "text-cream-muted", border: "border-cream-muted" },
 } as const;
 
 // Extracts: "black" | "slate" | "slate-medium" | "crimson"

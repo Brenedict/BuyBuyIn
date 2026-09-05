@@ -19,9 +19,10 @@ export interface IconProps {
         type: "normal" | "circle";
         padding: "small" | "big";
     };
+    className?: string;
 }
 
-function Icon({ icon, size, variant, bg, align = "center" }: IconProps) {
+function Icon({ icon, size, variant, bg, align = "center", className = "" }: IconProps) {
     const IconType = icon;
 
     // Get background styles if it exists
@@ -30,7 +31,7 @@ function Icon({ icon, size, variant, bg, align = "center" }: IconProps) {
         : "";
 
     return (
-        <div className={` aspect-square flex w-fit ${AlignClasses[align]} items-center ${bgStyles}`}>
+        <div className={`aspect-square flex w-fit ${AlignClasses[align] } ${className} items-center ${bgStyles}`}>
             <IconType
                 className={`${ColorClasses[variant].text}  stroke-0 `}
                 style={{ fontSize: `var(--${SizeClasses[size]})` }}

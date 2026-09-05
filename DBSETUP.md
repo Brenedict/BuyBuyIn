@@ -48,7 +48,7 @@ TEST_DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/test_mydb?s
 4. Run the following command to create your local database (must match your `.env` URL):
 
 ```sql
-CREATE DATABASE mydb;
+CREATE DATABASE ped_system;
 ```
 
 5. Type `\q` and press Enter to exit.
@@ -57,15 +57,15 @@ CREATE DATABASE mydb;
 Navigate back to the **root** folder (`BuyBuyIn/`) and run the predefined workspace scripts to generate the client and apply your database tables:
 
 ```bash
-npm run gen:prisma
-npm run mig:prisma
+npm prisma generate
+npm prisma migrate dev
 ```
 
 ## 7. Seed Data (Optional)
 To manually inspect your database or add dummy user data, open Prisma Studio from the root folder:
 
 ```bash
-npm run studio:prisma
+npm prisma studio
 ```
 This will open a browser tab where you can click on the `user` table, click **Add Record**, fill in the required fields, and save changes.
 

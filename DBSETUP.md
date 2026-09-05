@@ -48,7 +48,7 @@ TEST_DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/test_mydb?s
 4. Run the following command to create your local database (must match your `.env` URL):
 
 ```sql
-CREATE DATABASE ped_system;
+CREATE DATABASE mydb;
 ```
 
 5. Type `\q` and press Enter to exit.

@@ -6,12 +6,31 @@ This covers the local installation and configuration of PostgreSQL for the proje
 
 ## 1. Install PostgreSQL
 
+### For Windows
+
 1. Download the latest version of PostgreSQL for your operating system from [EnterpriseDB](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
 2. Run the installer. You can skip the Stack Builder portion and use the default settings for the rest of the installation. **Remember the password you set for the default `postgres` user.**
 
+### For Arch Linux
+1. Install Postgre using the package manager:
+```bash
+sudo pacman -S postgresql
+```
+2. Arch doesn't auto-initialize the data directory. Switch to the postgres user and run:
+```bash
+sudo -iu postgres initdb -D /var/lib/postgres/data
+```
+3. Enable postgresql
+```bash
+sudo systemctl enable --now postgresql
+```
+4. Set password using:
+```bash
+sudo -iu postgres psql -c "ALTER USER postgres PASSWORD <'yourpassword'>;"
+```
 ---
 
-## 2. Verify and Configure PATH (Windows)
+## 2. Verify and Configure PATH 
 
 Ensure `psql` is available in your terminal by running:
 
@@ -19,6 +38,7 @@ Ensure `psql` is available in your terminal by running:
 psql --version
 ```
 
+### Windows
 If you receive an error, you must add PostgreSQL to your system's PATH:
 
 1. Find your PostgreSQL `bin` folder path (e.g., `C:\Program Files\PostgreSQL\16\bin`).
@@ -27,6 +47,15 @@ If you receive an error, you must add PostgreSQL to your system's PATH:
 4. Under _System variables_ or _User variables_, select the **Path** variable and click **Edit...**.
 5. Click **New**, paste your `bin` folder path, and click **OK** on all windows to save.
 
+
+### Linux
+1. Check if postgresql package exists on your device:
+```bash
+pacman -Qs postgresql
+```
+2. Check /usr/bin exists in path using:
+```bash
+echo $PATH
 ---
 
 ## 3. Project Installation
@@ -62,6 +91,7 @@ TEST_DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/test_mydb?s
 
 ## 5. Create the Database
 
+### Windows
 1. Open the **SQL Shell (psql)** from your Start menu.
 2. Press **Enter** 4 times to accept the default Server, Database, Port, and Username.
 3. Enter your PostgreSQL password.
@@ -78,6 +108,12 @@ CREATE DATABASE mydb;
 
 ---
 
+### Linux
+1. Use terminal to open psql
+```bash
+sudo -iu postgres psql
+```
+
 ## 6. Prisma Setup
 
 Navigate back to the **root** folder (`BuyBuyIn/`) and run this scripts.
@@ -93,9 +129,8 @@ npm run gen:prisma
 ## 7. Seed Data (Optional)
 
 To manually inspect the database or add dummy user data, open Prisma Studio from the root folder:
-
 ```bash
-npm prisma studio
+npm run studio:prisma
 ```
 
 ## 8. Run and Verify (IMPORTANT)

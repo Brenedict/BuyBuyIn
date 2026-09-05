@@ -21,6 +21,7 @@ If you receive an error, you must add PostgreSQL to your system's PATH:
 Since this is a monorepo, install all dependencies from the **root** directory:
 ```bash
 npm install
+```
 
 ## 4. Environment Variables
 Navigate to the `server/` directory, copy the example environment file, and rename it to `.env`:

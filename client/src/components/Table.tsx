@@ -2,10 +2,10 @@ import { Children, isValidElement, useState, type ReactNode } from "react";
 import { Text } from "./Text";
 import Button from "./Button";
 import { ColorClasses, type ColorVariant, type SizeVariant, type WeightVariant } from "../types/common";
-import Icon from "./Icon";
 
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
+import { useTablePagination } from "../hooks/useTablePagination";
 import { useSearchParams } from "react-router";
 
 /* eslint-disable react-refresh/only-export-components */
@@ -152,8 +152,6 @@ function Table({
     pageKey = "page",
     ...props
 }: TableProps) {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [page, setPage] = useState<number>(() => (searchParams.has(pageKey) ? Number(searchParams.get(pageKey)) : 1));
     const childrenArray = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Row);
     const footerChildren = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Footer);
     const header = childrenArray[0];
@@ -172,6 +170,8 @@ function Table({
         textWeight = "medium",
     } = pagination ?? {};
 
+    const { page, setPage } = useTablePagination(rows, pageKey, maxItems);
+
     if (pagination) {
         const start = (page - 1) * maxItems;
         const end = page * maxItems;
@@ -182,18 +182,6 @@ function Table({
             paginatedRows.length > 0 ? `${start + 1} to ${lastIndex}` : "0"
         } out of ${rows.length}`;
     }
-
-    const setPageClamped = (page: number) => {
-        const maxPages = Math.ceil(rows.length / maxItems);
-        const clampedPage = Math.min(Math.max(page, 1), maxPages);
-
-        const newParams = new URLSearchParams(searchParams);
-        if (clampedPage !== 1) newParams.set(pageKey, clampedPage.toString());
-        else newParams.delete(pageKey);
-
-        setPage(() => clampedPage);
-        setSearchParams(newParams);
-    };
 
     return (
         <section
@@ -216,9 +204,9 @@ function Table({
                     </Text>
                     <PaginationControls
                         page={page}
-                        handleLeftClick={() => setPageClamped(page - 1)}
-                        handleRightClick={() => setPageClamped(page + 1)}
-                        handleInputChange={(e) => setPageClamped(Number(e.target.value))}
+                        handleLeftClick={() => setPage(page - 1)}
+                        handleRightClick={() => setPage(page + 1)}
+                        handleInputChange={(e) => setPage(Number(e.target.value))}
                     />
                 </section>
             )}

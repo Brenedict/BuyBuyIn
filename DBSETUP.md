@@ -24,7 +24,11 @@ sudo -iu postgres initdb -D /var/lib/postgres/data
 ```bash
 sudo systemctl enable --now postgresql
 ```
-4. Set password using:
+4. Verify the status of postgresql, it should display `active (running)`
+```bash
+sudo systemctl status postgresql
+```
+5. Set password using:
 ```bash
 sudo -iu postgres psql -c "ALTER USER postgres PASSWORD <'yourpassword'>;"
 ```

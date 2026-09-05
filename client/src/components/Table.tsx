@@ -6,6 +6,7 @@ import Icon from "./Icon";
 
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
+import { useSearchParams } from "react-router";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -17,6 +18,14 @@ interface RowProps {
 }
 
 function Row({ children, borderedBottom = false, bgVariant = "cream-muted" }: RowProps) {
+    return (
+        <tr className={` border-brown   ${ColorClasses[bgVariant].bg}   ${borderedBottom ? "border-b " : ""}`}>
+            {children}
+        </tr>
+    );
+}
+
+function Footer({ children, borderedBottom = false, bgVariant = "cream-muted" }: RowProps) {
     return (
         <tr className={` border-brown   ${ColorClasses[bgVariant].bg}   ${borderedBottom ? "border-b " : ""}`}>
             {children}
@@ -122,6 +131,7 @@ interface TableProps extends React.HTMLAttributes<HTMLElement> {
     bordered?: boolean;
     rounded?: boolean;
     shadow?: boolean;
+    pageKey?: string;
     pagination?: {
         maxItems?: number;
         borderedTop?: boolean;
@@ -133,9 +143,19 @@ interface TableProps extends React.HTMLAttributes<HTMLElement> {
     };
 }
 
-function Table({ children, pagination, bordered = true, rounded = true, shadow = true, ...props }: TableProps) {
-    const [page, setPage] = useState<number>(1);
+function Table({
+    children,
+    pagination,
+    bordered = true,
+    rounded = true,
+    shadow = true,
+    pageKey = "page",
+    ...props
+}: TableProps) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [page, setPage] = useState<number>(() => (searchParams.has(pageKey) ? Number(searchParams.get(pageKey)) : 1));
     const childrenArray = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Row);
+    const footerChildren = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Footer);
     const header = childrenArray[0];
     const rows = childrenArray.slice(1);
 
@@ -167,7 +187,12 @@ function Table({ children, pagination, bordered = true, rounded = true, shadow =
         const maxPages = Math.ceil(rows.length / maxItems);
         const clampedPage = Math.min(Math.max(page, 1), maxPages);
 
+        const newParams = new URLSearchParams(searchParams);
+        if (clampedPage !== 1) newParams.set(pageKey, clampedPage.toString());
+        else newParams.delete(pageKey);
+
         setPage(() => clampedPage);
+        setSearchParams(newParams);
     };
 
     return (
@@ -177,7 +202,10 @@ function Table({ children, pagination, bordered = true, rounded = true, shadow =
         >
             <table className="table-auto w-full ">
                 <thead>{header}</thead>
-                <tbody className="[&_tr:last-child]:border-b-0! ">{paginatedRows ?? rows}</tbody>
+                <tbody className="[&_tr:last-child]:border-b-0! ">
+                    {paginatedRows ?? rows}
+                    {footerChildren}
+                </tbody>
             </table>
             {pagination && (
                 <section
@@ -198,4 +226,4 @@ function Table({ children, pagination, bordered = true, rounded = true, shadow =
     );
 }
 
-export default Object.assign(Table, { Row, Header, Data });
+export default Object.assign(Table, { Row, Header, Data, Footer });

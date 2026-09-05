@@ -1,10 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import React from "react";
-
+import type { StoryObj } from "@storybook/react-vite";
 import Table from "../components/Table";
+import { Text } from "../components/Text";
 import { type ColorVariant, type SizeVariant, type WeightVariant } from "../types/common";
 import "../index.css";
 import { TABLE_SAMPLE_USERS } from "../TESTINGDATA/tableData";
+import { createMemoryRouter, RouterProvider } from "react-router";
+import type { ReactElement } from "react";
 
 // Custom args type
 type TableArgs = {
@@ -76,6 +77,21 @@ const meta = {
         layout: "centered",
     },
     tags: ["autodocs"],
+    decorators: [
+        (Story: (props?: unknown) => ReactElement) => {
+            const router = createMemoryRouter(
+                [
+                    {
+                        path: "/",
+                        element: <Story />,
+                    },
+                ],
+                { initialEntries: ["/"] }
+            );
+
+            return <RouterProvider router={router} />;
+        },
+    ],
     argTypes: {
         children: { table: { disable: true } },
         pagination: { table: { disable: true } },
@@ -546,6 +562,60 @@ export const CustomPaginationColors: Story = {
         docs: {
             description: {
                 story: "Table with custom pagination colors (crimson background with cream text).",
+            },
+        },
+    },
+};
+
+export const WithFooter: Story = {
+    args: {
+        maxItems: 3,
+    },
+    render: (args) => {
+        const paginationConfig = {
+            maxItems: args.maxItems,
+            borderedTop: true,
+            borderVariant: args.borderVariant,
+            bgVariant: args.bgVariant,
+            textVariant: args.textVariant,
+            textSize: args.textSize,
+            textWeight: args.textWeight,
+        };
+
+        return (
+            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
+                <Table.Row borderedBottom>
+                    <Table.Header text="Name" nowrap />
+                    <Table.Header text="Contact No." nowrap />
+                    <Table.Header text="Role" nowrap />
+                    <Table.Header text="Branch" nowrap />
+                    <Table.Header text="Status" nowrap />
+                </Table.Row>
+
+                {TABLE_SAMPLE_USERS.map((user, i) => (
+                    <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
+                        <Table.Data text={user.name} nowrap />
+                        <Table.Data text={user.contact} nowrap />
+                        <Table.Data text={user.role} nowrap />
+                        <Table.Data text={user.branch} nowrap />
+                        <Table.Data text={user.status} nowrap />
+                    </Table.Row>
+                ))}
+
+                <Table.Footer>
+                    <Table.Data colSpan={6}>
+                        <Text variant="crimson" weight="bold" align="center">
+                            Total: {TABLE_SAMPLE_USERS.length}
+                        </Text>
+                    </Table.Data>
+                </Table.Footer>
+            </Table>
+        );
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Table with a persistent footer row showing the total count. The footer is not affected by pagination and always displays at the bottom.",
             },
         },
     },

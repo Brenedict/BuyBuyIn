@@ -190,10 +190,8 @@ function Table({
         >
             <table className="table-auto w-full ">
                 <thead>{header}</thead>
-                <tbody className="[&_tr:last-child]:border-b-0! ">
-                    {paginatedRows ?? rows}
-                    {footerChildren}
-                </tbody>
+                <tbody className="[&_tr:last-child]:border-b-0! ">{paginatedRows ?? rows}</tbody>
+                <tfoot>{footerChildren}</tfoot>
             </table>
             {pagination && (
                 <section

@@ -42,5 +42,12 @@ export const TABLE_SAMPLE_USERS = [
             branch: "Branch South, Quezon",
             status: "Pending",
         },
+        {
+            name: "Gab",
+            contact: "09423456789",
+            role: "Cashier",
+            branch: "Branch West, Pasay",
+            status: "Active",
+        },
     ]),
 ];

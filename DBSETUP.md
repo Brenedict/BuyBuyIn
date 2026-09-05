@@ -16,7 +16,7 @@ This covers the local installation and configuration of PostgreSQL for the proje
 Ensure `psql` is available in your terminal by running:
 
 ```bash
-psql --version`
+psql --version
 ```
 
 If you receive an error, you must add PostgreSQL to your system's PATH:

@@ -14,6 +14,8 @@ export interface IconProps {
     size: SizeVariant;
     variant: ColorVariant;
     align?: AlignVariant;
+    active?: boolean;
+    activeVariant?: ColorVariant;
     bg?: {
         variant: ColorVariant;
         type: "normal" | "circle";
@@ -21,8 +23,9 @@ export interface IconProps {
     };
 }
 
-function Icon({ icon, size, variant, bg, align = "center" }: IconProps) {
+function Icon({ icon, size, variant, active = false, activeVariant, bg, align = "center" }: IconProps) {
     const IconType = icon;
+    const effectiveVariant = active && activeVariant ? activeVariant : variant;
 
     // Get background styles if it exists
     const bgStyles = bg
@@ -32,7 +35,7 @@ function Icon({ icon, size, variant, bg, align = "center" }: IconProps) {
     return (
         <div className={` aspect-square flex w-fit ${AlignClasses[align]} items-center ${bgStyles}`}>
             <IconType
-                className={`${ColorClasses[variant].text}  stroke-0 `}
+                className={`${ColorClasses[effectiveVariant].text}  stroke-0 `}
                 style={{ fontSize: `var(--${SizeClasses[size]})` }}
             />
         </div>

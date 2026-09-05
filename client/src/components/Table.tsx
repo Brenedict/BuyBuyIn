@@ -89,26 +89,15 @@ interface PaginationControlsProps {
 }
 
 function PaginationControls({ page, handleLeftClick, handleRightClick, handleInputChange }: PaginationControlsProps) {
-    const [activeButton, setActiveButton] = useState<"left" | "right" | null>(null);
-
     return (
         <div className="flex items-center">
             <Button
-                size="small"
+                size="medium"
                 variant="grey"
-                className="rounded-none! rounded-l-2xl! border-0!"
-                onMouseDown={() => setActiveButton("left")}
-                onMouseUp={() => setActiveButton(null)}
-                onMouseLeave={() => setActiveButton(null)}
+                className="rounded-none! rounded-l-2xl! border-0! p-1!"
                 onClick={handleLeftClick}
-            >
-                <Icon
-                    size="big"
-                    variant={activeButton === "left" ? "brown" : "cream"}
-                    icon={KeyboardArrowLeftOutlinedIcon}
-                />
-            </Button>
-
+                leftIcon={KeyboardArrowLeftOutlinedIcon}
+            />
             <input
                 type="text"
                 size={2}
@@ -117,20 +106,12 @@ function PaginationControls({ page, handleLeftClick, handleRightClick, handleInp
                 className="w-fit min-w-6 h-full text-center bg-white outline-0 border-brown border-y-2 px-1"
             />
             <Button
-                size="small"
+                size="medium"
                 variant="grey"
-                className="rounded-none! rounded-r-2xl! border-0!"
-                onMouseDown={() => setActiveButton("right")}
-                onMouseUp={() => setActiveButton(null)}
-                onMouseLeave={() => setActiveButton(null)}
+                className="rounded-none! rounded-r-2xl! border-0! p-1!"
                 onClick={handleRightClick}
-            >
-                <Icon
-                    size="big"
-                    variant={activeButton === "right" ? "brown" : "cream"}
-                    icon={KeyboardArrowRightOutlinedIcon}
-                />
-            </Button>
+                leftIcon={KeyboardArrowRightOutlinedIcon}
+            />
         </div>
     );
 }

@@ -76,4 +76,6 @@ npm run dev
 ```
 
 * **Frontend:** Open `http://localhost:5173` in your browser.
-* **Backend API Test:** Open `http://localhost:3000/api/v1/auth/protected` in your browser. If your setup is correct,
+* **Backend API Test:** Open `http://localhost:3000/api/v1/auth/protected` in your browser. 
+
+If your setup is correct, it should return a JSON response similar to `{"message":"Authentication passed"}`

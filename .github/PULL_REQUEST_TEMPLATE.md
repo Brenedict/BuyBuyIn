@@ -24,16 +24,35 @@ Please select the option that best describes your changes:
 
 **Example Setup Steps:**
 
-1. Switch to this branch:
+1. Ensure your main branch is up to date
 
-```
-git checkout <branch-name>
+```bash
+git pull origin main
 ```
 
-2. Pull the latest changes:
+2. Ensure your git sees this branch
 
+```bash
+git fetch --all
 ```
-git pull origin <branch-name>
+
+3. Switch to this branch:
+
+```bash
+git checkout <your-branch-name>
+```
+
+3. Pull the latest changes in case there were late pushes:
+
+```bash
+git pull origin <your-branch-name>
+```
+
+4. Wait for the dependencies to install first
+
+```bash
+# You should be in the root branch: /BuyBuyIn
+npm install
 ```
 
 ## Test Cases Checklist

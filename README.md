@@ -12,6 +12,7 @@ This repository is an npm-workspaces monorepo split into three packages:
 
 1. You should first open the [» BuyBuyIn Kanban Board](https://github.com/users/Brenedict/projects/5).
 2. To understand how to contribute, see [» CONTRIBUTING.md](./CONTRIBUTING.md) for the full workflow. Code style is enforced via the root `.prettierrc` and each package's ESLint config. Meaning you **SHOULD** have the `prettier code` extension in your text editor (e.g. Visual Studio Code).
+3. For local database setup and configuration, see [» DBSETUP.md](./DBSETUP.md).
 
 ---
 

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 // import Icon, { type IconProps } from "../components/Icon.tsx";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-import  Button  from "../components/Button";
+import { Button } from "../components/Button";
 import "../index.css";
 
 const meta = {
@@ -12,8 +12,7 @@ const meta = {
         layout: "centered",
         docs: {
             description: {
-                component:
-                    "Button component to be used as primary template for all buttons in the project",
+                component: "Button component to be used as primary template for all buttons in the project",
             },
         },
     },
@@ -41,7 +40,7 @@ export const LeftIconAndButtonExample: Story = {
         size: "medium",
         variant: "grey",
         children: "Dropdown",
-        leftIcon: ArrowDropDownIcon
+        leftIcon: ArrowDropDownIcon,
     },
     parameters: {
         docs: {
@@ -70,11 +69,10 @@ export const RightIconAndButtonExample: Story = {
         size: "medium",
         variant: "secondary",
         children: "Dropdown",
-        rightIcon: ArrowDropDownIcon
+        rightIcon: ArrowDropDownIcon,
     },
     parameters: {
-        docs: {
-        },
+        docs: {},
     },
     render: (args) => <Button {...args}>{args.children}</Button>,
 };

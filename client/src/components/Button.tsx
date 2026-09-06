@@ -54,11 +54,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     leftIcon?: MaterialIcon;
     rightIcon?: MaterialIcon;
     iconExtraClass?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 // Main logic of the Button component
-function Button({
+export function Button({
     variant = "main",
     size = "medium",
     leftIcon,
@@ -70,7 +70,7 @@ function Button({
 }: ButtonProps) {
     return (
         <button
-            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${className} flex items-center`}
+            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${className} flex items-center justify-center`}
             {...props}
         >
             {leftIcon && (
@@ -83,5 +83,3 @@ function Button({
         </button>
     );
 }
-
-export default Button;

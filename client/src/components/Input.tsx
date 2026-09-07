@@ -11,48 +11,49 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Text } from "./Text";
+import { Button } from "./Button";
 
 interface LabelProp {
     htmlFor?: string;
     label?: ReactNode;
+    boldLabel?: boolean;
     isRequired?: boolean;
     error?: string;
 }
 
 interface InputProp extends React.InputHTMLAttributes<HTMLInputElement> {
-    placeholder?: string;
+    boldLabel?: boolean;
     error?: string;
 }
 
 interface TextAreaProp extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-    placeholder?: string;
-    hidden?: boolean;
-    error?: string;
-}
-
-interface SelectProp extends React.SelectHTMLAttributes<HTMLSelectElement> {
-    optionList: Array<{ content: string; value: string }>;
+    boldLabel?: boolean;
     hidden?: boolean;
     error?: string;
 }
 
 interface GeneralInputProp extends LabelProp, InputProp {
+    boldLabel?: boolean;
     type: "text" | "email" | "number" | "time" | "date" | "datetime-local";
     hidden?: boolean;
 }
 
 const InputStyles = {
     error: (error: string | undefined): string => (error ? "border-crimson" : "border-brown"),
-
-    // TODO: This is currently temporary, for improvement refer to Issue #25
-    disabled: " disabled:text-slate-light disabled:border-slate-light disabled:font-normal disabled:cursor-not-allowed",
+    disabled: (disabled: boolean): string =>
+        disabled
+            ? " disabled:text-slate-light disabled:border-slate-light disabled:font-normal disabled:cursor-not-allowed"
+            : "",
 };
 
-function Label({ htmlFor, label, isRequired }: LabelProp) {
+function Label({ htmlFor, label, boldLabel = true, isRequired }: LabelProp) {
     if (!label) return null;
 
     return (
-        <label htmlFor={htmlFor} className="text-big font-bold block w-full mb-1 text-brown">
+        <label
+            htmlFor={htmlFor}
+            className={`text-big block w-full mb-1 text-brown ${boldLabel ? "font-bold" : "font-normal"}`}
+        >
             {label}
             {isRequired && (
                 <span className="text-crimson ml-1" aria-hidden="true">
@@ -69,12 +70,25 @@ function ErrorMessage({ error }: { error?: string }) {
 }
 
 function BaseInput({ className, error, type, ...props }: InputProp) {
-    const requiresNonWhitespace = type === "text" || type === "search" || !type;
-    const errorStyle = InputStyles.error(error);
-    const disabledStyle = InputStyles.disabled;
+    // Extracts native input  attribute
+    const { disabled, placeholder } = props;
 
+    // Sets to default false if disabled is not provided as an argument
+    const isDisabled: boolean = disabled ?? false;
+
+    // Sets a default placeholder so input is never blank
+    const placeholderText = placeholder ?? "Enter something here...";
+
+    // Determines fix styles when input has error/is disabled
+    const errorStyle = InputStyles.error(error);
+    const disabledStyle = InputStyles.disabled(isDisabled ?? false);
+
+    const requiresNonWhitespace = type === "text" || type === "search" || !type;
+
+    // Used to hold input element (equivalent to document.getElementById)
     const inputRef = useRef<HTMLInputElement | null>(null);
 
+    // Handles native clearing logic from input of search type
     const handleClear = () => {
         const input = inputRef.current;
         if (!input) {
@@ -106,16 +120,20 @@ function BaseInput({ className, error, type, ...props }: InputProp) {
                 type={type}
                 pattern={requiresNonWhitespace ? ".*\\S+.*" : undefined}
                 title={requiresNonWhitespace ? "This field cannot be empty or just spaces." : undefined}
-                disabled
                 aria-invalid={!!error}
                 ref={inputRef}
                 {...props}
-                className={`rounded-xl! text-medium! py-2! block font-medium border border-slate-dark focus:outline-none focus:ring-2 focus:ring-slate-medium/0 focus:border-slate-dark
-                ${errorStyle}
-                ${disabledStyle} 
-                [&::-webkit-search-cancel-button]:hidden bg-cream w-full placeholder-slate-light ${className}`}
+                placeholder={placeholderText}
+                className={`
+                    rounded-xl! text-medium! py-2! block font-medium border border-slate-dark 
+                    [&::-webkit-search-cancel-button]:hidden calendar-icon-brown bg-cream w-full placeholder-slate-light 
+                    focus:outline-none focus:ring-1 focus:ring-slate-dark
+                    ${errorStyle}
+                    ${disabledStyle} 
+                    ${className}
+                `}
             />
-            {type === "search" && (
+            {type === "search" && !isDisabled && (
                 <button
                     type="button"
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-brown hover:text-slate-light hover:cursor-pointer focus:outline-none"
@@ -125,6 +143,8 @@ function BaseInput({ className, error, type, ...props }: InputProp) {
                     <ClearIcon />
                 </button>
             )}
+
+            {type === "date" && !isDisabled && <div className="absolute top-0 h-11 right-13 w-px bg-slate-dark"></div>}
         </div>
     );
 }
@@ -133,6 +153,7 @@ export function GeneralInput({
     type,
     placeholder,
     label,
+    boldLabel,
     className = "",
     hidden = false,
     isRequired,
@@ -141,7 +162,7 @@ export function GeneralInput({
 }: GeneralInputProp) {
     return (
         <div className={`w-full ${hidden ? "hidden" : ""}`}>
-            <Label htmlFor={props.id} label={label} isRequired={isRequired} />
+            <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
             <BaseInput
                 type={type}
                 placeholder={placeholder}
@@ -197,8 +218,8 @@ export function PasswordInput({
 }
 
 export function TextAreaInput({
-    placeholder,
     label,
+    boldLabel,
     className = "",
     hidden = false,
     isRequired,
@@ -206,8 +227,18 @@ export function TextAreaInput({
     onChange,
     ...props
 }: LabelProp & TextAreaProp) {
+    // Extracts native input  attribute
+    const { disabled, placeholder } = props;
+
+    // Sets to default false if disabled is not provided as an argument
+    const isDisabled: boolean = disabled ?? false;
+
+    // Sets a default placeholder so input is never blank
+    const placeholderText = placeholder ?? "Enter something here...";
+
+    // Determines fix styles when input has error/is disabled
     const errorStyle = InputStyles.error(error);
-    const disabledStyle = InputStyles.disabled;
+    const disabledStyle = InputStyles.disabled(isDisabled);
 
     const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const textValue = e.target.value;
@@ -221,91 +252,60 @@ export function TextAreaInput({
     };
 
     return (
-        <div className={`text-dark-blue w-full ${hidden ? "hidden" : ""}`}>
-            <Label htmlFor={props.id} label={label} isRequired={isRequired} />
+        <div className={`w-full ${hidden ? "hidden" : ""}`}>
+            <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
 
             <textarea
-                placeholder={placeholder}
                 required={isRequired}
                 aria-required={isRequired}
                 aria-invalid={!!error}
                 onChange={handleTextAreaChange}
-                className={`block rounded-2xl text-description font-normal px-4 py-3 scroll-px-4 scroll-py-3 border 
+                {...props}
+                placeholder={placeholderText}
+                className={`
+                    block rounded-xl text-description font-normal px-4 py-3 scroll-px-4 scroll-py-3 border border-slate-dark
+                    bg-cream w-full min-h-20 resize-none placeholder-slate-light  
+                    focus:outline-none focus:ring-1 focus:ring-slate-dark focus:border-slate-dark
                     ${errorStyle} 
                     ${disabledStyle} 
-                    bg-off-white w-full min-h-20 resize-none placeholder-grayish-blue ${className}`}
-                {...props}
+                    ${className}
+                    `}
             ></textarea>
             <ErrorMessage error={error} />
         </div>
     );
 }
 
-export function SearchInput({ placeholder, className = "", hidden = false, error, ...props }: LabelProp & InputProp) {
+export function SearchInput({
+    className = "",
+    hidden = false,
+    isRequired,
+    label,
+    boldLabel,
+    error,
+    ...props
+}: LabelProp & InputProp) {
+    // Extracts native input  attribute
+    const { disabled } = props;
+
+    // Sets to default false if disabled is not provided as an argument
+    const isDisabled: boolean = disabled ?? false;
+
+    // Changes search icon style depending on when the input is disabled
+    const searchIconStyle = isDisabled ? "text-slate-light" : "text-brown";
+
     return (
         <div className={`w-full relative ${hidden ? "hidden" : ""}`}>
+            <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
+
             <BaseInput
                 type="search"
-                placeholder={placeholder}
                 className={`pl-10 text-sm py-2 px-4 rounded-3xl ${className}`}
                 error={error}
                 {...props}
             />
-            <SearchOutlinedIcon className="text-brown stroke-0 absolute bottom-2 left-3.5 text-big-medium!" />
-            <ErrorMessage error={error} />
-        </div>
-    );
-}
 
-export function SelectInputOld({
-    label,
-    className = "",
-    iconClassName = "",
-    optionList,
-    hidden = false,
-    isRequired,
-    error,
-    ...props
-}: LabelProp & SelectProp & { iconClassName?: string }) {
-    const errorStyle = InputStyles.error(error);
-    const disabledStyle = InputStyles.disabled;
-    return (
-        <div className={`text-dark-blue relative w-full ${hidden ? "hidden" : ""}`}>
-            <Label label={label} isRequired={isRequired} />
-
-            <div className="flex items-center">
-                <select
-                    required={isRequired}
-                    aria-required={isRequired}
-                    aria-invalid={!!error}
-                    className={`appearance-none block rounded-2xl text-description font-normal px-4 py-3 border pr-8 
-                        ${errorStyle} 
-                        ${disabledStyle} 
-                        bg-cream w-full placeholder-slate-light hover:bg-off-white-border transition-colors ${className}`}
-                    {...props}
-                >
-                    {isRequired && (
-                        <option value="" disabled hidden>
-                            Select an option...
-                        </option>
-                    )}
-
-                    {optionList.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.content}
-                        </option>
-                    ))}
-                </select>
-
-                <div
-                    className={`absolute right-3 shrink-0 -ml-10 pointer-events-none border-l flex pl-2 py-[14px] ${iconClassName}`}
-                >
-                    <div className="bg-crimson ">
-                        <Icon icon={ArrowDropDownOutlinedIcon} size="medium" variant="cream" />
-                    </div>
-                </div>
-            </div>
-
+            <SearchOutlinedIcon className={`text-big-medium stroke-0 absolute bottom-2 left-3.5 ${searchIconStyle}`} />
             <ErrorMessage error={error} />
         </div>
     );
@@ -343,54 +343,130 @@ function Option({ value, children }: { value: string; children: ReactNode }) {
     );
 }
 
+function SelectInputDefaultVariant({
+    isOpen,
+    setIsOpen,
+    selectedValue,
+    setSelectedValue,
+    className,
+}: SelectContextType & { className?: string }) {
+    const isOpenStyle = isOpen ? "rounded-t-xl border-2! border-slate-dark!" : "rounded-2xl";
+
+    return (
+        <section
+            onClick={() => setIsOpen((open) => !open)}
+            className={`
+                flex justify-between items-center px-4 border   
+                bg-cream w-full placeholder-slate-light hover:bg-off-white-border transition-colors 
+                ${isOpenStyle}              
+                ${className}
+            `}
+        >
+            <Text variant="black" size="normal" weight="medium" className="py-3">
+                {selectedValue}
+            </Text>
+
+            <div className="flex self-stretch gap-4">
+                {/* Vertical Line Separator */}
+                <div className={`self-stretch bg-slate-dark ${isOpen ? "w-0.5" : "w-px"}`} />
+
+                <span className="flex items-center">
+                    <div className="bg-crimson rounded-sm">
+                        <Icon
+                            icon={ArrowDropDownOutlinedIcon}
+                            size="big"
+                            variant="cream"
+                            className={`${isOpen ? "rotate-180 transition ease-in" : "transition ease-in"}`}
+                        />
+                    </div>
+                </span>
+            </div>
+        </section>
+    );
+}
+
+function SelectInputButtonVariant({
+    isOpen,
+    setIsOpen,
+    selectedValue,
+    setSelectedValue,
+    className,
+}: SelectContextType & { className?: string }) {
+    return (
+        <Button
+            onClick={() => setIsOpen((open) => !open)}
+            variant="main"
+            size="medium"
+            className={`transition ease-in ${className}`}
+            rightIcon={ArrowDropDownOutlinedIcon}
+            iconExtraClass={`${isOpen ? "rotate-180 transition ease-in " : "transition ease-in "}`}
+        >
+            {selectedValue}
+        </Button>
+    );
+}
+
 export function SelectInput({
     name,
     children,
     defaultValue,
+    variant = "default",
     className,
 }: {
     name: string;
     children: ReactNode;
     defaultValue: string;
+    variant?: "default" | "button";
     className?: string;
 }) {
+    const selectInputParentRef = useRef<HTMLDivElement | null>(null);
+
+    // State management for dropdown modal
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(defaultValue);
 
-    const isOpenStyle = isOpen ? "rounded-t-xl" : "rounded-2xl";
+    const isDefaultVariant = variant === "default";
+
+    // Custom style for options dropdown depending on variant
+    const dropdownVariantStyle = isDefaultVariant
+        ? "w-full rounded-b-xl border-b  border-x"
+        : "mt-1 min-w-40 rounded-xl border";
+
+    document.addEventListener("click", function (event) {
+        // Check if the click is outside of the select input
+        if (selectInputParentRef.current && !selectInputParentRef.current.contains(event.target as Node)) {
+            setIsOpen(false);
+        }
+    });
 
     return (
-        <div className="w-full relative">
+        <div className="w-full relative" ref={selectInputParentRef}>
             <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue }}>
                 {/* hidden input that holds data of dropdown */}
                 <input hidden type="text" name={name} value={selectedValue} />
 
-                <section
-                    onClick={() => setIsOpen((open) => !open)}
-                    className={`flex justify-between items-center 
-                             px-4 border   
-                             ${isOpenStyle}              
-                        bg-cream w-full placeholder-slate-light hover:bg-off-white-border transition-colors ${className}`}
-                >
-                    <Text variant="black" size="normal" weight="medium" className="py-3">
-                        {selectedValue}
-                    </Text>
-
-                    <div className="flex self-stretch gap-4">
-                        {/* Vertical Line Separator */}
-                        <div className="w-px self-stretch bg-slate-dark" />
-
-                        <span className="flex items-center">
-                            <div className="bg-crimson rounded-sm">
-                                <Icon icon={ArrowDropDownOutlinedIcon} size="big" variant="cream" />
-                            </div>
-                        </span>
-                    </div>
-                </section>
+                {isDefaultVariant ? (
+                    <SelectInputDefaultVariant
+                        isOpen={isOpen}
+                        setIsOpen={setIsOpen}
+                        selectedValue={selectedValue}
+                        setSelectedValue={setSelectedValue}
+                        className={className}
+                    />
+                ) : (
+                    <SelectInputButtonVariant
+                        isOpen={isOpen}
+                        setIsOpen={setIsOpen}
+                        selectedValue={selectedValue}
+                        setSelectedValue={setSelectedValue}
+                        className={className}
+                    />
+                )}
 
                 {isOpen && (
-                    <section className="absolute max-h-41 overflow-auto z-100 rounded-b-xl w-full border-b border-x max-h-">
-                        {children}
+                    // This is nested so that the scrollbar properly follows the border radius
+                    <section className={`absolute z-100 max-h-41 overflow-hidden ${dropdownVariantStyle}`}>
+                        <div className="max-h-41 overflow-auto">{children}</div>
                     </section>
                 )}
             </SelectContext.Provider>

@@ -1,5 +1,5 @@
 // General Imports
-import { useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useRef, useState, type ReactNode } from "react";
 
 // Components
 import Icon from "./Icon";
@@ -257,7 +257,7 @@ export function SearchInput({ placeholder, className = "", hidden = false, error
     );
 }
 
-export function SelectInput({
+export function SelectInputOld({
     label,
     className = "",
     iconClassName = "",
@@ -310,6 +310,91 @@ export function SelectInput({
         </div>
     );
 }
+
+interface SelectContextType {
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedValue: string;
+    setSelectedValue: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const SelectContext = createContext<SelectContextType | null>(null);
+
+function Option({
+    value,
+    children,
+    defaultSelected,
+}: {
+    value: string;
+    children: ReactNode;
+    defaultSelected?: boolean;
+}) {
+    const context = useContext(SelectContext);
+
+    if (!context) {
+        throw new Error("Select.Option must be used within a Select");
+    }
+
+    const { isOpen, setIsOpen, selectedValue, setSelectedValue } = context;
+    const isSelected = selectedValue === value;
+
+    if (defaultSelected) {
+        setSelectedValue(value);
+    }
+
+    return (
+        <div
+            onClick={() => {
+                setSelectedValue(value);
+                setIsOpen(false);
+            }}
+            className={`cursor-pointer px-4 py-2 hover:bg-gray-100 ${
+                isSelected ? "bg-blue-50 font-semibold text-blue-600" : ""
+            }`}
+        >
+            {children}
+        </div>
+    );
+}
+
+export function SelectInput({ name, children, className }: { name: string; children: ReactNode; className?: string }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedValue, setSelectedValue] = useState("");
+
+    return (
+        <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue }}>
+            {/* hidden input that holds data of dropdown */}
+            <input hidden type="text" name={name} value={selectedValue} />
+
+            <section
+                onClick={() => setIsOpen((open) => !open)}
+                className={`flex justify-between items-center 
+                    block rounded-2xl text-description font-normal px-4 border 
+                        
+                        bg-cream w-full placeholder-slate-light hover:bg-off-white-border transition-colors ${className}`}
+            >
+                <div>
+                    <Text variant="black" size="normal" weight="medium" className="py-3">
+                        {selectedValue}
+                    </Text>
+                </div>
+
+                <div className="flex self-stretch">
+                    {/* Vertical Line Separator */}
+                    <div className="w-[1px] self-stretch bg-slate-dark" />
+
+                    <div className="py-3 bg-crimson rounded-sm ">
+                        <Icon icon={ArrowDropDownOutlinedIcon} size="big" variant="cream" />
+                    </div>
+                </div>
+            </section>
+
+            {isOpen && <section>{children}</section>}
+        </SelectContext.Provider>
+    );
+}
+
+SelectInput.Option = Option;
 
 export function LeftLabeledInput({ label, children }: { label: string; children: ReactNode }) {
     return (

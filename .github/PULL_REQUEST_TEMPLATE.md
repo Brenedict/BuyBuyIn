@@ -24,10 +24,10 @@ Please select the option that best describes your changes:
 
 **Example Setup Steps:**
 
-1. Ensure your main branch is up to date
+1. Ensure your development branch is up to date
 
 ```bash
-git pull origin main
+git pull origin development
 ```
 
 2. Ensure your git sees this branch

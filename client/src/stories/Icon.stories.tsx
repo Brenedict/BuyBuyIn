@@ -89,3 +89,53 @@ export const IconPreview: Story = {
         },
     },
 };
+// Directly hovering the icon itself — plain `hover:`/`active:` works fine here
+// because the icon IS the hovered element, no `group` ancestor needed.
+export const IconDirectHover: Story = {
+    args: {
+        variant: "black",
+        icon: AccountCircleOutlinedIcon,
+        size: "bigger",
+        bg: true,
+        bg_variant: "cream",
+        bg_padding: "big",
+        bg_type: "circle",
+        iconClassName: "hover:text-crimson active:text-maroon transition-colors",
+    },
+    parameters: {
+        docs: {
+            description: {
+                story:
+                    "Hover or click directly on the icon to see it change color. Since nothing wraps it, plain `hover:`/`active:` classes on `iconClassName` apply normally — no `group` needed when the icon itself is the element being interacted with.",
+            },
+        },
+    },
+};
+
+// Icon inside a `group` container, mirroring how it behaves inside Button:
+// the icon's color reacts to hovering/pressing the PARENT, not itself.
+export const IconGroupHover: Story = {
+    render: (args) => (
+        <div className="group cursor-pointer rounded-xl bg-slate-dark px-6 py-4 transition-colors hover:bg-brown active:bg-maroon">
+            <IconStoryComponent {...args} />
+        </div>
+    ),
+    args: {
+        variant: "cream",
+        icon: AccountCircleOutlinedIcon,
+        size: "bigger",
+        bg: false,
+        bg_variant: "crimson",
+        bg_padding: "big",
+        bg_type: "normal",
+        iconClassName: "transition-colors group-hover:text-brown group-active:text-maroon",
+    },
+    parameters: {
+        docs: {
+            description: {
+                story:
+                    "Hover or click anywhere on the surrounding container to see the icon's color respond. This uses Tailwind's `group`/`group-hover:`/`group-active:` pattern: the container carries the `group` class, and the icon's `iconClassName` uses `group-hover:`/`group-active:` prefixes instead of plain `hover:`/`active:`. This is the same mechanism used inside the Button component, where the icon mirrors the button's hover/active state rather than needing to be hovered directly.",
+            },
+        },
+    },
+};

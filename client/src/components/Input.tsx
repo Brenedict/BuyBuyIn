@@ -369,23 +369,22 @@ export function SelectInput({ name, children, className }: { name: string; child
             <section
                 onClick={() => setIsOpen((open) => !open)}
                 className={`flex justify-between items-center 
-                    block rounded-2xl text-description font-normal px-4 border 
-                        
+                            block rounded-2xl text-description font-normal px-4 border                 
                         bg-cream w-full placeholder-slate-light hover:bg-off-white-border transition-colors ${className}`}
             >
-                <div>
-                    <Text variant="black" size="normal" weight="medium" className="py-3">
-                        {selectedValue}
-                    </Text>
-                </div>
+                <Text variant="black" size="normal" weight="medium" className="py-3">
+                    {selectedValue}
+                </Text>
 
-                <div className="flex self-stretch">
+                <div className="flex self-stretch gap-4">
                     {/* Vertical Line Separator */}
-                    <div className="w-[1px] self-stretch bg-slate-dark" />
+                    <div className="w-px self-stretch bg-slate-dark" />
 
-                    <div className="py-3 bg-crimson rounded-sm ">
-                        <Icon icon={ArrowDropDownOutlinedIcon} size="big" variant="cream" />
-                    </div>
+                    <span className="flex items-center">
+                        <div className="bg-crimson">
+                            <Icon icon={ArrowDropDownOutlinedIcon} size="big" variant="cream" />
+                        </div>
+                    </span>
                 </div>
             </section>
 

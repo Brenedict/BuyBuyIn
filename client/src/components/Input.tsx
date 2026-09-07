@@ -1,5 +1,5 @@
 // General Imports
-import { createContext, useContext, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 
 // Components
 import Icon from "./Icon";
@@ -45,7 +45,7 @@ const InputStyles = {
     error: (error: string | undefined): string => (error ? "border-crimson" : "border-brown"),
 
     // TODO: This is currently temporary, for improvement refer to Issue #25
-    disabled: "disabled:bg-slate-100 disabled:text-slate-dark disabled:border-slate-200 disabled:cursor-not-allowed",
+    disabled: " disabled:text-slate-light disabled:border-slate-light disabled:font-normal disabled:cursor-not-allowed",
 };
 
 function Label({ htmlFor, label, isRequired }: LabelProp) {
@@ -110,7 +110,7 @@ function BaseInput({ className, error, type, ...props }: InputProp) {
                 aria-invalid={!!error}
                 ref={inputRef}
                 {...props}
-                className={`block text-normal font-medium border 
+                className={`rounded-xl! text-medium! py-2! block font-medium border border-slate-dark focus:outline-none focus:ring-2 focus:ring-slate-medium/0 focus:border-slate-dark
                 ${errorStyle}
                 ${disabledStyle} 
                 [&::-webkit-search-cancel-button]:hidden bg-cream w-full placeholder-slate-light ${className}`}
@@ -320,27 +320,15 @@ interface SelectContextType {
 
 const SelectContext = createContext<SelectContextType | null>(null);
 
-function Option({
-    value,
-    children,
-    defaultSelected,
-}: {
-    value: string;
-    children: ReactNode;
-    defaultSelected?: boolean;
-}) {
+function Option({ value, children }: { value: string; children: ReactNode }) {
     const context = useContext(SelectContext);
 
     if (!context) {
         throw new Error("Select.Option must be used within a Select");
     }
 
-    const { isOpen, setIsOpen, selectedValue, setSelectedValue } = context;
+    const { setIsOpen, selectedValue, setSelectedValue } = context;
     const isSelected = selectedValue === value;
-
-    if (defaultSelected) {
-        setSelectedValue(value);
-    }
 
     return (
         <div
@@ -348,48 +336,65 @@ function Option({
                 setSelectedValue(value);
                 setIsOpen(false);
             }}
-            className={`cursor-pointer px-4 py-2 hover:bg-gray-100 ${
-                isSelected ? "bg-blue-50 font-semibold text-blue-600" : ""
-            }`}
+            className={`cursor-pointer px-4 py-2 hover:bg-off-white hover:text-slate-dark hover:font-normal ${isSelected ? "bg-crimson font-bold text-cream" : "bg-cream"}`}
         >
             {children}
         </div>
     );
 }
 
-export function SelectInput({ name, children, className }: { name: string; children: ReactNode; className?: string }) {
+export function SelectInput({
+    name,
+    children,
+    defaultValue,
+    className,
+}: {
+    name: string;
+    children: ReactNode;
+    defaultValue: string;
+    className?: string;
+}) {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState("");
+    const [selectedValue, setSelectedValue] = useState(defaultValue);
+
+    const isOpenStyle = isOpen ? "rounded-t-xl" : "rounded-2xl";
 
     return (
-        <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue }}>
-            {/* hidden input that holds data of dropdown */}
-            <input hidden type="text" name={name} value={selectedValue} />
+        <div className="w-full relative">
+            <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue }}>
+                {/* hidden input that holds data of dropdown */}
+                <input hidden type="text" name={name} value={selectedValue} />
 
-            <section
-                onClick={() => setIsOpen((open) => !open)}
-                className={`flex justify-between items-center 
-                            block rounded-2xl text-description font-normal px-4 border                 
+                <section
+                    onClick={() => setIsOpen((open) => !open)}
+                    className={`flex justify-between items-center 
+                             px-4 border   
+                             ${isOpenStyle}              
                         bg-cream w-full placeholder-slate-light hover:bg-off-white-border transition-colors ${className}`}
-            >
-                <Text variant="black" size="normal" weight="medium" className="py-3">
-                    {selectedValue}
-                </Text>
+                >
+                    <Text variant="black" size="normal" weight="medium" className="py-3">
+                        {selectedValue}
+                    </Text>
 
-                <div className="flex self-stretch gap-4">
-                    {/* Vertical Line Separator */}
-                    <div className="w-px self-stretch bg-slate-dark" />
+                    <div className="flex self-stretch gap-4">
+                        {/* Vertical Line Separator */}
+                        <div className="w-px self-stretch bg-slate-dark" />
 
-                    <span className="flex items-center">
-                        <div className="bg-crimson">
-                            <Icon icon={ArrowDropDownOutlinedIcon} size="big" variant="cream" />
-                        </div>
-                    </span>
-                </div>
-            </section>
+                        <span className="flex items-center">
+                            <div className="bg-crimson rounded-sm">
+                                <Icon icon={ArrowDropDownOutlinedIcon} size="big" variant="cream" />
+                            </div>
+                        </span>
+                    </div>
+                </section>
 
-            {isOpen && <section>{children}</section>}
-        </SelectContext.Provider>
+                {isOpen && (
+                    <section className="absolute max-h-41 overflow-auto z-100 rounded-b-xl w-full border-b border-x max-h-">
+                        {children}
+                    </section>
+                )}
+            </SelectContext.Provider>
+        </div>
     );
 }
 

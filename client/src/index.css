@@ -33,9 +33,9 @@
     --color-crimson: #c83a24;
     --color-crimson-muted: #c83a244f;
     --color-coral: #fe7470;
-    --color-off-white: #fefced;
-    --color-cream: #f4ede5;
-    --color-cream-muted: #f4ede533;
+    --color-off-white: #f4ede5;
+    --color-cream: #fefced;
+    --color-cream-muted: #fefced33;
 
     /* ==== Typography (Sizes) ==== */
     --text-icon-hero: 4rem; /* 64px */
@@ -76,4 +76,9 @@
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-crimson) var(--color-cream);
 }

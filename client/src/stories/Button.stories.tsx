@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 // import Icon, { type IconProps } from "../components/Icon.tsx";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-import  Button  from "../components/Button";
+import { Button } from "../components/Button";
 import "../index.css";
 
 const meta = {
@@ -12,8 +12,7 @@ const meta = {
         layout: "centered",
         docs: {
             description: {
-                component:
-                    "Button component to be used as primary template for all buttons in the project",
+                component: "Button component to be used as primary template for all buttons in the project",
             },
         },
     },
@@ -39,9 +38,9 @@ export const ButtonUse: Story = {
 export const LeftIconAndButtonExample: Story = {
     args: {
         size: "medium",
-        variant: "main",
+        variant: "grey",
         children: "Dropdown",
-        leftIcon: ArrowDropDownIcon
+        leftIcon: ArrowDropDownIcon,
     },
     parameters: {
         docs: {
@@ -70,94 +69,10 @@ export const RightIconAndButtonExample: Story = {
         size: "medium",
         variant: "secondary",
         children: "Dropdown",
-        rightIcon: ArrowDropDownIcon
+        rightIcon: ArrowDropDownIcon,
     },
     parameters: {
-        docs: {
-        },
+        docs: {},
     },
     render: (args) => <Button {...args}>{args.children}</Button>,
 };
-// export const TextLeftIcon: Story = {
-//     args: {
-//         size: "bigger",
-//         weight: "bold",
-//         variant: "crimson",
-//         children: "test",
-//         font: "default",
-//         svg: {
-//             gap: "medium",
-//             icon: AccountBoxIcon,
-//             position: "left",
-//             size: "larger",
-//         },
-//     },
-//     parameters: {
-//         docs: {
-//             // Yes tama yung formatting nito, wag galawin indentation masisira yung code block - Binas
-//             description: {
-//                 story: `The \`gap\` prop controls the spacing between the icon and the text, and the \`size\` prop controls the size of the icon. The \`variant\` prop of the \`svg\` object can be used to override the color of the icon, but if not provided, it will inherit the color from the text variant. Pass an \`svg\` prop with \`position: "left"\` to render an icon before the text. 
-// \`\`\`typescript
-// const svg = {
-//     gap: "medium",
-//     icon: AccountBoxIcon,
-//     position: "left",
-//     size: "larger",
-// }
-// \`\`\`
-
-// \`\`\`typescript
-// // Usage 1: Object argument
-// <Text svg={svg}>
-//     test
-// </Text>
-// \`\`\`
-
-// \`\`\`typescript
-// // Usage 2: Raw argument
-// <Text svg={{ gap: "medium", icon: AccountBoxIcon, position: "left", size: "larger" }}>
-//     test
-// </Text>
-// \`\`\`
-//                 `,
-//             },
-//         },
-//     },
-//     render: (args) => (
-//         <Text svg={args.svg} {...args}>
-//             {args.children}
-//         </Text>
-//     ),
-// };
-
-// export const TextRightIcon: Story = {
-//     args: {
-//         size: "bigger",
-//         weight: "bold",
-//         variant: "crimson",
-//         children: "test",
-//         font: "default",
-//         svg: {
-//             gap: "medium",
-//             icon: AccountBoxIcon,
-//             position: "right",
-//             size: "larger",
-//         },
-//     },
-//     parameters: {
-//         docs: {
-//             // Yes tama yung formatting nito, wag galawin indentation masisira yung code block - Binas
-//             description: {
-//                 story: `Same thing but with \`position: "right"\` to render an icon after the text. 
-// \`\`\`typescript
-// // Example Usage: Right Position Icon
-// <Text svg={{ gap: "medium", icon: AccountBoxIcon, position: "right", size: "larger" }}>
-//     test
-// </Text>
-// \`\`\`
-//                 `,
-//             },
-//         },
-//     },
-//     render: (args) => <Text {...args}>{args.children}</Text>,
-// };

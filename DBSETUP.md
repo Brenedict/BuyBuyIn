@@ -1,0 +1,155 @@
+# Database Setup Guide
+
+This covers the local installation and configuration of PostgreSQL for the project.
+
+---
+
+## 1. Install PostgreSQL
+
+### For Windows
+
+1. Download the latest version of PostgreSQL for your operating system from [EnterpriseDB](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
+2. Run the installer. You can skip the Stack Builder portion and use the default settings for the rest of the installation. **Remember the password you set for the default `postgres` user.**
+
+### For Arch Linux
+1. Install Postgre using the package manager:
+```bash
+sudo pacman -S postgresql
+```
+2. Arch doesn't auto-initialize the data directory. Switch to the postgres user and run:
+```bash
+sudo -iu postgres initdb -D /var/lib/postgres/data
+```
+3. Enable postgresql
+```bash
+sudo systemctl enable --now postgresql
+```
+4. Verify the status of postgresql, it should display `active (running)`
+```bash
+sudo systemctl status postgresql
+```
+5. Set password using:
+```bash
+sudo -iu postgres psql -c "ALTER USER postgres PASSWORD <'yourpassword'>;"
+```
+---
+
+## 2. Verify and Configure PATH 
+
+Ensure `psql` is available in your terminal by running:
+
+```bash
+psql --version
+```
+
+### Windows
+If you receive an error, you must add PostgreSQL to your system's PATH:
+
+1. Find your PostgreSQL `bin` folder path (e.g., `C:\Program Files\PostgreSQL\16\bin`).
+2. Open Windows search and type "Edit the system environment variables".
+3. Click **Environment Variables...** at the bottom.
+4. Under _System variables_ or _User variables_, select the **Path** variable and click **Edit...**.
+5. Click **New**, paste your `bin` folder path, and click **OK** on all windows to save.
+
+
+### Linux
+1. Check if postgresql package exists on your device:
+```bash
+pacman -Qs postgresql
+```
+2. Check /usr/bin exists in path using:
+```bash
+echo $PATH
+---
+
+## 3. Project Installation
+
+Since this is a monorepo, install all dependencies from the **root** directory:
+
+```bash
+npm install
+```
+
+---
+
+## 4. Environment Variables
+
+Navigate to the `server/` directory, copy the example environment file, and rename it to `.env`:
+
+```bash
+cd server
+cp .env.example .env
+```
+
+Edit the `.env` file to include your database credentials. Replace `johndoe` with your PostgreSQL username (usually `postgres`) and `randompassword` with your actual password. Make sure the database name is set to `mydb`. If you plan to change the database name in the url make sure it maches with the databas you create for step 5:
+
+ **IMPORTANT: Special Characters in Passwords** If your password contains special characters (like `@`, `#`, `$`), you **must** URL-encode them in your `.env` connection string so Prisma can read it correctly. For example, use `%24` instead of `$`. > 
+ 
+ Reference: [MDN Percent-encoding Guide](https://developer.mozilla.org/en-US/docs/Glossary/Percent-encoding) 
+
+```env
+PORT=3000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/mydb?schema=public"
+TEST_DATABASE_URL="postgresql://postgres:yourpassword@localhost:5432/test_mydb?schema=public"
+```
+
+---
+
+## 5. Create the Database
+
+### Windows
+1. Open the **SQL Shell (psql)** from your Start menu.
+2. Press **Enter** 4 times to accept the default Server, Database, Port, and Username.
+3. Enter your PostgreSQL password.
+4. Run the following command to create your local database (must match your `.env` URL):
+
+```sql
+CREATE DATABASE mydb;
+```
+
+---
+
+5. Type `\q` and press Enter to exit.
+6. You only need to do this once. Unless you delete your created database then you have to repeat this entire step once again.
+
+---
+
+### Linux
+1. Use terminal to open psql
+```bash
+sudo -iu postgres psql
+```
+
+## 6. Prisma Setup
+
+Navigate back to the **root** folder (`BuyBuyIn/`) and run this scripts.
+
+```bash
+# Adds the schemas (tables) to your local postgres
+npm run mig:prisma
+
+# Creates prisma schema objects (used in frontend backend communication)
+npm run gen:prisma
+```
+
+## 7. Seed Data (Optional)
+
+To manually inspect the database or add dummy user data, open Prisma Studio from the root folder:
+```bash
+npm run studio:prisma
+```
+
+## 8. Run and Verify (IMPORTANT)
+
+Start both the frontend and backend servers simultaneously from the **root** folder:
+
+```bash
+npm run dev
+```
+
+- **Frontend:** Open `http://localhost:5173` in your browser.
+- **Backend API Test:** Open `http://localhost:3000/api/v1/auth/protected` in your browser.
+
+If your setup is correct, it should return a JSON response similar to `{"message":"Authentication passed"}`

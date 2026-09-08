@@ -1,12 +1,11 @@
-import { Children, isValidElement, useState, type ReactNode } from "react";
+import { Children, isValidElement, type ReactNode } from "react";
 import { Text } from "./Text";
-import Button from "./Button";
+import { Button } from "./Button";
 import { ColorClasses, type ColorVariant, type SizeVariant, type WeightVariant } from "../types/common";
 
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import { useTablePagination } from "../hooks/useTablePagination";
-import { useSearchParams } from "react-router";
 
 /* eslint-disable react-refresh/only-export-components */
 

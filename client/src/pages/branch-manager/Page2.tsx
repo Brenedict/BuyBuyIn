@@ -1,8 +1,8 @@
 import { Form } from "react-router";
-import Table from "../components/Table";
-import { useFormSearchParams } from "../hooks/useFormSearchParams";
-import { TABLE_SAMPLE_USERS } from "../TESTINGDATA/tableData";
-import Button from "../components/Button";
+import Table from "../../components/Table";
+import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+import { TABLE_SAMPLE_USERS } from "../../TESTINGDATA/tableData";
+import { Button } from "../../components/Button";
 
 export function Page2() {
     const { values, submit } = useFormSearchParams({ search: "" });

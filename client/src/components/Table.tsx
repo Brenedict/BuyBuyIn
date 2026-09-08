@@ -6,6 +6,7 @@ import { ColorClasses, type ColorVariant, type SizeVariant, type WeightVariant }
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import { useTablePagination } from "../hooks/useTablePagination";
+import { EmptyData } from "./TablePartials";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -131,6 +132,7 @@ interface TableProps extends React.HTMLAttributes<HTMLElement> {
     rounded?: boolean;
     shadow?: boolean;
     pageKey?: string;
+    emptyDataBgVariant?: ColorVariant;
     pagination?: {
         maxItems?: number;
         borderedTop?: boolean;
@@ -149,6 +151,7 @@ function Table({
     rounded = true,
     shadow = true,
     pageKey = "page",
+    emptyDataBgVariant = "cream-muted",
     ...props
 }: TableProps) {
     const childrenArray = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Row);
@@ -189,8 +192,10 @@ function Table({
         >
             <table className="table-auto w-full ">
                 <thead>{header}</thead>
-                <tbody className="[&_tr:last-child]:border-b-0! ">{paginatedRows ?? rows}</tbody>
-                <tfoot>{footerChildren}</tfoot>
+                <tbody className="[&_tr:last-child]:border-b-0! ">
+                    {rows.length > 0 ? (paginatedRows ?? rows) : <EmptyData bgVariant={emptyDataBgVariant} />}
+                    {footerChildren}
+                </tbody>
             </table>
             {pagination && (
                 <section
@@ -199,12 +204,14 @@ function Table({
                     <Text size={textSize} weight={textWeight} align="left" variant={textVariant}>
                         {paginationText}
                     </Text>
-                    <PaginationControls
-                        page={page}
-                        handleLeftClick={() => setPage(page - 1)}
-                        handleRightClick={() => setPage(page + 1)}
-                        handleInputChange={(e) => setPage(Number(e.target.value))}
-                    />
+                    {rows.length > 0 && (
+                        <PaginationControls
+                            page={page}
+                            handleLeftClick={() => setPage(page - 1)}
+                            handleRightClick={() => setPage(page + 1)}
+                            handleInputChange={(e) => setPage(Number(e.target.value))}
+                        />
+                    )}
                 </section>
             )}
         </section>

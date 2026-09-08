@@ -1,7 +1,14 @@
 import type { StoryObj } from "@storybook/react-vite";
 import Table from "../components/Table";
 import { Text } from "../components/Text";
-import { type ColorVariant, type SizeVariant, type WeightVariant } from "../types/common";
+import {
+    ColorClasses,
+    SizeClasses,
+    WeightClasses,
+    type ColorVariant,
+    type SizeVariant,
+    type WeightVariant,
+} from "../types/common";
 import "../index.css";
 import { TABLE_SAMPLE_USERS } from "../TESTINGDATA/tableData";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -14,6 +21,7 @@ type TableArgs = {
     rounded: boolean;
     shadow: boolean;
     enablePagination: boolean;
+    emptyData: boolean;
     // Header props
     headerText: string;
     headerTextVariant: ColorVariant;
@@ -38,37 +46,9 @@ type TableArgs = {
     textWeight: WeightVariant;
 };
 
-const COLOR_OPTIONS: ColorVariant[] = [
-    "black",
-    "slate",
-    "slate-dark",
-    "slate-medium",
-    "slate-light",
-    "brown",
-    "maroon",
-    "crimson",
-    "crimson-muted",
-    "cream",
-    "cream-muted",
-];
-
-const SIZE_OPTIONS: SizeVariant[] = [
-    "iconHero",
-    "larger",
-    "large",
-    "bigger",
-    "big",
-    "mediumBig",
-    "mediumSmall",
-    "medium",
-    "normal",
-    "description",
-    "small",
-    "smaller",
-    "smallest",
-];
-
-const WEIGHT_OPTIONS: WeightVariant[] = ["black", "bold", "medium", "regular", "light"];
+const COLOR_OPTIONS: ColorVariant[] = Object.keys(ColorClasses) as ColorVariant[];
+const SIZE_OPTIONS: SizeVariant[] = Object.keys(SizeClasses) as SizeVariant[];
+const WEIGHT_OPTIONS: WeightVariant[] = Object.keys(WeightClasses) as WeightVariant[];
 
 const meta = {
     title: "Table",
@@ -95,6 +75,8 @@ const meta = {
     argTypes: {
         children: { table: { disable: true } },
         pagination: { table: { disable: true } },
+        pageKey: { table: { disable: true } },
+        emptyDataBgVariant: { table: { disable: true } },
 
         // Table props
         bordered: {
@@ -115,6 +97,11 @@ const meta = {
         enablePagination: {
             control: "boolean",
             description: "Enable pagination controls",
+            table: { category: "Table" },
+        },
+        emptyData: {
+            control: "boolean",
+            description: "Show empty data table",
             table: { category: "Table" },
         },
         // Header props
@@ -234,6 +221,7 @@ const meta = {
         rounded: true,
         shadow: true,
         enablePagination: true,
+        emptyData: false,
         // Header defaults
         headerText: "Column",
         headerTextVariant: "crimson",
@@ -321,45 +309,46 @@ export const Default: Story = {
                     />
                 </Table.Row>
 
-                {TABLE_SAMPLE_USERS.map((user, i) => (
-                    <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
-                        <Table.Data
-                            text={user.name}
-                            textVariant={args.dataTextVariant}
-                            weight={args.dataWeight}
-                            size={args.dataSize}
-                            nowrap={args.dataNowrap}
-                        />
-                        <Table.Data
-                            text={user.contact}
-                            textVariant={args.dataTextVariant}
-                            weight={args.dataWeight}
-                            size={args.dataSize}
-                            nowrap={args.dataNowrap}
-                        />
-                        <Table.Data
-                            text={user.role}
-                            textVariant={args.dataTextVariant}
-                            weight={args.dataWeight}
-                            size={args.dataSize}
-                            nowrap={args.dataNowrap}
-                        />
-                        <Table.Data
-                            text={user.branch}
-                            textVariant={args.dataTextVariant}
-                            weight={args.dataWeight}
-                            size={args.dataSize}
-                            nowrap={args.dataNowrap}
-                        />
-                        <Table.Data
-                            text={user.status}
-                            textVariant={args.dataTextVariant}
-                            weight={args.dataWeight}
-                            size={args.dataSize}
-                            nowrap={args.dataNowrap}
-                        />
-                    </Table.Row>
-                ))}
+                {args.emptyData === false &&
+                    TABLE_SAMPLE_USERS.map((user, i) => (
+                        <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
+                            <Table.Data
+                                text={user.name}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.contact}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.role}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.branch}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.status}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                        </Table.Row>
+                    ))}
             </Table>
         );
     },
@@ -616,6 +605,42 @@ export const WithFooter: Story = {
         docs: {
             description: {
                 story: "Table with a persistent footer row showing the total count. The footer is not affected by pagination and always displays at the bottom.",
+            },
+        },
+    },
+};
+
+export const EmptyDataTable: Story = {
+    args: {
+        maxItems: 3,
+    },
+    render: (args) => {
+        const paginationConfig = {
+            maxItems: args.maxItems,
+            borderedTop: true,
+            borderVariant: args.borderVariant,
+            bgVariant: args.bgVariant,
+            textVariant: args.textVariant,
+            textSize: args.textSize,
+            textWeight: args.textWeight,
+        };
+
+        return (
+            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
+                <Table.Row borderedBottom>
+                    <Table.Header text="Name" nowrap />
+                    <Table.Header text="Contact No." nowrap />
+                    <Table.Header text="Role" nowrap />
+                    <Table.Header text="Branch" nowrap />
+                    <Table.Header text="Status" nowrap />
+                </Table.Row>
+            </Table>
+        );
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Table that has empty data (no rows).",
             },
         },
     },

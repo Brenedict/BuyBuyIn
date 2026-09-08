@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 interface UseTablePaginationReturn {
@@ -31,7 +31,7 @@ export function useTablePagination<T>(rows: T[], pageKey: string, maxItems: numb
     );
 
     // Clamp the page when the user directly modifies the url
-    useEffect(() => {
+    useLayoutEffect(() => {
         const clampedPageInit = () => {
             const rawParam = searchParams.get(pageKey);
             const pageParam = rawParam ? Number(rawParam) : 1;

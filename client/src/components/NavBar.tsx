@@ -1,10 +1,12 @@
-
+// General Imports
 import React from "react";
-import Icon from "./Icon";
-import type { MaterialIcon } from "../types/common";
 import { NavLink } from "react-router";
+
+// Components
+import Icon from "./Icon";
 import { Text } from "./Text";
 
+// Material UI Icons
 import BuyBuyInIcon from "@mui/icons-material/LocalOffer";
 import DashboardIcon from "@mui/icons-material/SpaceDashboard";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -16,10 +18,11 @@ import XReadIcon from "@mui/icons-material/Receipt";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-export type UserRoles =
-    | "hqadmin"
-    | "branchmanager"
-    | "cashier";
+// Types / Utils
+import { ROUTES } from "../routes/Routes";
+import type { MaterialIcon } from "../types/common";
+
+export type UserRoles = "hqadmin" | "branchmanager" | "cashier";
 
 interface NavItem {
     label: string;
@@ -36,27 +39,27 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         {
             label: "Dashboard",
             icon: DashboardIcon,
-            path: "/hq/dashboard",
+            path: ROUTES.HQ_ADMIN.dashboard,
         },
         {
             label: "Inventory",
             icon: InventoryIcon,
-            path: "/hq/inventory",
+            path: ROUTES.HQ_ADMIN.inventory,
         },
         {
             label: "Manage Users",
             icon: UsersIcon,
-            path: "/hq/manage-users",
+            path: ROUTES.HQ_ADMIN.manageUsers,
         },
         {
             label: "Subscriptions",
             icon: SubscriptionsIcon,
-            path: "/hq/subscriptions",
+            path: ROUTES.HQ_ADMIN.manageUsers,
         },
         {
             label: "Branch Wide Offers",
             icon: BranchOfferIcon,
-            path: "/hq/branch-offers",
+            path: ROUTES.HQ_ADMIN.branchOffers,
         },
     ],
 
@@ -64,27 +67,27 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         {
             label: "Dashboard",
             icon: DashboardIcon,
-            path: "/branch/dashboard",
+            path: ROUTES.BRANCH_MANAGER.dashboard,
         },
         {
             label: "Inventory",
             icon: InventoryIcon,
-            path: "/branch/inventory",
+            path: ROUTES.BRANCH_MANAGER.inventory,
         },
         {
             label: "Manage Users",
             icon: UsersIcon,
-            path: "/branch/manage-users",
+            path: ROUTES.BRANCH_MANAGER.manageUsers,
         },
         {
             label: "Transactions",
             icon: TransactionsIcon,
-            path: "/branch/transactions",
+            path: ROUTES.BRANCH_MANAGER.transactions,
         },
         {
             label: "Branch Wide Offers",
             icon: BranchOfferIcon,
-            path: "/branch/branch-offers",
+            path: ROUTES.BRANCH_MANAGER.branchOffers,
         },
     ],
 
@@ -92,22 +95,22 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         {
             label: "Dashboard",
             icon: DashboardIcon,
-            path: "/cashier/dashboard",
+            path: ROUTES.CASHIER.dashboard,
         },
         {
             label: "Transactions",
             icon: TransactionsIcon,
-            path: "/cashier/transactions",
+            path: ROUTES.CASHIER.transactions,
         },
         {
             label: "X-Read",
             icon: XReadIcon,
-            path: "/cashier/x-read",
+            path: ROUTES.CASHIER.xRead,
         },
         {
             label: "Point of Sale",
             icon: PointOfSaleIcon,
-            path: "/cashier/pos",
+            path: ROUTES.CASHIER.pointOfSale,
         },
     ],
 };
@@ -201,11 +204,7 @@ export function NavBar({ role }: NavBarProps) {
                     "
                 >
                     {items.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            className="group relative"
-                        >
+                        <NavLink key={item.path} to={item.path} className="group relative">
                             {({ isActive }) => (
                                 <>
                                     <Icon
@@ -215,10 +214,10 @@ export function NavBar({ role }: NavBarProps) {
                                         bg={
                                             isActive
                                                 ? {
-                                                    variant: "crimson",
-                                                    type: "normal",
-                                                    padding: "small",
-                                                }
+                                                      variant: "crimson",
+                                                      type: "normal",
+                                                      padding: "small",
+                                                  }
                                                 : undefined
                                         }
                                         className="transition-transform duration-150"
@@ -257,10 +256,7 @@ export function NavBar({ role }: NavBarProps) {
                                             z-50
                                         "
                                     >
-                                        <Text
-                                            variant="cream"
-                                            weight="bold"
-                                        >
+                                        <Text variant="cream" weight="bold">
                                             {item.label}
                                         </Text>
                                     </div>
@@ -315,10 +311,7 @@ export function NavBar({ role }: NavBarProps) {
                             z-50
                         "
                     >
-                        <Text
-                            variant="cream"
-                            weight="bold"
-                        >
+                        <Text variant="cream" weight="bold">
                             Log Out
                         </Text>
                     </div>
@@ -327,4 +320,3 @@ export function NavBar({ role }: NavBarProps) {
         </nav>
     );
 }
-

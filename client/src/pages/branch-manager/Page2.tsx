@@ -3,7 +3,8 @@ import Table from "../../components/Table";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import { TABLE_SAMPLE_USERS } from "../../TESTINGDATA/tableData";
 import { Button } from "../../components/Button";
-import { EditDeleteButtons } from "../../components/TablePartials";
+import { DateText, EditDeleteButtons, PrimarySecondaryText } from "../../components/TablePartials";
+import type { ReactNode } from "react";
 
 export function Page2() {
     const { values, submit } = useFormSearchParams({ search: "" });
@@ -37,6 +38,7 @@ export function Page2() {
                     <Table.Header text="Role" nowrap />
                     <Table.Header text="Branch" nowrap />
                     <Table.Header text="Status" nowrap />
+                    <Table.Header text="Created At" nowrap />
                     <Table.Header text="Action" nowrap />
                 </Table.Row>
 
@@ -58,8 +60,16 @@ export function Page2() {
                         <Table.Data text={user.name} nowrap />
                         <Table.Data text={user.contact} nowrap />
                         <Table.Data text={user.role} nowrap />
-                        <Table.Data text={user.branch} nowrap />
+                        <Table.Data>
+                            {(() => {
+                                const splitted = user.branch.split(", ");
+                                return <PrimarySecondaryText primary={splitted?.[0]} secondary={splitted?.[1]} />;
+                            })()}
+                        </Table.Data>
                         <Table.Data text={user.status} nowrap />
+                        <Table.Data>
+                            <DateText date={user.createdAt} type="datetime" />
+                        </Table.Data>
                         <Table.Data>
                             <EditDeleteButtons id={i} handleEdit={handleEdit} handleDelete={handleDelete} />
                         </Table.Data>

@@ -5,6 +5,7 @@ import { Text } from "./Text";
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import { formatFullDate, formatShortDate, formatTime } from "../utils/dateUtils";
 
 export interface ButtonActions {
     text: string;
@@ -81,4 +82,44 @@ export function EditDeleteButtons({
             ]}
         />
     );
+}
+
+function NormalText({ text }: { text: string }) {
+    return (
+        <Text size="normal" variant="brown" weight="medium">
+            {text}
+        </Text>
+    );
+}
+
+function SubText({ text }: { text: string }) {
+    return (
+        <Text size="description" variant="slate-light" weight="medium">
+            {text}
+        </Text>
+    );
+}
+
+export function PrimarySecondaryText({ primary, secondary }: { primary: string; secondary: string }) {
+    return (
+        <div className="flex flex-col justify-center items-center">
+            <NormalText text={primary} />
+            <SubText text={secondary} />
+        </div>
+    );
+}
+
+export function DateText({ date, type }: { date: Date; type: "shortdate" | "fulldate" | "datetime" | "time" }) {
+    switch (type) {
+        case "shortdate":
+            return <NormalText text={formatShortDate(date)} />;
+        case "fulldate":
+            return <NormalText text={formatFullDate(date)} />;
+        case "time":
+            return <NormalText text={formatTime(date)} />;
+        case "datetime":
+            return <PrimarySecondaryText primary={formatFullDate(date)} secondary={formatTime(date)} />;
+        default:
+            return null;
+    }
 }

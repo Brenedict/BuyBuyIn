@@ -55,6 +55,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     rightIcon?: MaterialIcon;
     iconExtraClass?: string;
     children?: React.ReactNode;
+    transition?: boolean;
 }
 
 // Main logic of the Button component
@@ -66,11 +67,14 @@ export function Button({
     children,
     iconExtraClass = "",
     className = "",
+    transition = true,
     ...props
 }: ButtonProps) {
+    const transitionClass = transition ? "hover:scale-110 active:scale-100 transition-transform transition-color" : "";
+
     return (
         <button
-            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${className} flex items-center justify-center hover:scale-110 active:scale-100 transition-transform`}
+            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${transitionClass} ${className} flex items-center justify-center `}
             {...props}
         >
             {leftIcon && (

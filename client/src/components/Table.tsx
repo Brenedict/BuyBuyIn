@@ -108,7 +108,7 @@ function PaginationControls({ page, handleLeftClick, handleRightClick, handleInp
             <Button
                 size="medium"
                 variant="grey"
-                className="rounded-none! rounded-l-2xl! border-0! p-1!"
+                className="rounded-none! rounded-l-2xl! border-0! p-1! hover:scale-100!"
                 onClick={handleLeftClick}
                 leftIcon={KeyboardArrowLeftOutlinedIcon}
             />
@@ -122,7 +122,7 @@ function PaginationControls({ page, handleLeftClick, handleRightClick, handleInp
             <Button
                 size="medium"
                 variant="grey"
-                className="rounded-none! rounded-r-2xl! border-0! p-1!"
+                className="rounded-none! rounded-r-2xl! border-0! p-1! hover:scale-100!"
                 onClick={handleRightClick}
                 leftIcon={KeyboardArrowRightOutlinedIcon}
             />

@@ -6,6 +6,7 @@ export const TABLE_SAMPLE_USERS = [
             role: "Manager",
             branch: "Branch North, Manila",
             status: "Active",
+            createdAt: new Date(),
         },
         {
             name: "Kenken",
@@ -13,6 +14,7 @@ export const TABLE_SAMPLE_USERS = [
             role: "Cashier",
             branch: "Branch South, Quezon",
             status: "Active",
+            createdAt: new Date(),
         },
         {
             name: "Romir",
@@ -20,6 +22,7 @@ export const TABLE_SAMPLE_USERS = [
             role: "Supervisor",
             branch: "Branch East, Makati",
             status: "Inactive",
+            createdAt: new Date(),
         },
         {
             name: "Richbert",
@@ -27,6 +30,7 @@ export const TABLE_SAMPLE_USERS = [
             role: "Cashier",
             branch: "Branch West, Pasay",
             status: "Active",
+            createdAt: new Date(),
         },
         {
             name: "Mark",
@@ -34,6 +38,7 @@ export const TABLE_SAMPLE_USERS = [
             role: "Manager",
             branch: "Branch North, Manila",
             status: "Active",
+            createdAt: new Date(),
         },
         {
             name: "Zyryl",
@@ -41,6 +46,7 @@ export const TABLE_SAMPLE_USERS = [
             role: "Cashier",
             branch: "Branch South, Quezon",
             status: "Pending",
+            createdAt: new Date(),
         },
         {
             name: "Gab",
@@ -48,6 +54,7 @@ export const TABLE_SAMPLE_USERS = [
             role: "Cashier",
             branch: "Branch West, Pasay",
             status: "Active",
+            createdAt: new Date(),
         },
     ]),
 ];

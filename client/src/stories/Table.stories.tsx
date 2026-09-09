@@ -224,9 +224,9 @@ const meta = {
         emptyData: false,
         // Header defaults
         headerText: "Column",
-        headerTextVariant: "crimson",
+        headerTextVariant: "off-white",
         headerWeight: "bold",
-        headerSize: "mediumBig",
+        headerSize: "normal",
         headerStyle: "capitalize",
         headerNowrap: true,
         headerBorderedBottom: true,
@@ -435,7 +435,7 @@ export const NoTableBorderStyle: Story = {
 export const UppercaseHeaders: Story = {
     args: {
         headerStyle: "uppercase",
-        headerTextVariant: "brown",
+        headerTextVariant: "off-white",
         headerWeight: "bold",
         headerSize: "medium",
         enablePagination: false,

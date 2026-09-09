@@ -13,6 +13,7 @@ import "../index.css";
 import { TABLE_SAMPLE_USERS } from "../TESTINGDATA/tableData";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import type { ReactElement } from "react";
+import { ActionButtons, EditDeleteButtons } from "../components/TablePartials";
 
 // Custom args type
 type TableArgs = {
@@ -641,6 +642,274 @@ export const EmptyDataTable: Story = {
         docs: {
             description: {
                 story: "Table that has empty data (no rows).",
+            },
+        },
+    },
+};
+
+export const WithActionButtons: Story = {
+    render: (args) => {
+        const paginationConfig = args.enablePagination
+            ? {
+                  maxItems: args.maxItems,
+                  borderedTop: args.borderedTop,
+                  borderVariant: args.borderVariant,
+                  bgVariant: args.bgVariant,
+                  textVariant: args.textVariant,
+                  textSize: args.textSize,
+                  textWeight: args.textWeight,
+              }
+            : undefined;
+
+        return (
+            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
+                <Table.Row borderedBottom={args.headerBorderedBottom}>
+                    <Table.Header
+                        text={args.headerText}
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Contact No."
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Role"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Branch"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Status"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Actions"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                </Table.Row>
+
+                {args.emptyData === false &&
+                    TABLE_SAMPLE_USERS.map((user, i) => (
+                        <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
+                            <Table.Data
+                                text={user.name}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.contact}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.role}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.branch}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.status}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data>
+                                <ActionButtons
+                                    id={i}
+                                    actions={[
+                                        {
+                                            text: "Sample button",
+                                            handleClick: (i) => {
+                                                return () => {
+                                                    alert("Clicked!");
+                                                };
+                                            },
+                                        },
+                                    ]}
+                                />
+                            </Table.Data>
+                        </Table.Row>
+                    ))}
+            </Table>
+        );
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "A fully configurable table with custom action buttons",
+            },
+        },
+    },
+};
+
+export const WithEditAndDeleteButtons: Story = {
+    render: (args) => {
+        const paginationConfig = args.enablePagination
+            ? {
+                  maxItems: args.maxItems,
+                  borderedTop: args.borderedTop,
+                  borderVariant: args.borderVariant,
+                  bgVariant: args.bgVariant,
+                  textVariant: args.textVariant,
+                  textSize: args.textSize,
+                  textWeight: args.textWeight,
+              }
+            : undefined;
+
+        return (
+            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
+                <Table.Row borderedBottom={args.headerBorderedBottom}>
+                    <Table.Header
+                        text={args.headerText}
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Contact No."
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Role"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Branch"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Status"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                    <Table.Header
+                        text="Actions"
+                        textVariant={args.headerTextVariant}
+                        weight={args.headerWeight}
+                        size={args.headerSize}
+                        style={args.headerStyle}
+                        nowrap={args.headerNowrap}
+                    />
+                </Table.Row>
+
+                {args.emptyData === false &&
+                    TABLE_SAMPLE_USERS.map((user, i) => (
+                        <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
+                            <Table.Data
+                                text={user.name}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.contact}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.role}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.branch}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data
+                                text={user.status}
+                                textVariant={args.dataTextVariant}
+                                weight={args.dataWeight}
+                                size={args.dataSize}
+                                nowrap={args.dataNowrap}
+                            />
+                            <Table.Data>
+                                <EditDeleteButtons
+                                    id={i}
+                                    handleEdit={(i) => {
+                                        return () => {
+                                            alert(`Edited: ${i}`);
+                                        };
+                                    }}
+                                    handleDelete={(i) => {
+                                        return () => {
+                                            alert(`Deleted: ${i}`);
+                                        };
+                                    }}
+                                />
+                            </Table.Data>
+                        </Table.Row>
+                    ))}
+            </Table>
+        );
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "A fully configurable table with edit and delete action buttons.",
             },
         },
     },

@@ -75,7 +75,7 @@ function OffersSection() {
     );
 }
 
-export function BranchWideOffers() {
+export function BranchManager_BranchWideOffers() {
     return (
         <Card>
             <Card.Header>

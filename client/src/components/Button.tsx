@@ -1,34 +1,34 @@
 // General Imports
-import React from "react";
+import React, { useState } from "react";
 // Components
 import Icon from "./Icon";
-import type { MaterialIcon } from "../types/common";
+import type { MaterialIcon, ColorVariant } from "../types/common";
 
-const ButtonColorClasses = {
+export const ButtonColorClasses = {
     main: {
         button: "bg-crimson text-cream font-bold hover:opacity-75 active:bg-maroon active:opacity-100 hover:cursor-pointer",
         icon: "cream",
-        iconExtra: ""
+        iconExtra: "",
     },
     secondary: {
         button: "bg-cream text-black border-2 border-black font-bold hover:bg-brown hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-brown active:text-cream active:border-cream",
         icon: "black",
-        iconExtra: "group-active:text-cream group-hover:text-cream"
+        iconExtra: "group-active:text-cream group-hover:text-cream",
     },
     //TODO: Make custom styling for the main Login button
     login: {
         button: "bg-crimson text-cream font-bold",
         icon: "cream",
-        iconExtra: ""
+        iconExtra: "",
     },
     grey: {
         button: "bg-slate-medium text-cream font-bold hover:opacity-75 hover:cursor-pointer active:opacity-100 active:text-brown active:bg-cream",
         icon: "cream",
-        iconExtra: "group-active:text-brown"
+        iconExtra: "group-active:text-brown",
     },
 } as const;
 
-type ButtonColorVariant = keyof typeof ButtonColorClasses;
+export type ButtonColorVariant = keyof typeof ButtonColorClasses;
 
 const ButtonSizeClasses = {
     small: {
@@ -55,6 +55,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     rightIcon?: MaterialIcon;
     iconExtraClass?: string;
     children?: React.ReactNode;
+    transition?: boolean;
 }
 
 // Main logic of the Button component
@@ -66,19 +67,32 @@ export function Button({
     children,
     iconExtraClass = "",
     className = "",
+    transition = true,
     ...props
 }: ButtonProps) {
+    const transitionClass = transition ? "hover:scale-110 active:scale-100 transition-transform transition-color" : "";
+
     return (
         <button
-            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${className} flex items-center justify-center`}
+            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${transitionClass} ${className} flex items-center justify-center `}
             {...props}
         >
             {leftIcon && (
-                <Icon icon={leftIcon} variant={ButtonColorClasses[variant].icon } iconClassName={`${ButtonColorClasses[variant].iconExtra} ${iconExtraClass}`} size={ButtonSizeClasses[size].icon} />
+                <Icon
+                    icon={leftIcon}
+                    variant={ButtonColorClasses[variant].icon}
+                    iconClassName={`${ButtonColorClasses[variant].iconExtra} ${iconExtraClass}`}
+                    size={ButtonSizeClasses[size].icon}
+                />
             )}
-            <div>{children}</div>
+            {children && <div>{children}</div>}
             {rightIcon && (
-                <Icon icon={rightIcon} variant={ButtonColorClasses[variant].icon} iconClassName={`${ButtonColorClasses[variant].iconExtra} ${iconExtraClass}`} size={ButtonSizeClasses[size].icon} />
+                <Icon
+                    icon={rightIcon}
+                    variant={ButtonColorClasses[variant].icon}
+                    iconClassName={`${ButtonColorClasses[variant].iconExtra} ${iconExtraClass}`}
+                    size={ButtonSizeClasses[size].icon}
+                />
             )}
         </button>
     );

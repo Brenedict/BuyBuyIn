@@ -1,0 +1,34 @@
+# .github/labeler.yml
+
+# Frontend changes (React app)
+frontend:
+    - changed-files:
+          - any-glob-to-any-file: "client/**/*"
+
+# Backend changes (Express server & tests)
+backend:
+    - changed-files:
+          - any-glob-to-any-file: "server/**/*"
+
+# Shared workspace changes (Prisma & Zod schemas)
+shared:
+    - changed-files:
+          - any-glob-to-any-file: "shared/**/*"
+
+# Documentation & GitHub config changes
+docs:
+    - changed-files:
+          - any-glob-to-any-file:
+                - "**/*.md"
+                - ".github/ISSUE_TEMPLATE/**/*"
+                - ".github/PULL_REQUEST_TEMPLATE.md"
+
+# Infrastructure & Root Config changes
+devops:
+    - changed-files:
+          - any-glob-to-any-file:
+                - "docker-compose.yml"
+                - ".github/workflows/**/*"
+                - "package.json"
+                - ".prettierrc"
+                - ".gitignore"

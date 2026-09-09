@@ -14,6 +14,8 @@ export interface IconProps {
     size: SizeVariant;
     variant: ColorVariant;
     align?: AlignVariant;
+    active?: boolean;
+    activeVariant?: ColorVariant;
     bg?: {
         variant: ColorVariant;
         type: "normal" | "circle";
@@ -32,7 +34,7 @@ function Icon({ icon, size, variant, bg, align = "center", className = "", iconC
         : "";
 
     return (
-        <div className={`aspect-square flex w-fit ${AlignClasses[align] } items-center ${bgStyles} ${className}`}>
+        <div className={`aspect-square flex w-fit ${AlignClasses[align]} items-center ${bgStyles} ${className}`}>
             <IconType
                 className={`${ColorClasses[variant].text}  stroke-0 ${iconClassName}`}
                 style={{ fontSize: `var(--${SizeClasses[size]})` }}

@@ -1,3 +1,81 @@
+import { Form } from "react-router";
+import Table from "../../components/Table";
+import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+import { TABLE_SAMPLE_USERS } from "../../TESTINGDATA/tableData";
+import { Button } from "../../components/Button";
+import { DateText, EditDeleteButtons, PrimarySecondaryText } from "../../components/TablePartials";
+import type { ReactNode } from "react";
+
 export function Page2() {
-    return <div>This is the page 2</div>;
+    const { values, submit } = useFormSearchParams({ search: "" });
+
+    const handleEdit = (id: string | number) => () => {
+        alert(`Edit: ${id}`);
+    };
+
+    const handleDelete = (id: string | number) => () => {
+        alert(`Delete: ${id}`);
+    };
+
+    return (
+        <>
+            <div>This is the page 2</div>
+            <Form onSubmit={submit()} className="flex gap-2 my-2">
+                <input
+                    type="text"
+                    defaultValue={values.search}
+                    name="search"
+                    className="border-2 border-crimson rounded-2xl px-2"
+                />
+                <Button type="submit" variant="main">
+                    Search
+                </Button>
+            </Form>
+            <Table bordered rounded shadow pagination={{}}>
+                <Table.Row borderedBottom>
+                    <Table.Header text="Name" nowrap />
+                    <Table.Header text="Contact No." nowrap />
+                    <Table.Header text="Role" nowrap />
+                    <Table.Header text="Branch" nowrap />
+                    <Table.Header text="Status" nowrap />
+                    <Table.Header text="Created At" nowrap />
+                    <Table.Header text="Action" nowrap />
+                </Table.Row>
+
+                {/*
+                 * NOTE:
+                 * Example lang to, ginamitan ko ng direct filter for demo lang
+                 * ideally sa loader ka ng router maghahandle  ng filters
+                 * pwede mo makuha dun mismo yung mga params
+                 */}
+                {TABLE_SAMPLE_USERS.filter(
+                    (user) =>
+                        user.name.toLowerCase().includes(values.search.toLowerCase()) ||
+                        user.contact.toLowerCase().includes(values.search.toLowerCase()) ||
+                        user.role.toLowerCase().includes(values.search.toLowerCase()) ||
+                        user.branch.toLowerCase().includes(values.search.toLowerCase()) ||
+                        user.status.toLowerCase().includes(values.search.toLowerCase())
+                ).map((user, i) => (
+                    <Table.Row key={i}>
+                        <Table.Data text={user.name} nowrap />
+                        <Table.Data text={user.contact} nowrap />
+                        <Table.Data text={user.role} nowrap />
+                        <Table.Data>
+                            {(() => {
+                                const splitted = user.branch.split(", ");
+                                return <PrimarySecondaryText primary={splitted?.[0]} secondary={splitted?.[1]} />;
+                            })()}
+                        </Table.Data>
+                        <Table.Data text={user.status} nowrap />
+                        <Table.Data>
+                            <DateText date={user.createdAt} type="datetime" />
+                        </Table.Data>
+                        <Table.Data>
+                            <EditDeleteButtons id={i} handleEdit={handleEdit} handleDelete={handleDelete} />
+                        </Table.Data>
+                    </Table.Row>
+                ))}
+            </Table>
+        </>
+    );
 }

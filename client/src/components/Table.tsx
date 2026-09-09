@@ -193,15 +193,17 @@ function Table({
     return (
         <section
             {...props}
-            className={`${shadow ? "shadow-xl" : ""} ${rounded ? "rounded-2xl" : ""} ${bordered ? "border-brown border" : ""} overflow-hidden ${props.className ?? ""} `}
+            className={`${shadow ? "shadow-xl" : ""} ${rounded ? "rounded-2xl" : ""} ${bordered ? "border-brown border" : ""} overflow-hidden  bg-off-white ${props.className ?? ""} `}
         >
-            <table className="table-auto w-full ">
-                <thead>{header}</thead>
-                <tbody className="[&_tr:last-child]:border-b-0! ">
-                    {rows.length > 0 ? (paginatedRows ?? rows) : <EmptyData bgVariant={emptyDataBgVariant} />}
-                    {footerChildren}
-                </tbody>
-            </table>
+            <div className="overflow-x-auto">
+                <table className="table-auto w-full">
+                    <thead>{header}</thead>
+                    <tbody className="[&_tr:last-child]:border-b-0! ">
+                        {rows.length > 0 ? (paginatedRows ?? rows) : <EmptyData bgVariant={emptyDataBgVariant} />}
+                        {footerChildren}
+                    </tbody>
+                </table>
+            </div>
             {pagination && (
                 <section
                     className={`${ColorClasses[bgVariant].bg} ${borderedTop ? `border-t ${ColorClasses[borderVariant].border}` : ""}  px-8 py-4  flex justify-between w-full`}

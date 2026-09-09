@@ -1,0 +1,237 @@
+import { Children, isValidElement, type ReactNode } from "react";
+import { Text } from "./Text";
+import { Button } from "./Button";
+import { ColorClasses, type ColorVariant, type SizeVariant, type WeightVariant } from "../types/common";
+
+import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
+import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
+import { useTablePagination } from "../hooks/useTablePagination";
+import { EmptyData } from "./TablePartials";
+
+/* eslint-disable react-refresh/only-export-components */
+
+interface RowProps {
+    children: ReactNode;
+    bgVariant?: ColorVariant;
+    borderedTop?: boolean;
+    borderedBottom?: boolean;
+}
+
+function Row({ children, borderedBottom = false, bgVariant = "off-white" }: RowProps) {
+    return (
+        <tr className={` border-brown   ${ColorClasses[bgVariant].bg}   ${borderedBottom ? "border-b " : ""}`}>
+            {children}
+        </tr>
+    );
+}
+
+function Footer({ children, borderedBottom = false, bgVariant = "off-white" }: RowProps) {
+    return (
+        <tr className={` border-brown   ${ColorClasses[bgVariant].bg}   ${borderedBottom ? "border-b " : ""}`}>
+            {children}
+        </tr>
+    );
+}
+
+interface HeaderProps extends Omit<React.ThHTMLAttributes<HTMLTableCellElement>, "style"> {
+    textVariant?: ColorVariant;
+    bgVariant?: ColorVariant;
+    weight?: WeightVariant;
+    size?: SizeVariant;
+    style?: "capitalize" | "uppercase";
+    text: string;
+    nowrap?: boolean;
+}
+
+function Header({
+    text,
+    nowrap = false,
+    textVariant = "off-white",
+    bgVariant = "slate-medium",
+    weight = "bold",
+    style = "capitalize",
+    size = "medium",
+    ...props
+}: HeaderProps) {
+    return (
+        <th
+            {...props}
+            className={`${nowrap ? "whitespace-nowrap" : ""} ${style} px-16 py-4 ${ColorClasses[bgVariant].bg} ${props.className} `}
+        >
+            <Text size={size} weight={weight} align="center" variant={textVariant}>
+                {text}
+            </Text>
+        </th>
+    );
+}
+
+interface DataProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+    children?: ReactNode;
+    nowrap?: boolean;
+    text?: string;
+    textVariant?: ColorVariant;
+    weight?: WeightVariant;
+    size?: SizeVariant;
+}
+
+function Data({
+    children,
+    nowrap = false,
+    text,
+    textVariant = "brown",
+    weight = "medium",
+    size = "normal",
+    ...props
+}: DataProps) {
+    return (
+        <td {...props} className={`${nowrap ? "whitespace-nowrap" : ""}  px-4 py-4 border-0 ${props.className} `}>
+            {text && (
+                <Text variant={textVariant} weight={weight} size={size} align="center">
+                    {text}
+                </Text>
+            )}
+            {children}
+        </td>
+    );
+}
+
+interface PaginationControlsProps {
+    page: number;
+    handleLeftClick: () => void;
+    handleRightClick: () => void;
+    handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function PaginationControls({ page, handleLeftClick, handleRightClick, handleInputChange }: PaginationControlsProps) {
+    return (
+        <div className="flex items-center">
+            <Button
+                size="medium"
+                variant="grey"
+                className="rounded-none! rounded-l-2xl! border-0! p-1! hover:scale-100!"
+                onClick={handleLeftClick}
+                leftIcon={KeyboardArrowLeftOutlinedIcon}
+            />
+            <input
+                type="text"
+                size={2}
+                value={page}
+                onChange={handleInputChange}
+                className="w-fit min-w-6 h-full text-center bg-off-white outline-0 border-brown border-y-2 px-1 font-sans-flex"
+            />
+            <Button
+                size="medium"
+                variant="grey"
+                className="rounded-none! rounded-r-2xl! border-0! p-1! hover:scale-100!"
+                onClick={handleRightClick}
+                leftIcon={KeyboardArrowRightOutlinedIcon}
+            />
+        </div>
+    );
+}
+
+interface TableProps extends React.HTMLAttributes<HTMLElement> {
+    children: ReactNode;
+    borderVariant?: ColorVariant;
+    bordered?: boolean;
+    rounded?: boolean;
+    shadow?: boolean;
+    pageKey?: string;
+    emptyDataBgVariant?: ColorVariant;
+    pagination?: {
+        maxItems?: number;
+        borderedTop?: boolean;
+        borderVariant?: ColorVariant;
+        bgVariant?: ColorVariant;
+        textVariant?: ColorVariant;
+        textSize?: SizeVariant;
+        textWeight?: WeightVariant;
+    };
+}
+
+function Table({
+    children,
+    pagination,
+    bordered = true,
+    rounded = true,
+    shadow = true,
+    pageKey = "page",
+    emptyDataBgVariant = "off-white",
+    ...props
+}: TableProps) {
+    const childrenArray = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Row);
+    const footerChildren = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Footer);
+    const header = childrenArray[0];
+    const rows = childrenArray.slice(1);
+
+    let paginatedRows = null;
+    let paginationText = null;
+
+    const {
+        maxItems = 5,
+        borderedTop = true,
+        borderVariant = "brown",
+        bgVariant = "off-white",
+        textVariant = "crimson",
+        textSize = "description",
+        textWeight = "medium",
+    } = pagination ?? {};
+
+    const { page, setPage } = useTablePagination(rows, pageKey, maxItems);
+
+    if (pagination) {
+        const start = (page - 1) * maxItems;
+        const end = page * maxItems;
+        const lastIndex = Math.min(end, rows.length);
+        paginatedRows = rows.slice(start, end);
+
+        paginationText = `Showing ${
+            paginatedRows.length > 0 ? `${start + 1} to ${lastIndex}` : "0"
+        } out of ${rows.length}`;
+    }
+
+    return (
+        <section
+            {...props}
+            className={`${shadow ? "shadow-xl" : ""} ${rounded ? "rounded-2xl" : ""} ${bordered ? "border-brown border" : ""} overflow-hidden  bg-off-white ${props.className ?? ""} `}
+        >
+            <div className="h-full overflow-auto overscroll-none">
+                <table className="w-full table-auto">
+                    <thead className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">{header}</thead>
+
+                    <tbody className={`${footerChildren.length > 0 ? "" : "[&_tr:last-child]:border-b-0!"}`}>
+                        {rows.length > 0 ? (paginatedRows ?? rows) : <EmptyData bgVariant={emptyDataBgVariant} />}
+                    </tbody>
+
+                    <tfoot className="[&_tr:last-child]:border-b-0! [&_th]:sticky [&_th]:bottom-0 [&_th]:z-10 [&_td]:sticky [&_td]:bottom-0 [&_td]:z-10">
+                        {footerChildren}
+                    </tfoot>
+                </table>
+            </div>
+            {pagination && (
+                <section
+                    className={`${ColorClasses[bgVariant].bg} ${borderedTop ? `border-t ${ColorClasses[borderVariant].border}` : ""}  px-8 py-4  flex justify-between w-full`}
+                >
+                    <Text size={textSize} weight={textWeight} align="left" variant={textVariant}>
+                        {paginationText}
+                    </Text>
+                    {rows.length > 0 && (
+                        <PaginationControls
+                            page={page}
+                            handleLeftClick={() => setPage(page - 1)}
+                            handleRightClick={() => setPage(page + 1)}
+                            handleInputChange={(e) => {
+                                const nextPage = Number(e.target.value);
+                                if (isNaN(nextPage)) return page;
+
+                                return setPage(nextPage);
+                            }}
+                        />
+                    )}
+                </section>
+            )}
+        </section>
+    );
+}
+
+export default Object.assign(Table, { Row, Header, Data, Footer });

@@ -54,7 +54,7 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         {
             label: "Subscriptions",
             icon: SubscriptionsIcon,
-            path: ROUTES.HQ_ADMIN.manageUsers,
+            path: ROUTES.HQ_ADMIN.subscriptions,
         },
         {
             label: "Branch Wide Offers",

@@ -24,7 +24,7 @@ function StaticLayout() {
             {/* Insert Nav */}
             <NavBar role="branchmanager"></NavBar>
 
-            <section className="p-8 grow overflow-y-auto overscroll-y-auto0">
+            <section className="p-8 grow overflow-y-auto overscroll-y-auto">
                 <Outlet />
             </section>
         </main>

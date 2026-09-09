@@ -366,7 +366,7 @@ export const WithoutPagination: Story = {
         enablePagination: false,
     },
     render: (args) => (
-        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow}>
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100">
             <Table.Row borderedBottom>
                 <Table.Header text="Name" nowrap />
                 <Table.Header text="Contact No." nowrap />
@@ -375,7 +375,7 @@ export const WithoutPagination: Story = {
                 <Table.Header text="Status" nowrap />
             </Table.Row>
 
-            {TABLE_SAMPLE_USERS.slice(0, 5).map((user, i) => (
+            {TABLE_SAMPLE_USERS.map((user, i) => (
                 <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
                     <Table.Data text={user.name} nowrap />
                     <Table.Data text={user.contact} nowrap />
@@ -403,7 +403,7 @@ export const NoTableBorderStyle: Story = {
         shadow: false,
     },
     render: (args) => (
-        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow}>
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100">
             <Table.Row>
                 <Table.Header text="Name" nowrap />
                 <Table.Header text="Contact No." nowrap />
@@ -412,7 +412,7 @@ export const NoTableBorderStyle: Story = {
                 <Table.Header text="Status" nowrap />
             </Table.Row>
 
-            {TABLE_SAMPLE_USERS.slice(0, 5).map((user, i) => (
+            {TABLE_SAMPLE_USERS.map((user, i) => (
                 <Table.Row key={i}>
                     <Table.Data text={user.name} nowrap />
                     <Table.Data text={user.contact} nowrap />
@@ -441,7 +441,7 @@ export const UppercaseHeaders: Story = {
         enablePagination: false,
     },
     render: (args) => (
-        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow}>
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100">
             <Table.Row borderedBottom>
                 <Table.Header
                     text="Name"
@@ -485,7 +485,7 @@ export const UppercaseHeaders: Story = {
                 />
             </Table.Row>
 
-            {TABLE_SAMPLE_USERS.slice(0, 5).map((user, i) => (
+            {TABLE_SAMPLE_USERS.map((user, i) => (
                 <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
                     <Table.Data text={user.name} nowrap />
                     <Table.Data text={user.contact} nowrap />

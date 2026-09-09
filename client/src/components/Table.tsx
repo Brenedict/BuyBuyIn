@@ -195,13 +195,17 @@ function Table({
             {...props}
             className={`${shadow ? "shadow-xl" : ""} ${rounded ? "rounded-2xl" : ""} ${bordered ? "border-brown border" : ""} overflow-hidden  bg-off-white ${props.className ?? ""} `}
         >
-            <div className="overflow-x-auto">
-                <table className="table-auto w-full">
-                    <thead>{header}</thead>
-                    <tbody className="[&_tr:last-child]:border-b-0! ">
+            <div className="h-full overflow-auto overscroll-none">
+                <table className="w-full table-auto">
+                    <thead className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">{header}</thead>
+
+                    <tbody className={`${footerChildren.length > 0 ? "" : "[&_tr:last-child]:border-b-0!"}`}>
                         {rows.length > 0 ? (paginatedRows ?? rows) : <EmptyData bgVariant={emptyDataBgVariant} />}
-                        {footerChildren}
                     </tbody>
+
+                    <tfoot className="[&_tr:last-child]:border-b-0! [&_th]:sticky [&_th]:bottom-0 [&_th]:z-10 [&_td]:sticky [&_td]:bottom-0 [&_td]:z-10">
+                        {footerChildren}
+                    </tfoot>
                 </table>
             </div>
             {pagination && (

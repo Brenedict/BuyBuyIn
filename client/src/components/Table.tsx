@@ -17,7 +17,7 @@ interface RowProps {
     borderedBottom?: boolean;
 }
 
-function Row({ children, borderedBottom = false, bgVariant = "cream-muted" }: RowProps) {
+function Row({ children, borderedBottom = false, bgVariant = "off-white" }: RowProps) {
     return (
         <tr className={` border-brown   ${ColorClasses[bgVariant].bg}   ${borderedBottom ? "border-b " : ""}`}>
             {children}
@@ -25,7 +25,7 @@ function Row({ children, borderedBottom = false, bgVariant = "cream-muted" }: Ro
     );
 }
 
-function Footer({ children, borderedBottom = false, bgVariant = "cream-muted" }: RowProps) {
+function Footer({ children, borderedBottom = false, bgVariant = "off-white" }: RowProps) {
     return (
         <tr className={` border-brown   ${ColorClasses[bgVariant].bg}   ${borderedBottom ? "border-b " : ""}`}>
             {children}
@@ -35,6 +35,7 @@ function Footer({ children, borderedBottom = false, bgVariant = "cream-muted" }:
 
 interface HeaderProps extends Omit<React.ThHTMLAttributes<HTMLTableCellElement>, "style"> {
     textVariant?: ColorVariant;
+    bgVariant?: ColorVariant;
     weight?: WeightVariant;
     size?: SizeVariant;
     style?: "capitalize" | "uppercase";
@@ -45,14 +46,18 @@ interface HeaderProps extends Omit<React.ThHTMLAttributes<HTMLTableCellElement>,
 function Header({
     text,
     nowrap = false,
-    textVariant = "crimson",
+    textVariant = "off-white",
+    bgVariant = "slate-medium",
     weight = "bold",
     style = "capitalize",
-    size = "mediumBig",
+    size = "medium",
     ...props
 }: HeaderProps) {
     return (
-        <th {...props} className={`${nowrap ? "whitespace-nowrap" : ""} ${style} px-16 py-6 ${props.className} `}>
+        <th
+            {...props}
+            className={`${nowrap ? "whitespace-nowrap" : ""} ${style} px-16 py-4 ${ColorClasses[bgVariant].bg} ${props.className} `}
+        >
             <Text size={size} weight={weight} align="center" variant={textVariant}>
                 {text}
             </Text>
@@ -112,7 +117,7 @@ function PaginationControls({ page, handleLeftClick, handleRightClick, handleInp
                 size={2}
                 value={page}
                 onChange={handleInputChange}
-                className="w-fit min-w-6 h-full text-center bg-white outline-0 border-brown border-y-2 px-1"
+                className="w-fit min-w-6 h-full text-center bg-off-white outline-0 border-brown border-y-2 px-1 font-sans-flex"
             />
             <Button
                 size="medium"
@@ -151,7 +156,7 @@ function Table({
     rounded = true,
     shadow = true,
     pageKey = "page",
-    emptyDataBgVariant = "cream-muted",
+    emptyDataBgVariant = "off-white",
     ...props
 }: TableProps) {
     const childrenArray = Children.toArray(children).filter((child) => isValidElement(child) && child.type === Row);
@@ -166,7 +171,7 @@ function Table({
         maxItems = 5,
         borderedTop = true,
         borderVariant = "brown",
-        bgVariant = "cream-muted",
+        bgVariant = "off-white",
         textVariant = "crimson",
         textSize = "description",
         textWeight = "medium",
@@ -209,7 +214,12 @@ function Table({
                             page={page}
                             handleLeftClick={() => setPage(page - 1)}
                             handleRightClick={() => setPage(page + 1)}
-                            handleInputChange={(e) => setPage(Number(e.target.value))}
+                            handleInputChange={(e) => {
+                                const nextPage = Number(e.target.value);
+                                if (isNaN(nextPage)) return page;
+
+                                return setPage(nextPage);
+                            }}
                         />
                     )}
                 </section>

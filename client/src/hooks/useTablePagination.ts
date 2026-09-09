@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 interface UseTablePaginationReturn {
@@ -14,44 +14,34 @@ export function useTablePagination<T>(rows: T[], pageKey: string, maxItems: numb
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = useState<number>(() => (searchParams.has(pageKey) ? Number(searchParams.get(pageKey)) : 1));
 
-    // Function to clamp the page to the number of pages
-    const setPageClamped = useCallback(
-        (page: number) => {
-            const maxPages = Math.ceil(rows.length / maxItems);
-            const clampedPage = Math.min(Math.max(page, 1), maxPages);
-
-            const newParams = new URLSearchParams(searchParams);
-            if (clampedPage !== 1) newParams.set(pageKey, clampedPage.toString());
-            else newParams.delete(pageKey);
-
-            setPage(() => clampedPage);
-            setSearchParams(newParams);
-        },
-        [maxItems, pageKey, rows.length, searchParams, setSearchParams]
-    );
-
-    // Clamp the page when the user directly modifies the url
-    useLayoutEffect(() => {
-        const clampedPageInit = () => {
-            const rawParam = searchParams.get(pageKey);
-            const pageParam = rawParam ? Number(rawParam) : 1;
+    const syncPage = useCallback(
+        (requestedPage: number) => {
             const maxPages = Math.max(1, Math.ceil(rows.length / maxItems));
-            const clampedPage = clampPage(pageParam, maxPages);
+            const clampedPage = clampPage(requestedPage, maxPages);
 
-            if (clampedPage !== page) setPage(clampedPage);
+            setPage((currentPage) => (currentPage === clampedPage ? currentPage : clampedPage));
 
-            if (clampedPage !== pageParam) {
+            const urlPage = searchParams.has(pageKey) ? Number(searchParams.get(pageKey)) : 1;
+            if (clampedPage !== urlPage) {
                 const newParams = new URLSearchParams(searchParams);
                 if (clampedPage !== 1) newParams.set(pageKey, clampedPage.toString());
                 else newParams.delete(pageKey);
                 setSearchParams(newParams);
             }
+        },
+        [maxItems, pageKey, rows.length, searchParams, setSearchParams]
+    );
+
+    useLayoutEffect(() => {
+        const initPages = async () => {
+            const pageParam = searchParams.has(pageKey) ? Number(searchParams.get(pageKey)) : 1;
+            syncPage(pageParam);
         };
-        clampedPageInit();
-    }, [pageKey, searchParams, maxItems, rows.length, page, setSearchParams]);
+        initPages();
+    }, [pageKey, searchParams, syncPage]);
 
     return {
         page,
-        setPage: setPageClamped,
+        setPage: syncPage,
     };
 }

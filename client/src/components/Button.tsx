@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Icon from "./Icon";
 import type { MaterialIcon, ColorVariant } from "../types/common";
 
-const ButtonColorClasses = {
+export const ButtonColorClasses = {
     main: {
         button: "bg-crimson text-cream font-bold hover:opacity-75 active:bg-maroon active:opacity-100 hover:cursor-pointer",
         icon: "cream",
@@ -28,7 +28,7 @@ const ButtonColorClasses = {
     },
 } as const;
 
-type ButtonColorVariant = keyof typeof ButtonColorClasses;
+export type ButtonColorVariant = keyof typeof ButtonColorClasses;
 
 const ButtonSizeClasses = {
     small: {
@@ -70,7 +70,7 @@ export function Button({
 }: ButtonProps) {
     return (
         <button
-            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${className} flex items-center justify-center`}
+            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${className} flex items-center justify-center hover:scale-110 active:scale-100 transition-transform`}
             {...props}
         >
             {leftIcon && (

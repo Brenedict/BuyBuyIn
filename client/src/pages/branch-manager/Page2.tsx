@@ -3,9 +3,18 @@ import Table from "../../components/Table";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import { TABLE_SAMPLE_USERS } from "../../TESTINGDATA/tableData";
 import { Button } from "../../components/Button";
+import { EditDeleteButtons } from "../../components/TablePartials";
 
 export function Page2() {
     const { values, submit } = useFormSearchParams({ search: "" });
+
+    const handleEdit = (id: string | number) => () => {
+        alert(`Edit: ${id}`);
+    };
+
+    const handleDelete = (id: string | number) => () => {
+        alert(`Delete: ${id}`);
+    };
 
     return (
         <>
@@ -28,6 +37,7 @@ export function Page2() {
                     <Table.Header text="Role" nowrap />
                     <Table.Header text="Branch" nowrap />
                     <Table.Header text="Status" nowrap />
+                    <Table.Header text="Action" nowrap />
                 </Table.Row>
 
                 {/*
@@ -50,6 +60,9 @@ export function Page2() {
                         <Table.Data text={user.role} nowrap />
                         <Table.Data text={user.branch} nowrap />
                         <Table.Data text={user.status} nowrap />
+                        <Table.Data>
+                            <EditDeleteButtons id={i} handleEdit={handleEdit} handleDelete={handleDelete} />
+                        </Table.Data>
                     </Table.Row>
                 ))}
             </Table>

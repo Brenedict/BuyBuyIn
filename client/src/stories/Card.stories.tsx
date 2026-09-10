@@ -7,7 +7,7 @@ import "../index.css";
 import { Button } from "../components/Button";
 
 const meta = {
-    title: "Card",
+    title: "All-Components/Card",
     component: Card,
     parameters: {
         layout: "centered",

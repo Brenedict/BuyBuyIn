@@ -5,7 +5,7 @@ import { fn } from "storybook/test";
 
 // Meta for PasswordInput
 const passwordInputMeta = {
-    title: "Input/Password",
+    title: "All-Components/Input-Components/Password",
     component: PasswordInput,
     parameters: {
         layout: "centered",

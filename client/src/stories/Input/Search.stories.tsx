@@ -5,7 +5,7 @@ import { fn } from "storybook/test";
 
 // Meta for SearchInput
 const searchMeta = {
-    title: "Input/Search",
+    title: "All-Components/Input-Components/Search",
     component: SearchInput,
     parameters: {
         layout: "centered",
@@ -14,6 +14,7 @@ const searchMeta = {
     args: {
         id: "search",
         name: "search",
+        label: "Search",
         placeholder: "Search anything here",
         onChange: fn(),
         isRequired: true,
@@ -31,19 +32,4 @@ export const SearchInputStory: Story = {
         name: "search",
         placeholder: "Search anything here",
     },
-};
-
-export const test: Story = {
-    args: {
-        id: "search",
-        name: "search",
-        placeholder: "Search anything here",
-    },
-    render: (args) => (
-        <div className="flex flex-col gap-10">
-            <SearchInput {...args} />
-            <SearchInput {...args} />
-            <SearchInput {...args} />
-        </div>
-    ),
 };

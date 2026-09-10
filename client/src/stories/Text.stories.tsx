@@ -6,7 +6,7 @@ import { Text } from "../components/Text";
 import "../index.css";
 
 const meta = {
-    title: "Text Component",
+    title: "All-Components/Text",
     component: Text,
     parameters: {
         layout: "centered",

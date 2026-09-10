@@ -6,7 +6,7 @@ import { fn } from "storybook/test";
 
 // Meta for GeneralInput
 const generalInputMeta = {
-    title: "Input/General",
+    title: "All-Components/Input-Components/General",
     component: GeneralInput,
     parameters: {
         layout: "centered",

@@ -13,6 +13,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import { Text } from "./Text";
 import { Button } from "./Button";
 
+// ------------------------ Input Types Props ------------------------
 interface LabelProp {
     htmlFor?: string;
     label?: ReactNode;
@@ -37,6 +38,29 @@ interface GeneralInputProp extends LabelProp, InputProp {
     type: "text" | "email" | "number" | "time" | "date" | "datetime-local";
     hidden?: boolean;
 }
+
+interface SelectInputProp extends LabelProp, React.SelectHTMLAttributes<HTMLSelectElement> {
+    name: string;
+    children: ReactNode;
+    defaultValue: string;
+    variant?: "default" | "button";
+}
+
+interface ChoiceProp extends React.InputHTMLAttributes<HTMLInputElement> {
+    children: React.ReactNode;
+    inputVariant?: "checkbox" | "radio";
+    stylized?: boolean;
+}
+
+// ------------------------ Required Contexts for some components ------------------------
+interface SelectContextType {
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedValue: string;
+    setSelectedValue: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const SelectContext = createContext<SelectContextType | null>(null);
 
 const InputStyles = {
     error: (error: string | undefined): string => (error ? "border-crimson" : "border-brown"),
@@ -295,7 +319,7 @@ export function SearchInput({
     const searchIconStyle = isDisabled ? "text-slate-light" : "text-brown";
 
     return (
-        <div className={`w-full relative ${hidden ? "hidden" : ""}`}>
+        <div className={`w-full relative  ${hidden ? "hidden" : ""}`}>
             <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
 
             <BaseInput
@@ -310,15 +334,6 @@ export function SearchInput({
         </div>
     );
 }
-
-interface SelectContextType {
-    isOpen: boolean;
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedValue: string;
-    setSelectedValue: React.Dispatch<React.SetStateAction<string>>;
-}
-
-const SelectContext = createContext<SelectContextType | null>(null);
 
 function Option({ value, children }: { value: string; children: ReactNode }) {
     const context = useContext(SelectContext);
@@ -407,18 +422,15 @@ function SelectInputButtonVariant({
 }
 
 export function SelectInput({
+    id,
     name,
+    label,
+    boldLabel,
     children,
     defaultValue,
     variant = "default",
     className,
-}: {
-    name: string;
-    children: ReactNode;
-    defaultValue: string;
-    variant?: "default" | "button";
-    className?: string;
-}) {
+}: SelectInputProp) {
     const selectInputParentRef = useRef<HTMLDivElement | null>(null);
 
     // State management for dropdown modal
@@ -441,6 +453,7 @@ export function SelectInput({
 
     return (
         <div className="w-full relative" ref={selectInputParentRef}>
+            <Label htmlFor={id} label={label} boldLabel={boldLabel} />
             <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue }}>
                 {/* hidden input that holds data of dropdown */}
                 <input hidden type="text" name={name} value={selectedValue} />
@@ -484,5 +497,24 @@ export function LeftLabeledInput({ label, children }: { label: string; children:
             </Text>
             {children}
         </div>
+    );
+}
+
+export function ChoiceInput({
+    children,
+    inputVariant = "checkbox",
+    stylized = false,
+    className,
+    ...props
+}: ChoiceProp) {
+    // TODO: Add additional styling here if there are special checkboxes/radios
+    const baseClass = stylized ? "" : "";
+    return (
+        <label className={`flex gap-2 ${baseClass}`}>
+            <input className={`accent-crimson ${className}`} type={inputVariant} {...props} />
+            <Text weight="medium" size="medium" variant="brown">
+                {children}
+            </Text>
+        </label>
     );
 }

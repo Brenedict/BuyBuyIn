@@ -3,6 +3,7 @@ import { Outlet, Link } from "react-router";
 import "../../index.css";
 
 import testBg from "../../assets/testbg.png";
+import { NavBar } from "../../components/NavBar";
 
 // Components
 
@@ -21,16 +22,9 @@ function StaticLayout() {
             style={{ backgroundImage: `url(${testBg})` }}
         >
             {/* Insert Nav */}
-            <div className="flex flex-col w-fit bg-red-300">
-                <Link to="/branch-wide-offers" className="p-4 text-black-300 hover:bg-gray-200">
-                    Offers
-                </Link>
-                <Link to="/page2" className="p-4 text-black-300 hover:bg-gray-200">
-                    Page 2
-                </Link>
-            </div>
+            <NavBar role="branchmanager"></NavBar>
 
-            <section className="p-8 grow overflow-y-auto overscroll-y-auto0">
+            <section className="p-8 grow overflow-y-auto overscroll-y-auto">
                 <Outlet />
             </section>
         </main>

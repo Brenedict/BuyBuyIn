@@ -1,10 +1,10 @@
 // General Imports
-import React from "react";
+import React, { useState } from "react";
 // Components
 import Icon from "./Icon";
-import type { MaterialIcon } from "../types/common";
+import type { MaterialIcon, ColorVariant } from "../types/common";
 
-const ButtonColorClasses = {
+export const ButtonColorClasses = {
     main: {
         button: "bg-crimson text-cream font-bold hover:opacity-75 active:bg-maroon active:opacity-100 hover:cursor-pointer",
         icon: "cream",
@@ -28,7 +28,7 @@ const ButtonColorClasses = {
     },
 } as const;
 
-type ButtonColorVariant = keyof typeof ButtonColorClasses;
+export type ButtonColorVariant = keyof typeof ButtonColorClasses;
 
 const ButtonSizeClasses = {
     small: {
@@ -55,6 +55,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     rightIcon?: MaterialIcon;
     iconExtraClass?: string;
     children?: React.ReactNode;
+    transition?: boolean;
 }
 
 // Main logic of the Button component
@@ -66,11 +67,14 @@ export function Button({
     children,
     iconExtraClass = "",
     className = "",
+    transition = true,
     ...props
 }: ButtonProps) {
+    const transitionClass = transition ? "hover:scale-110 active:scale-100 transition-transform transition-color" : "";
+
     return (
         <button
-            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${className} flex items-center justify-center`}
+            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${transitionClass} ${className} flex items-center justify-center `}
             {...props}
         >
             {leftIcon && (
@@ -81,7 +85,7 @@ export function Button({
                     size={ButtonSizeClasses[size].icon}
                 />
             )}
-            <div>{children}</div>
+            {children && <div>{children}</div>}
             {rightIcon && (
                 <Icon
                     icon={rightIcon}

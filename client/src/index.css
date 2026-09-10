@@ -1,14 +1,6 @@
 @import url("https://googleapis.com");
 @import "tailwindcss";
-@tailwind utilities;
 
-/* 
- * TODO: Make sure to update the styles here 
- * THIS IS FROM ANOTHER PROJECT PLEASE REDEFINE ALL OF THIS 
- * CORRESPONDING TO THE CURRENT PROJECT 
-*/
-
-/* PLACEHOLDER: Update this if needed */
 @font-face {
     font-family: "Google Sans Flex";
     src: url("./assets/google-sans-flex.ttf") format("truetype");
@@ -34,9 +26,9 @@
     --color-crimson: #c83a24;
     --color-crimson-muted: #c83a244f;
     --color-coral: #fe7470;
-    --color-off-white: #f4ede5;
-    --color-cream: #fefced;
-    --color-cream-muted: #fefced33;
+    --color-off-white: #fefced;
+    --color-cream: #f4ede5;
+    --color-cream-muted: #f4ede533;
 
     /* ==== Typography (Sizes) ==== */
     --text-icon-hero: 4rem; /* 64px */
@@ -44,6 +36,8 @@
     --text-large: 2.5rem; /* 40px */
     --text-bigger: 2rem; /* 32px */
     --text-big: 1.5rem; /* 24px */
+    --text-medium-big: 1.375rem; /* 22px */
+    --text-medium-small: 1.25rem; /* 20px */
     --text-medium: 1.125rem; /* 18px */
     --text-normal: 1rem; /* 16px */
     --text-description: 0.875rem; /* 14px */
@@ -66,7 +60,7 @@
     --background-image-hero: url("/assets/testbg.png");
 }
 
-@layer utilities {
+@layer components {
     * {
         scrollbar-width: thin;
         scrollbar-color: var(--color-crimson) var(--color-cream);

@@ -5,14 +5,13 @@ import { NavBar } from "../components/NavBar";
 import "../index.css";
 
 const meta = {
-    title: "NavBar Component",
+    title: "All-Components/NavBar",
     component: NavBar,
     parameters: {
         layout: "centered",
         docs: {
             description: {
-                component:
-                    "NavBar component to be used as primary template for all buttons in the project",
+                component: "NavBar component to be used as primary template for all buttons in the project",
             },
         },
     },

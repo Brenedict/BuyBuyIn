@@ -1,13 +1,6 @@
 @import url("https://googleapis.com");
 @import "tailwindcss";
 
-/* 
- * TODO: Make sure to update the styles here 
- * THIS IS FROM ANOTHER PROJECT PLEASE REDEFINE ALL OF THIS 
- * CORRESPONDING TO THE CURRENT PROJECT 
-*/
-
-/* PLACEHOLDER: Update this if needed */
 @font-face {
     font-family: "Google Sans Flex";
     src: url("./assets/google-sans-flex.ttf") format("truetype");
@@ -68,6 +61,11 @@
 }
 
 @layer components {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-crimson) var(--color-cream);
+    }
+
     .card-drop-shadow {
         box-shadow: 4px 4px 10px 0px rgba(68, 45, 29, 0.6);
     }
@@ -77,5 +75,10 @@
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Native way to change the calendar icon for input type date */
+    .calendar-icon-brown::-webkit-calendar-picker-indicator {
+        filter: invert(16%) sepia(21%) saturate(2206%) hue-rotate(338deg) brightness(96%) contrast(89%);
     }
 }

@@ -52,7 +52,7 @@ const SIZE_OPTIONS: SizeVariant[] = Object.keys(SizeClasses) as SizeVariant[];
 const WEIGHT_OPTIONS: WeightVariant[] = Object.keys(WeightClasses) as WeightVariant[];
 
 const meta = {
-    title: "Table",
+    title: "All-Components/Table",
     component: Table,
     parameters: {
         layout: "centered",

@@ -152,6 +152,8 @@ export function NavBar({ role }: NavBarProps) {
 
                 transition-[min-width]
                 duration-200
+
+                z-999
             "
         >
             <div

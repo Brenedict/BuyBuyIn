@@ -22,7 +22,7 @@ function IconStoryComponent({ bg, bg_variant, bg_padding, bg_type, ...rest }: Ic
 }
 
 const meta = {
-    title: "Icon",
+    title: "All-Components/Icon",
     component: IconStoryComponent, // <-- wrapper, not the real Icon
     parameters: {
         layout: "centered",
@@ -105,8 +105,7 @@ export const IconDirectHover: Story = {
     parameters: {
         docs: {
             description: {
-                story:
-                    "Hover or click directly on the icon to see it change color. Since nothing wraps it, plain `hover:`/`active:` classes on `iconClassName` apply normally — no `group` needed when the icon itself is the element being interacted with.",
+                story: "Hover or click directly on the icon to see it change color. Since nothing wraps it, plain `hover:`/`active:` classes on `iconClassName` apply normally — no `group` needed when the icon itself is the element being interacted with.",
             },
         },
     },
@@ -133,8 +132,7 @@ export const IconGroupHover: Story = {
     parameters: {
         docs: {
             description: {
-                story:
-                    "Hover or click anywhere on the surrounding container to see the icon's color respond. This uses Tailwind's `group`/`group-hover:`/`group-active:` pattern: the container carries the `group` class, and the icon's `iconClassName` uses `group-hover:`/`group-active:` prefixes instead of plain `hover:`/`active:`. This is the same mechanism used inside the Button component, where the icon mirrors the button's hover/active state rather than needing to be hovered directly.",
+                story: "Hover or click anywhere on the surrounding container to see the icon's color respond. This uses Tailwind's `group`/`group-hover:`/`group-active:` pattern: the container carries the `group` class, and the icon's `iconClassName` uses `group-hover:`/`group-active:` prefixes instead of plain `hover:`/`active:`. This is the same mechanism used inside the Button component, where the icon mirrors the button's hover/active state rather than needing to be hovered directly.",
             },
         },
     },

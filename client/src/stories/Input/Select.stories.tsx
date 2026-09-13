@@ -14,7 +14,6 @@ const selectInputMeta = {
         id: "roles",
         name: "roles",
         label: "",
-        isRequired: true,
         disabled: false,
         hidden: false,
     },

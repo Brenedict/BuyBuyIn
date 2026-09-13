@@ -46,7 +46,7 @@ interface SelectInputProp extends LabelProp, React.SelectHTMLAttributes<HTMLSele
     variant?: "default" | "button";
 }
 
-interface ChoiceProp extends React.InputHTMLAttributes<HTMLInputElement> {
+interface ChoiceProp extends LabelProp, React.InputHTMLAttributes<HTMLInputElement> {
     children: React.ReactNode;
     inputVariant?: "checkbox" | "radio";
     stylized?: boolean;
@@ -106,6 +106,7 @@ function BaseInput({ className, error, type, ...props }: InputProp) {
     // Determines fix styles when input has error/is disabled
     const errorStyle = InputStyles.error(error);
     const disabledStyle = InputStyles.disabled(isDisabled ?? false);
+    const searchStyle = "pr-10!";
 
     const requiresNonWhitespace = type === "text" || type === "search" || !type;
 
@@ -139,7 +140,8 @@ function BaseInput({ className, error, type, ...props }: InputProp) {
     };
 
     return (
-        <div className="relative w-full">
+        // NOTE: Added a min width here to prevent input from being extremely short
+        <div className="relative w-full min-w-64">
             <input
                 type={type}
                 pattern={requiresNonWhitespace ? ".*\\S+.*" : undefined}
@@ -154,6 +156,7 @@ function BaseInput({ className, error, type, ...props }: InputProp) {
                     focus:outline-none focus:ring-1 focus:ring-slate-dark
                     ${errorStyle}
                     ${disabledStyle} 
+                    ${type === "search" && searchStyle}
                     ${className}
                 `}
             />
@@ -180,10 +183,17 @@ export function GeneralInput({
     boldLabel,
     className = "",
     hidden = false,
-    isRequired,
     error,
     ...props
 }: GeneralInputProp) {
+    // Checks if native required attribute is present
+    const { required, id } = props;
+
+    // Sets to default false, ensures that when 'required' is not passed it is set to false instead of undefined
+    const isRequired = required;
+
+    console.log(id, " & ", props.id);
+
     return (
         <div className={`w-full ${hidden ? "hidden" : ""}`}>
             <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
@@ -206,10 +216,15 @@ export function PasswordInput({
     label,
     className = "",
     hidden = false,
-    isRequired,
     error,
     ...props
 }: LabelProp & InputProp) {
+    // Checks if native required attribute is present
+    const { required } = props;
+
+    // Sets to default false, ensures that when 'required' is not passed it is set to false instead of undefined
+    const isRequired = required;
+
     const [visible, setVisible] = useState<boolean>(false);
 
     const handleVisible = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -246,19 +261,21 @@ export function TextAreaInput({
     boldLabel,
     className = "",
     hidden = false,
-    isRequired,
     error,
     onChange,
     ...props
 }: LabelProp & TextAreaProp) {
-    // Extracts native input  attribute
-    const { disabled, placeholder } = props;
+    // Checks if native input attribute is present
+    const { disabled, placeholder, required } = props;
 
     // Sets to default false if disabled is not provided as an argument
     const isDisabled: boolean = disabled ?? false;
 
     // Sets a default placeholder so input is never blank
     const placeholderText = placeholder ?? "Enter something here...";
+
+    // Sets to default false, ensures that when 'required' is not passed it is set to false instead of undefined
+    const isRequired = required;
 
     // Determines fix styles when input has error/is disabled
     const errorStyle = InputStyles.error(error);
@@ -276,7 +293,8 @@ export function TextAreaInput({
     };
 
     return (
-        <div className={`w-full ${hidden ? "hidden" : ""}`}>
+        // NOTE: Added a min width here to prevent input from being extremely short
+        <div className={`w-full min-w-64 ${hidden ? "hidden" : ""}`}>
             <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
 
             <textarea
@@ -289,7 +307,7 @@ export function TextAreaInput({
                 className={`
                     block rounded-xl text-description font-normal px-4 py-3 scroll-px-4 scroll-py-3 border border-slate-dark
                     bg-cream w-full min-h-20 resize-none placeholder-slate-light  
-                    focus:outline-none focus:ring-1 focus:ring-slate-dark focus:border-slate-dark
+                    focus:outline-none focus:ring-1 focus:ring-slate-dark focus:border-slate-dark 
                     ${errorStyle} 
                     ${disabledStyle} 
                     ${className}
@@ -303,23 +321,25 @@ export function TextAreaInput({
 export function SearchInput({
     className = "",
     hidden = false,
-    isRequired,
     label,
     boldLabel,
     error,
     ...props
 }: LabelProp & InputProp) {
-    // Extracts native input  attribute
-    const { disabled } = props;
+    // Checks if native input attribute is present
+    const { disabled, required } = props;
 
     // Sets to default false if disabled is not provided as an argument
     const isDisabled: boolean = disabled ?? false;
+
+    // Sets to default false, ensures that when 'required' is not passed it is set to false instead of undefined
+    const isRequired = required;
 
     // Changes search icon style depending on when the input is disabled
     const searchIconStyle = isDisabled ? "text-slate-light" : "text-brown";
 
     return (
-        <div className={`w-full relative  ${hidden ? "hidden" : ""}`}>
+        <div className={`relative  ${hidden ? "hidden" : ""}`}>
             <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
 
             <BaseInput
@@ -367,12 +387,13 @@ function SelectInputDefaultVariant({
 }: SelectContextType & { className?: string }) {
     const isOpenStyle = isOpen ? "rounded-t-xl border-2! border-slate-dark!" : "rounded-2xl";
 
+    // NOTE: Added a minimum width here to prevent the drop down icon hitting the text
     return (
         <section
             onClick={() => setIsOpen((open) => !open)}
             className={`
                 flex justify-between items-center px-4 border   
-                bg-cream w-full placeholder-slate-light hover:bg-off-white-border transition-colors 
+                bg-cream w-full min-w-48 placeholder-slate-light hover:bg-off-white-border transition-colors 
                 ${isOpenStyle}              
                 ${className}
             `}
@@ -410,11 +431,12 @@ function SelectInputButtonVariant({
     return (
         <Button
             onClick={() => setIsOpen((open) => !open)}
+            type="button"
             variant="main"
             size="medium"
             className={`transition ease-in ${className}`}
             rightIcon={ArrowDropDownOutlinedIcon}
-            iconExtraClass={`${isOpen ? "rotate-180 transition ease-in " : "transition ease-in "}`}
+            iconExtraClass={`transition-transform duration-300 ease-in-out ${isOpen ? "rotate-180" : "rotate-0"}`}
         >
             {selectedValue}
         </Button>
@@ -504,17 +526,29 @@ export function ChoiceInput({
     children,
     inputVariant = "checkbox",
     stylized = false,
+    label,
     className,
     ...props
 }: ChoiceProp) {
+    // Checks if native required attribute is present
+    const { required } = props;
+
+    // Sets to default false, ensures that when 'required' is not passed it is set to false instead of undefined
+    const isRequired = required;
+
     // TODO: Add additional styling here if there are special checkboxes/radios
     const baseClass = stylized ? "" : "";
     return (
-        <label className={`flex gap-2 ${baseClass}`}>
-            <input className={`accent-crimson ${className}`} type={inputVariant} {...props} />
-            <Text weight="medium" size="medium" variant="brown">
-                {children}
-            </Text>
-        </label>
+        <div className={`w-full ${baseClass}`}>
+            <Label htmlFor={props.id} label={label} isRequired={isRequired} />
+            <div className="flex gap-2">
+                <input className={`accent-crimson ${className}`} type={inputVariant} {...props} />
+                <label htmlFor={props.id}>
+                    <Text weight="medium" size="medium" variant="brown">
+                        {children}
+                    </Text>
+                </label>
+            </div>
+        </div>
     );
 }

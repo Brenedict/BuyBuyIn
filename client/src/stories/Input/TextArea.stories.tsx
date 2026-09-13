@@ -15,7 +15,6 @@ const textAreaMeta = {
         name: "comment",
         label: "Comment",
         placeholder: "Enter your comment here",
-        isRequired: true,
         disabled: false,
         hidden: false,
     },

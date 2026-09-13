@@ -17,7 +17,6 @@ const searchMeta = {
         label: "Search",
         placeholder: "Search anything here",
         onChange: fn(),
-        isRequired: true,
         disabled: false,
         hidden: false,
     },

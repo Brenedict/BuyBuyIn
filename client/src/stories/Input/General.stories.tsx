@@ -19,7 +19,6 @@ const generalInputMeta = {
         placeholder: "Enter anything here",
         type: "text",
         onChange: fn(),
-        isRequired: true,
         disabled: false,
         hidden: false,
     },

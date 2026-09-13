@@ -17,7 +17,6 @@ const passwordInputMeta = {
         placeholder: "Enter password",
         label: "Password",
         onChange: fn(),
-        isRequired: true,
         disabled: false,
         hidden: false,
     },

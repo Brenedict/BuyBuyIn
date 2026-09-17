@@ -36,4 +36,15 @@ export const ROUTES = {
             branchOffers: `${base}/branch-offers`,
         };
     })(),
+
+    // ALL SUPER ADMIN ROUTES: Define all actions here for popup URL's
+    SUPER_ADMIN: (() => {
+        const base = "/super-admin";
+        return {
+            plans: `${base}/plans`,
+            businesses: `${base}/businesses`,
+            subscriptions: `${base}/subscriptions`,
+            subscriberAccounts: `${base}/subscriber-accounts`,
+        };
+    })(),
 } as const;

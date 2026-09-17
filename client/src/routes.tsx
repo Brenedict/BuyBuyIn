@@ -2,12 +2,14 @@
 import { type RouteObject } from "react-router";
 
 // Routes
+import { authRoutes } from "./routes/AuthRoutes";
 import { protectedRoutes } from "./routes/ProtectedRoutes";
 
 const routes: RouteObject[] = [
-    // TODO: Add Auth Routes for login handling here (preferrably refer to Kenneth)
-    //   ...authRoutes,
+    // Account auth related URLs
+    ...authRoutes,
 
+    // Role based URLs: /cashier, /branch-manager, /hq-admin, /super-admin
     ...protectedRoutes,
 
     // TODO: Add Error Page handling here (preferrably refer to Richard)

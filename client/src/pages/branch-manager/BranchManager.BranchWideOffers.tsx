@@ -13,3 +13,5 @@ export function BranchManager_BranchWideOffers() {
         </Card>
     );
 }
+
+export default BranchManager_BranchWideOffers;

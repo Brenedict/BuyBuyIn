@@ -1,0 +1,41 @@
+export const SAMPLE_USERS = [
+    {
+        id: 1,
+        name: "Benidict",
+        contact: "090123123123",
+        role: "Manager",
+        branch: "Branch North, Manila",
+        status: "Active",
+    },
+    {
+        id: 2,
+        name: "Boquiren",
+        contact: "090123123123",
+        role: "Manager",
+        branch: "Branch North, Manila",
+        status: "Active",
+    },
+    {
+        id: 3,
+        name: "Ken Ken",
+        contact: "090123123123",
+        role: "Cashier",
+        branch: "Branch West, Pasig",
+        status: "Suspended",
+    },
+    { id: 4, 
+        name: "Mark", 
+        contact: "090123123123", 
+        role: "Cashier", 
+        branch: "Branch West, Pasig", 
+        status: "Offline" 
+    },
+    {
+        id: 5,
+        name: "Richard",
+        contact: "090123123123",
+        role: "Manager",
+        branch: "Branch North, Quezon City",
+        status: "Offline",
+    },
+];

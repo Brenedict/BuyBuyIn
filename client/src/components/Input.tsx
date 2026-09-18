@@ -466,12 +466,16 @@ export function SelectInput({
         ? "w-full rounded-b-xl border-b  border-x"
         : "mt-1 min-w-40 rounded-xl border";
 
-    document.addEventListener("click", function (event) {
-        // Check if the click is outside of the select input
-        if (selectInputParentRef.current && !selectInputParentRef.current.contains(event.target as Node)) {
-            setIsOpen(false);
-        }
-    });
+    useEffect(() => {
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (selectInputParentRef.current && !selectInputParentRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("click", handleOutsideClick);
+        return () => document.removeEventListener("click", handleOutsideClick);
+    }, []);
 
     return (
         <div className="w-full relative" ref={selectInputParentRef}>
@@ -539,10 +543,10 @@ export function ChoiceInput({
     // TODO: Add additional styling here if there are special checkboxes/radios
     const baseClass = stylized ? "" : "";
     return (
-        <div className={`w-full ${baseClass}`}>
+        <div className={`w-full ${baseClass} ${className}`}>
             <Label htmlFor={props.id} label={label} isRequired={isRequired} />
-            <div className="flex gap-2">
-                <input className={`accent-crimson ${className}`} type={inputVariant} {...props} />
+            <div className={`flex gap-2 `}>
+                <input className={`accent-crimson`} type={inputVariant} {...props} />
                 <label htmlFor={props.id}>
                     <Text weight="medium" size="medium" variant="brown">
                         {children}

@@ -3,9 +3,9 @@ import { Text } from "./Text";
 import { Button, type ButtonProps } from "./Button";
 
 const CalculatorBtnColorClasses = {
-    cream: "border-crimson bg-cream text-brown card-glass-effect",
-    red: "border-crimson bg-crimson text-cream",
-    slate: "border-slate-medium bg-slate-medium text-cream",
+    cream: "border-crimson bg-cream text-brown card-glass-effect hover:bg-crimson hover:text-cream",
+    red: "border-crimson bg-crimson text-cream hover:bg-cream hover:text-crimson",
+    slate: "border-slate-medium bg-slate-medium text-cream hover:bg-cream hover:hover:text-slate-medium",
 } as const;
 type CalculatorBtnColorClassesVariant = keyof typeof CalculatorBtnColorClasses;
 
@@ -35,7 +35,7 @@ function Display() {
     const [displayCurrent, setDisplayCurrent] = useState<string>("");
 
     return (
-        <div className="border border-1 border-crimson rounded-[5px] min-h-[120px]">
+        <div className="border border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-white">
             <input type="text" name="display" value={displayCurrent} />
         </div>
     );
@@ -43,20 +43,21 @@ function Display() {
 
 export function Calculator() {
     const calcClass =
-        "flex flex-col justify-center items-center min-h-[680px] p-5 card-glass-effect max-w-[500px] bg-cream/60 rounded-[10px] border border-1 border-crimson";
+        "flex flex-col cursor-pointer justify-center items-center min-h-[680px] p-5 card-glass-effect max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
+    const [displayCurrent, setDisplayCurrent] = useState<string>("");
 
     return (
         <div className={calcClass}>
             <section className="flex flex-col gap-3">
-                <Display></Display>
+                <input
+                    className="order border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-white w-full"
+                    type="text"
+                    name="display"
+                    value={displayCurrent}
+                />
 
                 <div className="grid grid-cols-4 gap-3 w-full">
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => setDisplayCurrent("Hey ya")}>
                         7
                     </CalculatorBtn>
                     <CalculatorBtn

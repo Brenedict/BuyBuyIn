@@ -58,6 +58,8 @@ interface SelectContextType {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     selectedValue: string;
     setSelectedValue: React.Dispatch<React.SetStateAction<string>>;
+    onChange?: (e: any) => void;
+    name?: string;
 }
 
 const SelectContext = createContext<SelectContextType | null>(null);
@@ -362,7 +364,7 @@ function Option({ value, children }: { value: string; children: ReactNode }) {
         throw new Error("Select.Option must be used within a Select");
     }
 
-    const { setIsOpen, selectedValue, setSelectedValue } = context;
+    const { setIsOpen, selectedValue, setSelectedValue, onChange, name } = context;
     const isSelected = selectedValue === value;
 
     return (
@@ -370,6 +372,9 @@ function Option({ value, children }: { value: string; children: ReactNode }) {
             onClick={() => {
                 setSelectedValue(value);
                 setIsOpen(false);
+                if (onChange) {
+                    onChange({ target: { value, name } } as any);
+                }
             }}
             className={`cursor-pointer px-4 py-2 hover:bg-off-white hover:text-slate-dark hover:font-normal ${isSelected ? "bg-crimson font-bold text-cream" : "bg-cream"}`}
         >
@@ -452,6 +457,7 @@ export function SelectInput({
     defaultValue,
     variant = "default",
     className,
+    onChange,
 }: SelectInputProp) {
     const selectInputParentRef = useRef<HTMLDivElement | null>(null);
 
@@ -480,7 +486,7 @@ export function SelectInput({
     return (
         <div className="w-full relative" ref={selectInputParentRef}>
             <Label htmlFor={id} label={label} boldLabel={boldLabel} />
-            <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue }}>
+            <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue, onChange, name }}>
                 {/* hidden input that holds data of dropdown */}
                 <input hidden type="text" name={name} value={selectedValue} />
 

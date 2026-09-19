@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SearchInput } from "../../components/Input";
+import  SearchInput  from "../../components/inputs/SearchInput";
 import "../../index.css";
 import { fn } from "storybook/test";
 

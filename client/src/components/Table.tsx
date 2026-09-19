@@ -220,7 +220,7 @@ function Table({
                     <Text size={textSize} weight={textWeight} align="left" variant={textVariant}>
                         {paginationText}
                     </Text>
-                    {rows.length > 0 && (
+                    {rows.length > 0 && paginatedRows?.length !== rows.length && (
                         <PaginationControls
                             page={page}
                             handleLeftClick={() => setPage(page - 1)}

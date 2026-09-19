@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { TextAreaInput } from "../../components/Input";
+import  TextAreaInput  from "../../components/inputs/TextAreaInput";
 import "../../index.css";
 
 // Meta for TextAreaInput

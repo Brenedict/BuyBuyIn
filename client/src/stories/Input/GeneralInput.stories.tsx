@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { GeneralInput } from "../../components/Input";
+import  GeneralInput  from "../../components/inputs/GeneralInput";
 import "../../index.css";
 
 import { fn } from "storybook/test";

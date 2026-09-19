@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { SelectInput } from "../../components/Input";
+import  SelectInput  from "../../components/inputs/SelectInput";
 import { Card } from "../../components/Card";
 import "../../index.css";
 

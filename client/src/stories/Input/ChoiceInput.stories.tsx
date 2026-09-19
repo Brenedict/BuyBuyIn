@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ChoiceInput } from "../../components/Input";
+import  ChoiceInput  from "../../components/inputs/ChoiceInput";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 

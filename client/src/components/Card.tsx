@@ -46,7 +46,7 @@ function Header({
 }: CardProps & {
     centerContent?: boolean;
     toggleRightButton?: boolean;
-    rightButton?: React.ComponentType<any>;
+    rightButton?: ReactNode;
 }) {
     const defaultClass = `${bordered == true ? "border-b-[0.3px] border-black" : ""} `;
 
@@ -58,12 +58,10 @@ function Header({
           ? AlignFlexClasses.center
           : AlignFlexClasses.left;
 
-    const RightButtonComponent = rightButton;
-
     return (
         <div className={`${defaultClass} w-full px-6 py-4 flex ${contentAlignmentClass} ${className} `} {...props}>
             {children}
-            {toggleRightButton && RightButtonComponent && <RightButtonComponent />}
+            {toggleRightButton && rightButton}
         </div>
     );
 }

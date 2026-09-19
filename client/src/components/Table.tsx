@@ -72,6 +72,7 @@ interface DataProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
     textVariant?: ColorVariant;
     weight?: WeightVariant;
     size?: SizeVariant;
+    isPadded?: boolean;
 }
 
 function Data({
@@ -81,10 +82,14 @@ function Data({
     textVariant = "brown",
     weight = "medium",
     size = "normal",
+    isPadded = true,
     ...props
 }: DataProps) {
     return (
-        <td {...props} className={`${nowrap ? "whitespace-nowrap" : ""}  px-4 py-4 border-0 ${props.className} `}>
+        <td
+            {...props}
+            className={`${nowrap ? "whitespace-nowrap" : ""} ${isPadded ? "px-4 py-4" : ""} border-0 ${props.className} `}
+        >
             {text && (
                 <Text variant={textVariant} weight={weight} size={size} align="center">
                     {text}

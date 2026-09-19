@@ -26,6 +26,9 @@ export const ButtonColorClasses = {
         icon: "cream",
         iconExtra: "group-active:text-brown",
     },
+    transparent: {
+        button: "text-crimson border-crimson border-1 font-bold hover:bg-crimson-muted hover:text-cream hover:cursor-pointer",
+    },
 } as const;
 
 export type ButtonColorVariant = keyof typeof ButtonColorClasses;

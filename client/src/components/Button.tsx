@@ -70,7 +70,7 @@ export function Button({
     transition = true,
     ...props
 }: ButtonProps) {
-    const transitionClass = transition ? "hover:scale-110 active:scale-100 transition-transform transition-color" : "";
+    const transitionClass = transition ? "hover:scale-102 active:scale-100 transition-transform transition-color" : "";
 
     return (
         <button

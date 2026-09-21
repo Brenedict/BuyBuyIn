@@ -1,11 +1,11 @@
-import type { ColorVariant, MaterialIcon } from "../types/common";
-import { Button, type ButtonColorVariant } from "./Button";
-import Table from "./Table";
-import { Text } from "./Text";
+import type { ColorVariant, MaterialIcon } from "../../types/common";
+import { Button, type ButtonColorVariant } from "../Button";
+import Table from "../Table";
+import { Text } from "../Text";
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import { formatFullDate, formatShortDate, formatTime } from "../utils/dateUtils";
+import { formatFullDate, formatShortDate, formatTime } from "../../utils/dateUtils";
 
 export interface ButtonActions {
     text: string;

@@ -6,7 +6,7 @@ import { ColorClasses, type ColorVariant, type SizeVariant, type WeightVariant }
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import { useTablePagination } from "../hooks/useTablePagination";
-import { EmptyData } from "./TablePartials";
+import { EmptyData } from "./partials/TablePartials";
 
 /* eslint-disable react-refresh/only-export-components */
 

@@ -39,6 +39,7 @@ export function BarChart({
 }: BarChartProps) {
     const responsiveOptions = {
         ...(options as object),
+        responsive: true,
         maintainAspectRatio: false,
     };
 
@@ -58,6 +59,7 @@ export function DoughnutChart({
 }: DoughnutChartProps) {
     const responsiveOptions = {
         ...(options as object),
+        responsive: true,
         maintainAspectRatio: false,
     };
 
@@ -77,6 +79,7 @@ export function LineChart({
 }: LineChartProps) {
     const responsiveOptions = {
         ...(options as object),
+        responsive: true,
         maintainAspectRatio: false,
     };
 
@@ -96,6 +99,7 @@ export function PieChart({
 }: PieChartProps) {
     const responsiveOptions = {
         ...(options as object),
+        responsive: true,
         maintainAspectRatio: false,
     };
     return (
@@ -114,6 +118,7 @@ export function ScatterChart({
 }: ScatterChartProps) {
     const responsiveOptions = {
         ...(options as object),
+        responsive: true,
         maintainAspectRatio: false,
     };
 

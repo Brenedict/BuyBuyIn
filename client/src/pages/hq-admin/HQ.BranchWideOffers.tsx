@@ -7,16 +7,15 @@ import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 
-import SearchInput from "../../components/inputs/SearchInput"
-import GeneralInput  from "../../components/inputs/GeneralInput"
-import TextAreaInput from "../../components/inputs/TextAreaInput"
-import ChoiceInput  from "../../components/inputs/ChoiceInput"
-import SelectInput from "../../components/inputs/SelectInput"
-
+import SearchInput from "../../components/inputs/SearchInput";
+import GeneralInput from "../../components/inputs/GeneralInput";
+import TextAreaInput from "../../components/inputs/TextAreaInput";
+import ChoiceInput from "../../components/inputs/ChoiceInput";
+import SelectInput from "../../components/inputs/SelectInput";
 
 // Material UI Icons
 import AddIcon from "@mui/icons-material/Add";
-import { EditDeleteButtons } from "../../components/TablePartials";
+import { EditDeleteButtons } from "../../components/partials/TablePartials";
 
 interface OfferProps {
     offerTitle: string;
@@ -76,7 +75,7 @@ function ToggleOverallDiscountType() {
                 name="discountType"
                 defaultValue="Percentage"
                 label="Discount Type"
-                onChange={(e: React.ChangeEvent<HTMLSelectElement> ) => setDiscountType(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDiscountType(e.target.value)}
             >
                 <SelectInput.Option value="Percentage">Percentage</SelectInput.Option>
                 <SelectInput.Option value="FixedValue">Fixed Value</SelectInput.Option>

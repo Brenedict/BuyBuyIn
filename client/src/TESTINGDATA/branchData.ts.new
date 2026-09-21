@@ -95,7 +95,7 @@ export const PERFORMANCE_DATA = [
 ];
 export const INTER_BRANCH_PERFORMANCE_DATA = [3000, 3500, 4000, 7000, 6500, 5000, 4500, 5500, 5000, 6000, 11000, 8500];
 
-// Legend name and colors (semantic color names)
+// Legend name and colors 
 export const BRANCH_LEGEND: Array<{ name: string; color: ChartColorName }> = [
     { name: "Sta. Mesa", color: "sage" },
     { name: "Pasay", color: "burgundy" },

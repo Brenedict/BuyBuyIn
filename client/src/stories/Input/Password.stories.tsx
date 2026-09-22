@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { PasswordInput } from "../../components/Input";
+import  PasswordInput  from "../../components/inputs/PasswordInput";
 import "../../index.css";
 import { fn } from "storybook/test";
 

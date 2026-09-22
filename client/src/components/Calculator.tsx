@@ -43,7 +43,7 @@ function Display() {
 
 export function Calculator() {
     const calcClass =
-        "flex flex-col cursor-pointer justify-center items-center min-h-[680px] p-5 card-glass-effect max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
+        "flex flex-col cursor-pointer justify-center items-center min-h-[680px] p-5 card-glass-effect min-w-[400px] max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
     const [displayCurrent, setDisplayCurrent] = useState<string>("");
 
     return (

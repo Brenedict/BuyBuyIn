@@ -4,8 +4,10 @@ import { Button } from "../../components/Button";
 import { Calculator } from "../../components/Calculator";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
+import { useState } from "react";
 
 export function Cashier_PointOfSale() {
+    const [isCalculatorToggled, toggleCalculator] = useState(true);
     const date = new Date();
     const current = date.toDateString();
 
@@ -20,12 +22,14 @@ export function Cashier_PointOfSale() {
     const afterVatAmt: number = 145.09;
     const itemCnt: number = 8;
 
+    const buttonSize = "min-w-[115px]";
+
     return (
         <div>
             <section>
                 <SearchInput />
-                <div className="">
-                    <div className="flex flex-row gap-2 items-center justify-center">
+                <div className="flex flex-col">
+                    <div className="flex flex-row gap-1 items-center justify-center">
                         <Text size="big" variant="crimson" weight="bold">
                             Cashier POS
                         </Text>
@@ -43,32 +47,33 @@ export function Cashier_PointOfSale() {
                         </Text>
                     </div>
 
-                    <div className="flex flex-row w-full">
-                        <div className="flex flex-col">
-                            <Card isGlass dropShadow>
+                    <div className="flex flex-row w-full items-stretch border-blue border-1">
+                        <div className="flex flex-col flex-2 border-1 border-green">
+                            <Card isGlass dropShadow className="flex-2">
                                 <Card.Header>
                                     <Text variant="crimson" weight="bold" size="big">
                                         TOTAL AMOUNT DUE
                                     </Text>
                                 </Card.Header>
                                 <Card.Body>
-                                    <Text variant="crimson" weight="extraBold" size="larger">
+                                    <Text variant="crimson" weight="extraBold" size="large">
                                         P{amount}
                                     </Text>
                                 </Card.Body>
                                 <Card.Footer>
                                     <div className="flex flex-row items-center justify-between">
-                                        <Text variant="crimson" weight="medium" size="medium">
+                                        <Text variant="crimson" weight="medium" size="normal">
                                             Transaction #: {transNum}
                                         </Text>
                                         <div>
-                                            <Text variant="crimson" weight="medium" size="medium">
+                                            <Text variant="crimson" weight="medium" size="normal">
                                                 Discount : {discAmt}
                                             </Text>
-                                            <Text variant="crimson" weight="medium" size="medium">
+                                            <Text variant="crimson" weight="medium" size="normal">
+                                                {" "}
                                                 VAT 12% : {afterVatAmt}
                                             </Text>
-                                            <Text variant="crimson" weight="medium" size="medium">
+                                            <Text variant="crimson" weight="medium" size="normal">
                                                 Items: {itemCnt}
                                             </Text>
                                         </div>
@@ -76,14 +81,94 @@ export function Cashier_PointOfSale() {
                                 </Card.Footer>
                             </Card>
 
-                            <Card>
+                            <Card isGlass dropShadow className="h-3/6">
                                 <Card.Body>
-                                    <Table rounded shadow>
+                                    <Table
+                                        rounded
+                                        shadow
+                                        pagination={{
+                                            maxItems: 10,
+                                        }}
+                                        className="h-full"
+                                    >
                                         <Table.Row borderedBottom>
                                             <Table.Header bgVariant="crimson" textVariant="cream" text="Quantity" />
                                             <Table.Header bgVariant="crimson" textVariant="cream" text="Description" />
                                             <Table.Header bgVariant="crimson" textVariant="cream" text="Price" />
                                             <Table.Header bgVariant="crimson" textVariant="cream" text="Amount" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            {" "}
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
+                                        </Table.Row>
+                                        <Table.Row>
+                                            <Table.Data text="2" />
+                                            <Table.Data text="something" />
+                                            <Table.Data text="90000" />
+                                            <Table.Data text="180000" />
                                         </Table.Row>
                                         <Table.Row>
                                             <Table.Data text="2" />
@@ -95,49 +180,51 @@ export function Cashier_PointOfSale() {
                                 </Card.Body>
                             </Card>
 
-                            <Card>
+                            <Card className="flex flex-col flex-1">
                                 <Card.Body className="flex flex-row justify-between">
-                                    <div>
+                                    <div className="flex flex-col items-center justify-center">
                                         <Text variant="crimson" size="medium" weight="bold">
                                             SELECT MODE OF PAYMENT
                                         </Text>
 
-                                        <div className="flex flex-row">
-                                            <Button variant="transparent" size="medium">
+                                        <div className="flex flex-row gap-1 items-center justify-center">
+                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 Cash
                                             </Button>
-                                            <Button variant="transparent" size="medium">
+                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 E-Cash
                                             </Button>
-                                            <Button variant="transparent" size="medium">
+                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 Card
                                             </Button>
                                         </div>
                                     </div>
-                                    <div>
+                                    <div className="flex flex-col items-center justify-center">
                                         <Text variant="crimson" size="medium" weight="bold">
                                             TRANSACTION ACTIONS
                                         </Text>
-                                        <div className="flex flex-row">
-                                            <Button variant="transparent" size="medium">
+                                        <div className="flex flex-row gap-1 justify-center items-center">
+                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 Suspend
                                             </Button>
-                                            <Button variant="transparent" size="medium">
+                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 Resume
                                             </Button>
-                                            <Button variant="transparent" size="medium">
+                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 Void
                                             </Button>
                                         </div>
                                     </div>
                                 </Card.Body>
-                                <Button className="w-full!" variant="transparent" size="medium">
-                                    Pay
-                                </Button>
+                                <Card.Body>
+                                    <Button className="w-full!" variant="transparent" size="medium">
+                                        Pay
+                                    </Button>
+                                </Card.Body>
                             </Card>
                         </div>
 
-                        <Calculator />
+                        {isCalculatorToggled && <Calculator />}
                     </div>
                 </div>
             </section>

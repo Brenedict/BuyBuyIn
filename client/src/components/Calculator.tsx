@@ -1,6 +1,8 @@
 import { useState, type ReactElement, type ReactNode } from "react";
 import { Text } from "./Text";
 import { Button, type ButtonProps } from "./Button";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { VisibilityOffOutlined } from "@mui/icons-material";
 
 const CalculatorBtnColorClasses = {
     cream: "border-crimson bg-cream text-brown card-glass-effect hover:bg-crimson hover:text-cream",
@@ -10,10 +12,12 @@ const CalculatorBtnColorClasses = {
 type CalculatorBtnColorClassesVariant = keyof typeof CalculatorBtnColorClasses;
 
 function CalculatorBtn({
+    className,
     handleClick,
     children,
     variant,
 }: {
+    className?: string;
     handleClick: () => void;
     children: ReactNode;
     variant: CalculatorBtnColorClassesVariant;
@@ -35,22 +39,22 @@ function Display() {
     const [displayCurrent, setDisplayCurrent] = useState<string>("");
 
     return (
-        <div className="border border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-white">
-            <input type="text" name="display" value={displayCurrent} />
+        <div className="border border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-slate-dark">
+            <input className="bg-slate-dark" type="text" name="display" value={displayCurrent} />
         </div>
     );
 }
 
-export function Calculator() {
+export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<React.SetStateAction<boolean>> }) {
     const calcClass =
         "flex flex-col cursor-pointer justify-center items-center min-h-[680px] p-5 card-glass-effect min-w-[400px] max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
     const [displayCurrent, setDisplayCurrent] = useState<string>("");
 
     return (
         <div className={calcClass}>
-            <section className="flex flex-col gap-3">
+            <section className="flex flex-col gap-3 justify-center items-center">
                 <input
-                    className="order border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-white w-full"
+                    className="order border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-off-white w-full"
                     type="text"
                     name="display"
                     value={displayCurrent}
@@ -181,7 +185,7 @@ export function Calculator() {
                         F-OVER
                     </CalculatorBtn>
                 </div>
-                <div className="flex justify-between gap-3">
+                <div className="flex justify-between gap-3 w-full">
                     <CalculatorBtn
                         variant="cream"
                         handleClick={() => {
@@ -199,7 +203,7 @@ export function Calculator() {
                         RETAIL
                     </CalculatorBtn>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-3">
+                <div className="flex flex-col items-center justify-center gap-3 w-full">
                     <CalculatorBtn
                         variant="cream"
                         handleClick={() => {
@@ -225,6 +229,15 @@ export function Calculator() {
                         SUBTOTAL
                     </CalculatorBtn>
                 </div>
+                <Button
+                    onClick={() => handleToggle((e) => !e)}
+                    className="mt-2 max-w-[30%]"
+                    leftIcon={VisibilityOffOutlined}
+                    variant="transparent"
+                    size="small"
+                >
+                    hide
+                </Button>
             </section>
         </div>
     );

@@ -12,29 +12,61 @@ import GeneralInput from "../../components/inputs/GeneralInput";
 import TextAreaInput from "../../components/inputs/TextAreaInput";
 import ChoiceInput from "../../components/inputs/ChoiceInput";
 import SelectInput from "../../components/inputs/SelectInput";
+import { EditDeleteButtons } from "../../components/TablePartials";
 
 // Material UI Icons
 import AddIcon from "@mui/icons-material/Add";
-import { EditDeleteButtons } from "../../components/TablePartials";
+import CreateIcon from "@mui/icons-material/Create";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+
+// Test Data
+import { SAMPLE_OFFERS } from "../../TESTINGDATA/branchWideOfferData";
 
 interface OfferProps {
     offerTitle: string;
     startDate: string;
     endDate: string;
-    status: "Enabled" | "Draft" | "Disabled";
+    status: "enabled" | "draft" | "disabled";
 }
 
 function OfferCard({ offerTitle, startDate, endDate, status }: OfferProps) {
+    const statusClass: Record<OfferProps["status"], string> = {
+        enabled: "bg-crimson text-cream font-bold",
+        disabled: "bg-slate-light text-cream font-bold",
+        draft: "bg-slate-medium/90 text-cream font-bold",
+    };
+
+    const shortenedTitle = offerTitle.length > 20 ? `${offerTitle.substring(0, 20)}...` : offerTitle;
+
     return (
-        <Card isGlass={false}>
-            <Card.Body>
-                <Text weight="extraBold" size="big">
-                    {offerTitle}
-                </Text>
-                <Text>
-                    {startDate} - {endDate}
-                </Text>
-                <div>{status}</div>
+        <Card
+            className="hover:opacity-75 active:opacity-100 hover:cursor-pointer hover:scale-102 active:scale-100 transition-transform"
+            onClick={() => {}}
+        >
+            <Card.Body className="flex gap-3 justify-between">
+                <div className="flex flex-col gap-3">
+                    <Text weight="extraBold" size="big" className="col-span-2">
+                        {shortenedTitle}
+                    </Text>
+                    <Text variant="slate-light">
+                        {startDate} - {endDate}
+                    </Text>
+                    <div className={`w-fit px-3 py-1 rounded-xl ${statusClass[status]}`}>{status}</div>
+                </div>
+                <div className="flex h-fit gap-1 pt-1">
+                    <Button
+                        variant="secondary"
+                        rightIcon={CreateIcon}
+                        size="normal"
+                        className="p-1! bg-transparent! hover:bg-slate-dark!"
+                    ></Button>
+                    <Button
+                        variant="secondary"
+                        rightIcon={DeleteOutlinedIcon}
+                        size="normal"
+                        className="p-1! bg-transparent! hover:bg-crimson!"
+                    ></Button>
+                </div>
             </Card.Body>
         </Card>
     );
@@ -42,12 +74,19 @@ function OfferCard({ offerTitle, startDate, endDate, status }: OfferProps) {
 
 function OffersListSection() {
     return (
-        <section className="flex flex-col gap-6">
+        <div className="w-[25%] flex flex-col gap-4 h-full min-h-0">
             <SearchInput placeholder="Search Offers" />
-            <OfferCard offerTitle="Summer Sale 2026" startDate="May 1" endDate="June 30" status="Enabled" />
-            <OfferCard offerTitle="Summer Sale 2026" startDate="May 1" endDate="June 30" status="Enabled" />
-            <OfferCard offerTitle="Summer Sale 2026" startDate="May 1" endDate="June 30" status="Enabled" />
-        </section>
+            <section className="flex flex-col gap-6 pr-3 grow overflow-y-auto min-h-0 *:shrink-0">
+                {SAMPLE_OFFERS.map((row, i) => (
+                    <OfferCard
+                        offerTitle={row.offerName}
+                        startDate={String(row.startDate.toLocaleDateString("en-US"))}
+                        endDate={String(row.endDate.toLocaleDateString("en-US"))}
+                        status={row.offerStatus.toLocaleLowerCase() as OfferProps["status"]}
+                    />
+                ))}
+            </section>
+        </div>
     );
 }
 
@@ -89,9 +128,11 @@ function ToggleOverallDiscountType() {
                 onChange={(e) => setdiscountAmount(Number(e.target.value))}
             />
             <Text>
-                WARNING: This will apply{" "}
-                {discountType === "Percentage" ? `${discountAmount}%` : `Php ${discountAmount}`} discount to all
-                products.
+                WARNING: This will apply a{" "}
+                <span className="font-bold ">
+                    {discountType === "Percentage" ? `${discountAmount}%` : `Php ${discountAmount}`} discount
+                </span>{" "}
+                to all products.
             </Text>
         </div>
     );
@@ -108,43 +149,51 @@ function ToggleIndividualDiscountType() {
 
     return (
         <Card dropShadow={false}>
-            <Card.Header toggleRightButton rightButton={<Button leftIcon={AddIcon}>Add</Button>} bordered>
+            <Card.Header
+                toggleRightButton
+                rightButton={
+                    <Button size="normal" variant="grey" leftIcon={AddIcon}>
+                        Add
+                    </Button>
+                }
+                bordered
+            >
                 <Text weight="bold" size="big">
                     Included Products
                 </Text>
             </Card.Header>
-            <Table bordered rounded shadow pagination={{}}>
+            <Table pagination={{ maxItems: 5 }} className="rounded-none! border-0!">
                 <Table.Row borderedBottom>
-                    <Table.Header text="Quantity" />
-                    <Table.Header text="Product ID" />
-                    <Table.Header text="Product Name" />
-                    <Table.Header text="Shelf Price" />
-                    <Table.Header text="Discount" />
-                    <Table.Header text="Subtotal" />
-                    <Table.Header text="Action" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
                 </Table.Row>
                 <Table.Row>
-                    <Table.Data isPadded={false} text={"10"} />
-                    <Table.Data isPadded={false} text={"123-456"} />
-                    <Table.Data isPadded={false} text={"Meatbolz"} />
-                    <Table.Data isPadded={false} text={"P17.00"} />
-                    <Table.Data isPadded={false} text={"0.20"} />
-                    <Table.Data isPadded={false} text={"P27.20"} />
+                    <Table.Data isPadded={false} size="small" text={"26"} />
+                    <Table.Data isPadded={false} size="small" text={"532-124"} />
+                    <Table.Data isPadded={false} size="small" text={"Corned Beef"} />
+                    <Table.Data isPadded={false} size="small" text={"P36.00"} />
+                    <Table.Data isPadded={false} size="small" text={"0.70"} />
+                    <Table.Data isPadded={false} size="small" text={"P52.56"} />
 
                     <Table.Data isPadded={false}>
-                        <EditDeleteButtons id={1} handleEdit={handleEdit} handleDelete={handleDelete} />
+                        <EditDeleteButtons id={1} size="smallest" handleEdit={handleEdit} handleDelete={handleDelete} />
                     </Table.Data>
                 </Table.Row>
                 <Table.Row>
-                    <Table.Data isPadded={false} text={"26"} nowrap />
-                    <Table.Data isPadded={false} text={"532-124"} nowrap />
-                    <Table.Data isPadded={false} text={"Corned Beef"} nowrap />
-                    <Table.Data isPadded={false} text={"P36.00"} nowrap />
-                    <Table.Data isPadded={false} text={"0.70"} nowrap />
-                    <Table.Data isPadded={false} text={"P52.56"} nowrap />
+                    <Table.Data isPadded={false} size="small" text={"26"} />
+                    <Table.Data isPadded={false} size="small" text={"532-124"} />
+                    <Table.Data isPadded={false} size="small" text={"Corned Beef"} />
+                    <Table.Data isPadded={false} size="small" text={"P36.00"} />
+                    <Table.Data isPadded={false} size="small" text={"0.70"} />
+                    <Table.Data isPadded={false} size="small" text={"P52.56"} />
 
                     <Table.Data isPadded={false}>
-                        <EditDeleteButtons id={1} handleEdit={handleEdit} handleDelete={handleDelete} />
+                        <EditDeleteButtons id={1} size="smallest" handleEdit={handleEdit} handleDelete={handleDelete} />
                     </Table.Data>
                 </Table.Row>
             </Table>
@@ -157,14 +206,14 @@ function OfferConfigurationSection() {
     const [toggleOverallDiscount, setToggleOverallDiscount] = useState(true);
 
     return (
-        <Card className="flex-1" isGlass={false}>
-            <Card.Header toggleRightButton rightButton={<Button>Save Offer</Button>} bordered>
+        <Card isGlass={false} className="w-[75%] h-full flex flex-col">
+            <Card.Header toggleRightButton rightButton={<Button>Save Offer</Button>} bordered className="shrink-0">
                 <Text weight="bold" size="bigger">
                     Offer Configuration
                 </Text>
             </Card.Header>
 
-            <Card.Body>
+            <Card.Body className="flex flex-col gap-4 grow overflow-y-auto min-h-0 *:shrink-0">
                 <GeneralInput type="text" label="Offer Name" />
                 <TextAreaInput label="Description" />
 
@@ -227,8 +276,8 @@ function OfferConfigurationSection() {
 
 export function HQ_BranchWideOffers() {
     return (
-        <Card>
-            <Card.Body className="flex gap-6">
+        <Card className="h-[calc(100vh-4rem)] flex flex-col">
+            <Card.Body className="flex gap-6 grow min-h-0">
                 <OffersListSection />
                 <OfferConfigurationSection />
             </Card.Body>

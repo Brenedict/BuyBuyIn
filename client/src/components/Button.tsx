@@ -31,8 +31,16 @@ export const ButtonColorClasses = {
 export type ButtonColorVariant = keyof typeof ButtonColorClasses;
 
 const ButtonSizeClasses = {
+    smallest: {
+        button: "px-1 py-1 m-h-4 m-w-16 text-xs border rounded-[10px] gap-1",
+        icon: "smaller",
+    },
     small: {
         button: "px-2 py-2 m-h-4 m-w-16 text-xs border rounded-[10px] gap-1",
+        icon: "small",
+    },
+    normal: {
+        button: "px-2 py-2 m-h-4 m-w-16 text-sm border rounded-[10px] gap-1",
         icon: "normal",
     },
     medium: {

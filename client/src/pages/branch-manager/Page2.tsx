@@ -10,12 +10,11 @@ import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import { Button } from "../../components/Button";
 import { DateText, EditDeleteButtons, PrimarySecondaryText } from "../../components/TablePartials";
 
-import SearchInput from "../../components/inputs/SearchInput"
+import SearchInput from "../../components/inputs/SearchInput";
 import SelectInput from "../../components/inputs/SelectInput";
-import GeneralInput  from "../../components/inputs/GeneralInput"
-import TextAreaInput from "../../components/inputs/TextAreaInput"
-import ChoiceInput  from "../../components/inputs/ChoiceInput"
-
+import GeneralInput from "../../components/inputs/GeneralInput";
+import TextAreaInput from "../../components/inputs/TextAreaInput";
+import ChoiceInput from "../../components/inputs/ChoiceInput";
 
 // Test Data
 import { TABLE_SAMPLE_USERS } from "../../TESTINGDATA/tableData";

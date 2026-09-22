@@ -1,60 +1,312 @@
 export const SAMPLE_OFFERS = [
-    ...[...Array(10)].flatMap(() => [
+    ...[...Array(1)].flatMap(() => [
         {
-            name: "Benidict",
-            contact: "09123456789",
-            role: "Manager",
-            branch: "Branch North, Manila",
-            status: "Active",
-            createdAt: new Date(),
+            offerName: "Summer Sale 2026",
+            description: "Summer products discounted",
+            startDate: new Date(),
+            endDate: new Date(),
+            offerStatus: "ENABLED",
+            offerType: "INDIVIDUAL",
+            discountType: null,
+            overallDiscountValue: null,
+            branchWideOfferBranches: [
+                {
+                    branchName: "Branch North Manila",
+                },
+                {
+                    branchName: "Branch West Ave",
+                },
+                {
+                    branchName: "Branch South Bound",
+                },
+                {
+                    branchName: "Branch America",
+                },
+            ],
+            branchWideOfferProduct: [
+                {
+                    id: 1,
+                    unitDiscountValue: 20,
+                    requiredQuantity: 2,
+                    discountType: "PERCENTAGE",
+                },
+                {
+                    id: 2,
+                    unitDiscountValue: 5,
+                    requiredQuantity: 2,
+                    discountType: "FIXED_VALUE",
+                },
+                {
+                    id: 3,
+                    unitDiscountValue: 10,
+                    requiredQuantity: 3,
+                    discountType: "PERCENTAGE",
+                },
+            ],
         },
         {
-            name: "Kenken",
-            contact: "09223456789",
-            role: "Cashier",
-            branch: "Branch South, Quezon",
-            status: "Active",
-            createdAt: new Date(),
+            offerName: "Summer Sale 2026",
+            description: "Summer products discounted",
+            startDate: new Date(),
+            endDate: new Date(),
+            offerStatus: "DRAFT",
+            offerType: "INDIVIDUAL",
+            discountType: null,
+            overallDiscountValue: null,
+            branchWideOfferBranches: [
+                {
+                    branchName: "Branch North Manila",
+                },
+                {
+                    branchName: "Branch West Ave",
+                },
+                {
+                    branchName: "Branch South Bound",
+                },
+                {
+                    branchName: "Branch America",
+                },
+            ],
+            branchWideOfferProduct: [
+                {
+                    id: 1,
+                    unitDiscountValue: 20,
+                    requiredQuantity: 2,
+                    discountType: "PERCENTAGE",
+                },
+                {
+                    id: 2,
+                    unitDiscountValue: 5,
+                    requiredQuantity: 2,
+                    discountType: "FIXED_VALUE",
+                },
+                {
+                    id: 3,
+                    unitDiscountValue: 10,
+                    requiredQuantity: 3,
+                    discountType: "PERCENTAGE",
+                },
+            ],
         },
         {
-            name: "Romir",
-            contact: "09323456789",
-            role: "Supervisor",
-            branch: "Branch East, Makati",
-            status: "Inactive",
-            createdAt: new Date(),
+            offerName: "Summer Sale 2026",
+            description: "Summer products discounted",
+            startDate: new Date(),
+            endDate: new Date(),
+            offerStatus: "ENABLED",
+            offerType: "INDIVIDUAL",
+            discountType: null,
+            overallDiscountValue: null,
+            branchWideOfferBranches: [
+                {
+                    branchName: "Branch North Manila",
+                },
+                {
+                    branchName: "Branch West Ave",
+                },
+                {
+                    branchName: "Branch South Bound",
+                },
+                {
+                    branchName: "Branch America",
+                },
+            ],
+            branchWideOfferProduct: [
+                {
+                    id: 1,
+                    unitDiscountValue: 20,
+                    requiredQuantity: 2,
+                    discountType: "PERCENTAGE",
+                },
+                {
+                    id: 2,
+                    unitDiscountValue: 5,
+                    requiredQuantity: 2,
+                    discountType: "FIXED_VALUE",
+                },
+                {
+                    id: 3,
+                    unitDiscountValue: 10,
+                    requiredQuantity: 3,
+                    discountType: "PERCENTAGE",
+                },
+            ],
         },
         {
-            name: "Richbert",
-            contact: "09423456789",
-            role: "Cashier",
-            branch: "Branch West, Pasay",
-            status: "Active",
-            createdAt: new Date(),
+            offerName: "Summer Sale 2026",
+            description: "Summer products discounted",
+            startDate: new Date(),
+            endDate: new Date(),
+            offerStatus: "disabled",
+            offerType: "INDIVIDUAL",
+            discountType: null,
+            overallDiscountValue: null,
+            branchWideOfferBranches: [
+                {
+                    branchName: "Branch North Manila",
+                },
+                {
+                    branchName: "Branch West Ave",
+                },
+                {
+                    branchName: "Branch South Bound",
+                },
+                {
+                    branchName: "Branch America",
+                },
+            ],
+            branchWideOfferProduct: [
+                {
+                    id: 1,
+                    unitDiscountValue: 20,
+                    requiredQuantity: 2,
+                    discountType: "PERCENTAGE",
+                },
+                {
+                    id: 2,
+                    unitDiscountValue: 5,
+                    requiredQuantity: 2,
+                    discountType: "FIXED_VALUE",
+                },
+                {
+                    id: 3,
+                    unitDiscountValue: 10,
+                    requiredQuantity: 3,
+                    discountType: "PERCENTAGE",
+                },
+            ],
         },
         {
-            name: "Mark",
-            contact: "09523456789",
-            role: "Manager",
-            branch: "Branch North, Manila",
-            status: "Active",
-            createdAt: new Date(),
+            offerName: "Summer Sale 2026",
+            description: "Summer products discounted",
+            startDate: new Date(),
+            endDate: new Date(),
+            offerStatus: "ENABLED",
+            offerType: "INDIVIDUAL",
+            discountType: null,
+            overallDiscountValue: null,
+            branchWideOfferBranches: [
+                {
+                    branchName: "Branch North Manila",
+                },
+                {
+                    branchName: "Branch West Ave",
+                },
+                {
+                    branchName: "Branch South Bound",
+                },
+                {
+                    branchName: "Branch America",
+                },
+            ],
+            branchWideOfferProduct: [
+                {
+                    id: 1,
+                    unitDiscountValue: 20,
+                    requiredQuantity: 2,
+                    discountType: "PERCENTAGE",
+                },
+                {
+                    id: 2,
+                    unitDiscountValue: 5,
+                    requiredQuantity: 2,
+                    discountType: "FIXED_VALUE",
+                },
+                {
+                    id: 3,
+                    unitDiscountValue: 10,
+                    requiredQuantity: 3,
+                    discountType: "PERCENTAGE",
+                },
+            ],
         },
         {
-            name: "Zyryl",
-            contact: "09623456789",
-            role: "Cashier",
-            branch: "Branch South, Quezon",
-            status: "Pending",
-            createdAt: new Date(),
+            offerName: "Summer Sale 2026",
+            description: "Summer products discounted",
+            startDate: new Date(),
+            endDate: new Date(),
+            offerStatus: "ENABLED",
+            offerType: "INDIVIDUAL",
+            discountType: null,
+            overallDiscountValue: null,
+            branchWideOfferBranches: [
+                {
+                    branchName: "Branch North Manila",
+                },
+                {
+                    branchName: "Branch West Ave",
+                },
+                {
+                    branchName: "Branch South Bound",
+                },
+                {
+                    branchName: "Branch America",
+                },
+            ],
+            branchWideOfferProduct: [
+                {
+                    id: 1,
+                    unitDiscountValue: 20,
+                    requiredQuantity: 2,
+                    discountType: "PERCENTAGE",
+                },
+                {
+                    id: 2,
+                    unitDiscountValue: 5,
+                    requiredQuantity: 2,
+                    discountType: "FIXED_VALUE",
+                },
+                {
+                    id: 3,
+                    unitDiscountValue: 10,
+                    requiredQuantity: 3,
+                    discountType: "PERCENTAGE",
+                },
+            ],
         },
         {
-            name: "Gab",
-            contact: "09423456789",
-            role: "Cashier",
-            branch: "Branch West, Pasay",
-            status: "Active",
-            createdAt: new Date(),
+            offerName: "Summer Sale 2026",
+            description: "Summer products discounted",
+            startDate: new Date(),
+            endDate: new Date(),
+            offerStatus: "ENABLED",
+            offerType: "INDIVIDUAL",
+            discountType: null,
+            overallDiscountValue: null,
+            branchWideOfferBranches: [
+                {
+                    branchName: "Branch North Manila",
+                },
+                {
+                    branchName: "Branch West Ave",
+                },
+                {
+                    branchName: "Branch South Bound",
+                },
+                {
+                    branchName: "Branch America",
+                },
+            ],
+            branchWideOfferProduct: [
+                {
+                    id: 1,
+                    unitDiscountValue: 20,
+                    requiredQuantity: 2,
+                    discountType: "PERCENTAGE",
+                },
+                {
+                    id: 2,
+                    unitDiscountValue: 5,
+                    requiredQuantity: 2,
+                    discountType: "FIXED_VALUE",
+                },
+                {
+                    id: 3,
+                    unitDiscountValue: 10,
+                    requiredQuantity: 3,
+                    discountType: "PERCENTAGE",
+                },
+            ],
         },
     ]),
 ];

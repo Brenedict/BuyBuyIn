@@ -47,9 +47,9 @@ export function Cashier_PointOfSale() {
                         </Text>
                     </div>
 
-                    <div className="flex flex-row w-full items-stretch border-blue border-1">
-                        <div className="flex flex-col flex-2 border-1 border-green">
-                            <Card isGlass dropShadow className="flex-2">
+                    <div className="flex flex-row w-full border-blue border-1">
+                        <div className="flex flex-col flex-1 border-1 border-green">
+                            <Card isGlass dropShadow className="flex-1 h-2/5">
                                 <Card.Header>
                                     <Text variant="crimson" weight="bold" size="big">
                                         TOTAL AMOUNT DUE
@@ -81,16 +81,9 @@ export function Cashier_PointOfSale() {
                                 </Card.Footer>
                             </Card>
 
-                            <Card isGlass dropShadow className="h-3/6">
-                                <Card.Body>
-                                    <Table
-                                        rounded
-                                        shadow
-                                        pagination={{
-                                            maxItems: 10,
-                                        }}
-                                        className="h-full"
-                                    >
+                            <Card isGlass dropShadow className="h-2/5 max-h-[35vh] min-h-0">
+                                <Card.Body className="flex flex-col flex-1 max-h-[35vh]">
+                                    <Table rounded shadow pagination={{ maxItems: 10 }}>
                                         <Table.Row borderedBottom>
                                             <Table.Header bgVariant="crimson" textVariant="cream" text="Quantity" />
                                             <Table.Header bgVariant="crimson" textVariant="cream" text="Description" />

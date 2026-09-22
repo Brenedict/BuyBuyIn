@@ -367,7 +367,7 @@ export const WithoutPagination: Story = {
         enablePagination: false,
     },
     render: (args) => (
-        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100">
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100!">
             <Table.Row borderedBottom>
                 <Table.Header text="Name" nowrap />
                 <Table.Header text="Contact No." nowrap />
@@ -404,7 +404,7 @@ export const NoTableBorderStyle: Story = {
         shadow: false,
     },
     render: (args) => (
-        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100">
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100!">
             <Table.Row>
                 <Table.Header text="Name" nowrap />
                 <Table.Header text="Contact No." nowrap />
@@ -442,7 +442,7 @@ export const UppercaseHeaders: Story = {
         enablePagination: false,
     },
     render: (args) => (
-        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100">
+        <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100!">
             <Table.Row borderedBottom>
                 <Table.Header
                     text="Name"
@@ -796,7 +796,7 @@ export const WithEditAndDeleteButtons: Story = {
             : undefined;
 
         return (
-            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
+            <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig} >
                 <Table.Row borderedBottom={args.headerBorderedBottom}>
                     <Table.Header
                         text={args.headerText}

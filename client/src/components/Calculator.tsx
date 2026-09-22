@@ -7,7 +7,7 @@ import { VisibilityOffOutlined } from "@mui/icons-material";
 const CalculatorBtnColorClasses = {
     cream: "border-crimson bg-cream text-brown card-glass-effect hover:bg-crimson hover:text-cream",
     red: "border-crimson bg-crimson text-cream hover:bg-cream hover:text-crimson",
-    slate: "border-slate-medium bg-slate-medium text-cream hover:bg-cream hover:hover:text-slate-medium",
+    slate: "border-slate-medium bg-slate-medium text-cream hover:bg-cream hover:text-slate-medium",
 } as const;
 type CalculatorBtnColorClassesVariant = keyof typeof CalculatorBtnColorClasses;
 
@@ -35,15 +35,6 @@ function CalculatorBtn({
 }
 
 //TODO: add display functionality
-function Display() {
-    const [displayCurrent, setDisplayCurrent] = useState<string>("");
-
-    return (
-        <div className="border border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-slate-dark">
-            <input className="bg-slate-dark" type="text" name="display" value={displayCurrent} />
-        </div>
-    );
-}
 
 export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<React.SetStateAction<boolean>> }) {
     const calcClass =

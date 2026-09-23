@@ -23,7 +23,9 @@ function CalculatorBtn({
     variant: CalculatorBtnColorClassesVariant;
 }) {
     const variantclass =
-        "rounded-[5px] py-3 px-2 w-full h-full border border-1 text-medium-big font-bold" +
+        "cursor-pointer rounded-[5px] py-3 px-2 w-full h-full border border-1 text-medium-big font-bold" +
+        " " +
+        className +
         " " +
         CalculatorBtnColorClasses[variant];
 
@@ -38,8 +40,30 @@ function CalculatorBtn({
 
 export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<React.SetStateAction<boolean>> }) {
     const calcClass =
-        "flex flex-col cursor-pointer justify-center items-center min-h-[680px] p-5 card-glass-effect min-w-[400px] max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
+        "flex flex-col justify-center items-center min-h-[680px] p-5 card-glass-effect min-w-[400px] max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
+
     const [displayCurrent, setDisplayCurrent] = useState<string>("");
+    const [displayHistory, setDisplayHistory] = useState<string>("");
+
+    const handleNumber = (value: string) => {
+        setDisplayCurrent((current) => {
+            if (current === "0") {
+                return value;
+            }
+
+            return current + value;
+        });
+    };
+
+    const handleDelete = () => {
+        setDisplayCurrent((current) => {
+            if (current.length <= 1) {
+                return "0";
+            }
+
+            return current.slice(0, -1);
+        });
+    };
 
     return (
         <div className={calcClass}>
@@ -52,87 +76,37 @@ export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<Reac
                 />
 
                 <div className="grid grid-cols-4 gap-3 w-full">
-                    <CalculatorBtn variant="cream" handleClick={() => setDisplayCurrent("Hey ya")}>
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("7")}>
                         7
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("8")}>
                         8
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("9")}>
                         9
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="red"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="red" handleClick={() => setDisplayCurrent("0")}>
                         C
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("4")}>
                         4
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("5")}>
                         5
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("6")}>
                         6
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="slate"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="slate" handleClick={handleDelete}>
                         DEL
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("1")}>
                         1
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("2")}>
                         2
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("3")}>
                         3
                     </CalculatorBtn>
                     <CalculatorBtn
@@ -143,28 +117,13 @@ export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<Reac
                     >
                         DISC
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("0")}>
                         0
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("00")}>
                         00
                     </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
+                    <CalculatorBtn variant="cream" handleClick={() => setDisplayCurrent((prev) => prev + ".")}>
                         .
                     </CalculatorBtn>
                     <CalculatorBtn
@@ -177,6 +136,14 @@ export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<Reac
                     </CalculatorBtn>
                 </div>
                 <div className="flex justify-between gap-3 w-full">
+                    <CalculatorBtn
+                        variant="red"
+                        handleClick={() => {
+                            return;
+                        }}
+                    >
+                        QTY
+                    </CalculatorBtn>
                     <CalculatorBtn
                         variant="cream"
                         handleClick={() => {

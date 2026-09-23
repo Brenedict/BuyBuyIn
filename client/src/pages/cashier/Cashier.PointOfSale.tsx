@@ -48,6 +48,7 @@ export function Cashier_PointOfSale() {
     return (
         <div className="flex flex-col h-full">
             <section className={`flex flex-col h-full ${spacing}`}>
+                {/* top section */}
                 <div className="flex flex-row gap-2 w-full">
                     <SearchInput className="flex-1" />
                     <div className="flex flex-row">
@@ -58,6 +59,7 @@ export function Cashier_PointOfSale() {
                     </div>
                 </div>
 
+                {/* calendar and time */}
                 <div className={`flex flex-col h-full mt-3 relative`}>
                     <div className="flex flex-row gap-7 items-center justify-center">
                         <Text size="big" variant="crimson" weight="bold">
@@ -84,7 +86,7 @@ export function Cashier_PointOfSale() {
                             POS Terminal {terminalNumber}
                         </Text>
                     </div>
-
+                    {/* Amount Due Display */}
                     <div className={`flex flex-row w-full h-full px-0! ${spacing}`}>
                         <div className={`flex flex-col flex-1 gap-2 h-full`}>
                             <Card isGlass={false} dropShadow className="flex-1 h-1/5 max-h-[20vh] bg-off-white">
@@ -115,6 +117,7 @@ export function Cashier_PointOfSale() {
                                 </Card.Body>
                             </Card>
 
+                            {/* transactions table */}
                             <div className="h-2/5 min-h-0 max-h-[44vh] justify-center items-center overflow-auto flex-2">
                                 <Table rounded shadow pagination={{ maxItems: 10 }}>
                                     <Table.Row borderedBottom>
@@ -129,7 +132,7 @@ export function Cashier_PointOfSale() {
                                                 <div className="flex flex-row justify-center gap-[10%] items-center">
                                                     <Button size="smallest" leftIcon={Add}></Button>
                                                     {transaction[0]}
-                                                    <Button size="smallest" leftIcon={Remove}></Button>
+                                                    <Button size="smallest" variant="grey" leftIcon={Remove}></Button>
                                                 </div>
                                             </Table.Data>
                                             <Table.Data text={String(transaction[1])}></Table.Data>
@@ -139,6 +142,8 @@ export function Cashier_PointOfSale() {
                                     ))}
                                 </Table>
                             </div>
+
+                            {/* Actions panel */}
                             <Card className="flex flex-col flex-1 justify-center items-center px-10">
                                 <Card.Body className="flex flex-row justify-between w-full  px-0!">
                                     <div className="flex flex-col items-center  justify-center w-[45%] gap-2">
@@ -190,7 +195,7 @@ export function Cashier_PointOfSale() {
                                 </div>
                             </Card>
                         </div>
-
+                        {/* Calculator toggle */}
                         {isCalculatorToggled ? (
                             <Calculator handleToggle={setIsCalculatorToggled} />
                         ) : (
@@ -201,7 +206,7 @@ export function Cashier_PointOfSale() {
                                 leftIcon={ArrowLeftRounded}
                                 onClick={() => setIsCalculatorToggled((e) => !e)}
                             >
-                                <span className="hidden group-hover:inline">Calculator</span>
+                                <span className="hidden group-hover:inline">Keypad</span>
                             </Button>
                         )}
                     </div>

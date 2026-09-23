@@ -200,9 +200,11 @@ function Table({
     return (
         <section
             {...props}
-            className={`${shadow ? "shadow-xl" : ""} ${rounded ? "rounded-2xl" : ""} ${bordered ? "border-brown border" : ""} overflow-hidden  bg-off-white ${props.className ?? ""} `}
+            className={`${shadow ? "shadow-xl" : ""} ${rounded ? "rounded-2xl" : ""} ${bordered ? "border-brown border" : ""} flex h-full min-h-0 flex-col overflow-hidden bg-off-white ${
+                props.className ?? ""
+            }`}
         >
-            <div className="overflow-auto overscroll-none">
+            <div className="min-h-0 flex-1 overflow-auto overscroll-none">
                 <table className="w-full table-auto">
                     <thead className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">{header}</thead>
 
@@ -215,20 +217,25 @@ function Table({
                     </tfoot>
                 </table>
             </div>
+
             {pagination && (
                 <section
-                    className={`${ColorClasses[bgVariant].bg} ${borderedTop ? `border-t ${ColorClasses[borderVariant].border}` : ""}  px-8 py-4  flex justify-between w-full`}
+                    className={`${ColorClasses[bgVariant].bg} ${
+                        borderedTop ? `border-t ${ColorClasses[borderVariant].border}` : ""
+                    } flex w-full shrink-0 justify-between px-8 py-4`}
                 >
                     <Text size={textSize} weight={textWeight} align="left" variant={textVariant}>
                         {paginationText}
                     </Text>
-                    {rows.length > 0 && (
+
+                    {rows.length > 0 && paginatedRows?.length !== rows.length && (
                         <PaginationControls
                             page={page}
                             handleLeftClick={() => setPage(page - 1)}
                             handleRightClick={() => setPage(page + 1)}
                             handleInputChange={(e) => {
                                 const nextPage = Number(e.target.value);
+
                                 if (isNaN(nextPage)) return page;
 
                                 return setPage(nextPage);

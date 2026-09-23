@@ -204,6 +204,10 @@ function Table({
                 props.className ?? ""
             }`}
         >
+            {/**
+             * FROM BINAS: I Kept this classname for the table div, for some reason pag kinukuha ko yung
+             * from dev branch di properly lumalabas yung pagination
+             */}
             <div className="overflow-auto overscroll-none">
                 <table className="w-full table-auto">
                     <thead className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">{header}</thead>

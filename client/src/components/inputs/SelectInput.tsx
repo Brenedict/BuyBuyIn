@@ -181,7 +181,7 @@ export default function SelectInput({
 
                 {isOpen && (
                     // This is nested so that the scrollbar properly follows the border radius
-                    <section className={`absolute z-100 max-h-41 overflow-hidden ${dropdownVariantStyle}`}>
+                    <section className={`absolute z-800 max-h-41 overflow-hidden ${dropdownVariantStyle}`}>
                         <div className="max-h-41 overflow-auto">{children}</div>
                     </section>
                 )}

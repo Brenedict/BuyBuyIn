@@ -17,19 +17,20 @@ export type FontVariant = keyof typeof FontClasses;
 // ------------------------ FIXED Text Size Classes and Type ------------------------
 
 // Size Classes (Text and SVG)
+// Currently, the text sizes are downscaled two units for md size (1024x748)
 export const SizeClasses = {
-    iconHero: "text-icon-hero",
-    larger: "text-larger",
-    large: "text-large",
-    bigger: "text-bigger",
-    big: "text-big",
-    mediumBig: "text-medium-big",
-    mediumSmall: "text-medium-small",
-    medium: "text-medium",
-    normal: "text-normal",
+    iconHero: "lg:text-icon-hero md:text-large",
+    larger: "lg:text-larger md:text-bigger",
+    large: "lg:text-large md:text-big",
+    bigger: "lg:text-bigger md:text-medium-big",
+    big: "lg:text-big md:text-medium-small",
+    mediumBig: "lg:text-medium-big md:text-medium",
+    mediumSmall: "lg:text-medium-small md:text-normal",
+    medium: "lg:text-medium md:text-description",
+    normal: "lg:text-normal md:text-small-description",
     description: "text-description",
     small: "text-small-description",
-    smaller: "text-smaller-description",
+    smaller: "lg:text-smaller-description md:text-[0px]!",
     smallest: "text-smallest-description",
 } as const;
 

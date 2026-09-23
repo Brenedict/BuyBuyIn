@@ -1,312 +1,386 @@
+export const SAMPLE_OVERALL_BRANCHES = [
+    {
+        branchId: 1,
+        businessId: 1,
+        location: "PUP Sta. Mesa",
+        accountLimit: 10,
+    },
+    {
+        branchId: 2,
+        businessId: 1,
+        location: "PUP QC",
+        accountLimit: 10,
+    },
+    {
+        branchId: 3,
+        businessId: 1,
+        location: "PUP San Juan",
+        accountLimit: 10,
+    },
+    {
+        branchId: 4,
+        businessId: 1,
+        location: "PUP Sta. Rosa",
+        accountLimit: 10,
+    },
+    {
+        branchId: 5,
+        businessId: 1,
+        location: "PUP Mars",
+        accountLimit: 10,
+    },
+];
+
 export const SAMPLE_OFFERS = [
-    ...[...Array(1)].flatMap(() => [
-        {
-            offerName: "Summer Sale 2026",
-            description: "Summer products discounted",
-            startDate: new Date(),
-            endDate: new Date(),
-            offerStatus: "ENABLED",
-            offerType: "INDIVIDUAL",
-            discountType: null,
-            overallDiscountValue: null,
-            branchWideOfferBranches: [
-                {
-                    branchName: "Branch North Manila",
-                },
-                {
-                    branchName: "Branch West Ave",
-                },
-                {
-                    branchName: "Branch South Bound",
-                },
-                {
-                    branchName: "Branch America",
-                },
-            ],
-            branchWideOfferProduct: [
-                {
-                    id: 1,
-                    unitDiscountValue: 20,
-                    requiredQuantity: 2,
-                    discountType: "PERCENTAGE",
-                },
-                {
-                    id: 2,
-                    unitDiscountValue: 5,
-                    requiredQuantity: 2,
-                    discountType: "FIXED_VALUE",
-                },
-                {
-                    id: 3,
-                    unitDiscountValue: 10,
-                    requiredQuantity: 3,
-                    discountType: "PERCENTAGE",
-                },
-            ],
-        },
-        {
-            offerName: "Summer Sale 2026",
-            description: "Summer products discounted",
-            startDate: new Date(),
-            endDate: new Date(),
-            offerStatus: "DRAFT",
-            offerType: "INDIVIDUAL",
-            discountType: null,
-            overallDiscountValue: null,
-            branchWideOfferBranches: [
-                {
-                    branchName: "Branch North Manila",
-                },
-                {
-                    branchName: "Branch West Ave",
-                },
-                {
-                    branchName: "Branch South Bound",
-                },
-                {
-                    branchName: "Branch America",
-                },
-            ],
-            branchWideOfferProduct: [
-                {
-                    id: 1,
-                    unitDiscountValue: 20,
-                    requiredQuantity: 2,
-                    discountType: "PERCENTAGE",
-                },
-                {
-                    id: 2,
-                    unitDiscountValue: 5,
-                    requiredQuantity: 2,
-                    discountType: "FIXED_VALUE",
-                },
-                {
-                    id: 3,
-                    unitDiscountValue: 10,
-                    requiredQuantity: 3,
-                    discountType: "PERCENTAGE",
-                },
-            ],
-        },
-        {
-            offerName: "Summer Sale 2026",
-            description: "Summer products discounted",
-            startDate: new Date(),
-            endDate: new Date(),
-            offerStatus: "ENABLED",
-            offerType: "INDIVIDUAL",
-            discountType: null,
-            overallDiscountValue: null,
-            branchWideOfferBranches: [
-                {
-                    branchName: "Branch North Manila",
-                },
-                {
-                    branchName: "Branch West Ave",
-                },
-                {
-                    branchName: "Branch South Bound",
-                },
-                {
-                    branchName: "Branch America",
-                },
-            ],
-            branchWideOfferProduct: [
-                {
-                    id: 1,
-                    unitDiscountValue: 20,
-                    requiredQuantity: 2,
-                    discountType: "PERCENTAGE",
-                },
-                {
-                    id: 2,
-                    unitDiscountValue: 5,
-                    requiredQuantity: 2,
-                    discountType: "FIXED_VALUE",
-                },
-                {
-                    id: 3,
-                    unitDiscountValue: 10,
-                    requiredQuantity: 3,
-                    discountType: "PERCENTAGE",
-                },
-            ],
-        },
-        {
-            offerName: "Summer Sale 2026",
-            description: "Summer products discounted",
-            startDate: new Date(),
-            endDate: new Date(),
-            offerStatus: "disabled",
-            offerType: "INDIVIDUAL",
-            discountType: null,
-            overallDiscountValue: null,
-            branchWideOfferBranches: [
-                {
-                    branchName: "Branch North Manila",
-                },
-                {
-                    branchName: "Branch West Ave",
-                },
-                {
-                    branchName: "Branch South Bound",
-                },
-                {
-                    branchName: "Branch America",
-                },
-            ],
-            branchWideOfferProduct: [
-                {
-                    id: 1,
-                    unitDiscountValue: 20,
-                    requiredQuantity: 2,
-                    discountType: "PERCENTAGE",
-                },
-                {
-                    id: 2,
-                    unitDiscountValue: 5,
-                    requiredQuantity: 2,
-                    discountType: "FIXED_VALUE",
-                },
-                {
-                    id: 3,
-                    unitDiscountValue: 10,
-                    requiredQuantity: 3,
-                    discountType: "PERCENTAGE",
-                },
-            ],
-        },
-        {
-            offerName: "Summer Sale 2026",
-            description: "Summer products discounted",
-            startDate: new Date(),
-            endDate: new Date(),
-            offerStatus: "ENABLED",
-            offerType: "INDIVIDUAL",
-            discountType: null,
-            overallDiscountValue: null,
-            branchWideOfferBranches: [
-                {
-                    branchName: "Branch North Manila",
-                },
-                {
-                    branchName: "Branch West Ave",
-                },
-                {
-                    branchName: "Branch South Bound",
-                },
-                {
-                    branchName: "Branch America",
-                },
-            ],
-            branchWideOfferProduct: [
-                {
-                    id: 1,
-                    unitDiscountValue: 20,
-                    requiredQuantity: 2,
-                    discountType: "PERCENTAGE",
-                },
-                {
-                    id: 2,
-                    unitDiscountValue: 5,
-                    requiredQuantity: 2,
-                    discountType: "FIXED_VALUE",
-                },
-                {
-                    id: 3,
-                    unitDiscountValue: 10,
-                    requiredQuantity: 3,
-                    discountType: "PERCENTAGE",
-                },
-            ],
-        },
-        {
-            offerName: "Summer Sale 2026",
-            description: "Summer products discounted",
-            startDate: new Date(),
-            endDate: new Date(),
-            offerStatus: "ENABLED",
-            offerType: "INDIVIDUAL",
-            discountType: null,
-            overallDiscountValue: null,
-            branchWideOfferBranches: [
-                {
-                    branchName: "Branch North Manila",
-                },
-                {
-                    branchName: "Branch West Ave",
-                },
-                {
-                    branchName: "Branch South Bound",
-                },
-                {
-                    branchName: "Branch America",
-                },
-            ],
-            branchWideOfferProduct: [
-                {
-                    id: 1,
-                    unitDiscountValue: 20,
-                    requiredQuantity: 2,
-                    discountType: "PERCENTAGE",
-                },
-                {
-                    id: 2,
-                    unitDiscountValue: 5,
-                    requiredQuantity: 2,
-                    discountType: "FIXED_VALUE",
-                },
-                {
-                    id: 3,
-                    unitDiscountValue: 10,
-                    requiredQuantity: 3,
-                    discountType: "PERCENTAGE",
-                },
-            ],
-        },
-        {
-            offerName: "Summer Sale 2026",
-            description: "Summer products discounted",
-            startDate: new Date(),
-            endDate: new Date(),
-            offerStatus: "ENABLED",
-            offerType: "INDIVIDUAL",
-            discountType: null,
-            overallDiscountValue: null,
-            branchWideOfferBranches: [
-                {
-                    branchName: "Branch North Manila",
-                },
-                {
-                    branchName: "Branch West Ave",
-                },
-                {
-                    branchName: "Branch South Bound",
-                },
-                {
-                    branchName: "Branch America",
-                },
-            ],
-            branchWideOfferProduct: [
-                {
-                    id: 1,
-                    unitDiscountValue: 20,
-                    requiredQuantity: 2,
-                    discountType: "PERCENTAGE",
-                },
-                {
-                    id: 2,
-                    unitDiscountValue: 5,
-                    requiredQuantity: 2,
-                    discountType: "FIXED_VALUE",
-                },
-                {
-                    id: 3,
-                    unitDiscountValue: 10,
-                    requiredQuantity: 3,
-                    discountType: "PERCENTAGE",
-                },
-            ],
-        },
-    ]),
+    // Example 1: Selected Branches, Selected Products
+    {
+        id: 1,
+        offerName: "Summer Sale 2026",
+        description: "Summer products discounted",
+        startDate: "2026-09-30",
+        endDate: "2026-10-29",
+        offerStatus: "draft",
+        offerType: "INDIVIDUAL",
+        discountType: null,
+        overallDiscountValue: null,
+        branchWideOfferBranches: [
+            {
+                branchWideOfferId: 1,
+                branchId: 1,
+            },
+            {
+                branchWideOfferId: 2,
+                branchId: 2,
+            },
+            {
+                branchWideOfferId: 3,
+                branchId: 3,
+            },
+        ],
+        branchWideOfferProduct: [
+            {
+                id: 1,
+                productName: "Pasta",
+                shelfPrice: 50.99,
+                unitDiscountValue: 20,
+                requiredQuantity: 2,
+                discountType: "PERCENTAGE",
+            },
+            {
+                id: 2,
+                productName: "Tomato Sauce",
+                shelfPrice: 35,
+                unitDiscountValue: 5,
+                requiredQuantity: 2,
+                discountType: "FIXED_VALUE",
+            },
+            {
+                id: 3,
+                productName: "Eden Cheese",
+                shelfPrice: 23.5,
+                unitDiscountValue: 10,
+                requiredQuantity: 3,
+                discountType: "PERCENTAGE",
+            },
+        ],
+    },
+    // Example 2: All Branches, Overall Product Discounts
+    {
+        id: 2,
+        offerName: "Free4All",
+        description: "Free products in selected branches",
+        startDate: "2026-01-01",
+        endDate: "2026-01-01",
+        offerStatus: "enabled",
+        offerType: "OVERALL",
+        discountType: "PERCENTAGE",
+        overallDiscountValue: 100,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
+    },
+    // Example 3: Selected Branches (4 of 5), Percentage-Only Products
+    {
+        id: 3,
+        offerName: "Clearance Weekend",
+        description: "Last-chance markdowns on select items",
+        startDate: "2026-07-18",
+        endDate: "2026-07-19",
+        offerStatus: "enabled",
+        offerType: "INDIVIDUAL",
+        discountType: null,
+        overallDiscountValue: null,
+        branchWideOfferBranches: [
+            {
+                branchWideOfferId: 1,
+                branchId: 1,
+            },
+            {
+                branchWideOfferId: 2,
+                branchId: 2,
+            },
+            {
+                branchWideOfferId: 3,
+                branchId: 4,
+            },
+            {
+                branchWideOfferId: 4,
+                branchId: 5,
+            },
+        ],
+        branchWideOfferProduct: [
+            {
+                id: 1,
+                productName: "Ground Coffee",
+                shelfPrice: 120,
+                unitDiscountValue: 25,
+                requiredQuantity: 1,
+                discountType: "PERCENTAGE",
+            },
+            {
+                id: 2,
+                productName: "Rice 1kg",
+                shelfPrice: 85.5,
+                unitDiscountValue: 15,
+                requiredQuantity: 2,
+                discountType: "PERCENTAGE",
+            },
+        ],
+    },
+    // Example 4: All Branches, Overall Fixed-Value Discount Plus Product Lines
+    {
+        id: 4,
+        offerName: "Holiday Feast Pack",
+        description: "Flat discount on top of selected product promos",
+        startDate: "2026-12-01",
+        endDate: "2026-12-24",
+        offerStatus: "draft",
+        offerType: "OVERALL",
+        discountType: "FIXED_VALUE",
+        overallDiscountValue: 25,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
+    },
+    // Example 5: Single Branch, Single Product, Disabled
+    {
+        id: 5,
+        offerName: "QC Launch Promo",
+        description: "Opening-week promo exclusive to PUP QC",
+        startDate: "2026-06-01",
+        endDate: "2026-06-07",
+        offerStatus: "disabled",
+        offerType: "INDIVIDUAL",
+        discountType: null,
+        overallDiscountValue: null,
+        branchWideOfferBranches: [
+            {
+                branchWideOfferId: 1,
+                branchId: 2,
+            },
+        ],
+        branchWideOfferProduct: [
+            {
+                id: 1,
+                productName: "Instant Noodles",
+                shelfPrice: 18.5,
+                unitDiscountValue: 10,
+                requiredQuantity: 5,
+                discountType: "FIXED_VALUE",
+            },
+        ],
+    },
+    // Example 6: All Branches, Overall Percentage Only, No Product Lines
+    {
+        id: 6,
+        offerName: "Storewide 10% Off",
+        description: "Year-round flat percentage off everything",
+        startDate: "2026-01-01",
+        endDate: "2026-12-31",
+        offerStatus: "enabled",
+        offerType: "OVERALL",
+        discountType: "PERCENTAGE",
+        overallDiscountValue: 10,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
+    },
+    // Example 7: All Branches Explicitly, Many Products With Mixed Discounts
+    {
+        id: 7,
+        offerName: "Back to School Blitz",
+        description: "School-essential promos at every branch",
+        startDate: "2026-08-01",
+        endDate: "2026-08-31",
+        offerStatus: "draft",
+        offerType: "INDIVIDUAL",
+        discountType: null,
+        overallDiscountValue: null,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [
+            {
+                id: 1,
+                productName: "Ballpen Box (50pcs)",
+                shelfPrice: 450,
+                unitDiscountValue: 30,
+                requiredQuantity: 1,
+                discountType: "PERCENTAGE",
+            },
+            {
+                id: 2,
+                productName: "Notebook 200 Sheets",
+                shelfPrice: 75,
+                unitDiscountValue: 20,
+                requiredQuantity: 3,
+                discountType: "FIXED_VALUE",
+            },
+            {
+                id: 3,
+                productName: "Binder 1 inch",
+                shelfPrice: 99,
+                unitDiscountValue: 15,
+                requiredQuantity: 2,
+                discountType: "PERCENTAGE",
+            },
+            {
+                id: 4,
+                productName: "Eraser Bar",
+                shelfPrice: 15,
+                unitDiscountValue: 3,
+                requiredQuantity: 4,
+                discountType: "FIXED_VALUE",
+            },
+        ],
+    },
+    // Example 8: All Branches, Overall Fixed Value With Product Lines, Disabled
+    {
+        id: 8,
+        offerName: "New Year Clearance",
+        description: "Flat 15 off everything plus extra product promos",
+        startDate: "2026-01-02",
+        endDate: "2026-01-31",
+        offerStatus: "disabled",
+        offerType: "OVERALL",
+        discountType: "FIXED_VALUE",
+        overallDiscountValue: 15,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
+    },
+    // Example 9: Selected Branches (2 of 5), Free-Item Via 100% Percentage
+    {
+        id: 9,
+        offerName: "Buy More Save More",
+        description: "Free second item when buying 3",
+        startDate: "2026-10-05",
+        endDate: "2026-10-12",
+        offerStatus: "enabled",
+        offerType: "INDIVIDUAL",
+        discountType: null,
+        overallDiscountValue: null,
+        branchWideOfferBranches: [
+            {
+                branchWideOfferId: 1,
+                branchId: 1,
+            },
+            {
+                branchWideOfferId: 2,
+                branchId: 3,
+            },
+        ],
+        branchWideOfferProduct: [
+            {
+                id: 1,
+                productName: "Milk 1L",
+                shelfPrice: 95,
+                unitDiscountValue: 100,
+                requiredQuantity: 3,
+                discountType: "PERCENTAGE",
+            },
+            {
+                id: 2,
+                productName: "Oatmeal Pack",
+                shelfPrice: 110,
+                unitDiscountValue: 30,
+                requiredQuantity: 3,
+                discountType: "PERCENTAGE",
+            },
+        ],
+    },
+    // Example 10: All Branches, Overall Percentage Plus Heavy Product Mix
+    {
+        id: 10,
+        offerName: "Loyalty Week",
+        description: "Extra 15% off with loyalty card plus member deals",
+        startDate: "2026-10-15",
+        endDate: "2026-10-21",
+        offerStatus: "draft",
+        offerType: "OVERALL",
+        discountType: "PERCENTAGE",
+        overallDiscountValue: 15,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
+    },
+    // Example 11: Selected Branches (3 of 5), Single-Day Flash Sale, Disabled
+    {
+        id: 11,
+        offerName: "Flash Sale Friday",
+        description: "24-hour deep discounts on snacks",
+        startDate: "2026-11-20",
+        endDate: "2026-11-20",
+        offerStatus: "disabled",
+        offerType: "INDIVIDUAL",
+        discountType: null,
+        overallDiscountValue: null,
+        branchWideOfferBranches: [
+            {
+                branchWideOfferId: 1,
+                branchId: 3,
+            },
+            {
+                branchWideOfferId: 2,
+                branchId: 4,
+            },
+            {
+                branchWideOfferId: 3,
+                branchId: 5,
+            },
+        ],
+        branchWideOfferProduct: [
+            {
+                id: 1,
+                productName: "Potato Chips",
+                shelfPrice: 25,
+                unitDiscountValue: 40,
+                requiredQuantity: 1,
+                discountType: "PERCENTAGE",
+            },
+            {
+                id: 2,
+                productName: "Gummy Bears",
+                shelfPrice: 30,
+                unitDiscountValue: 50,
+                requiredQuantity: 2,
+                discountType: "PERCENTAGE",
+            },
+            {
+                id: 3,
+                productName: "Choco Crisp Roll",
+                shelfPrice: 12,
+                unitDiscountValue: 20,
+                requiredQuantity: 6,
+                discountType: "PERCENTAGE",
+            },
+        ],
+    },
+    // Example 12: All Branches, Large Overall Fixed Value, No Product Lines
+    {
+        id: 12,
+        offerName: "Off-Season Deal",
+        description: "Flat 50 off all items during off-season",
+        startDate: "2026-11-01",
+        endDate: "2026-11-30",
+        offerStatus: "draft",
+        offerType: "OVERALL",
+        discountType: "FIXED_VALUE",
+        overallDiscountValue: 50,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
+    },
 ];

@@ -1,5 +1,6 @@
 // General Import
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Form, useParams } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
@@ -19,17 +20,42 @@ import AddIcon from "@mui/icons-material/Add";
 import CreateIcon from "@mui/icons-material/Create";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 
+// ROUTES
+import { ROUTES } from "../../routes/Routes";
+
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
+
+// Utils
+import { calculateDiscountedSubtotal, calculateSubtotal, formatDiscountValue } from "../../utils/offersUtils";
+import { formatFullDate } from "../../utils/dateUtils";
+
 // Test Data
 import { SAMPLE_OFFERS } from "../../TESTINGDATA/branchWideOfferData";
+import { SAMPLE_OVERALL_BRANCHES } from "../../TESTINGDATA/branchWideOfferData";
+import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 
 interface OfferProps {
     offerTitle: string;
     startDate: string;
     endDate: string;
     status: "enabled" | "draft" | "disabled";
+    handleClick: () => void;
 }
 
-function OfferCard({ offerTitle, startDate, endDate, status }: OfferProps) {
+// Main Page Exported
+export default function HQ_BranchWideOffers() {
+    return (
+        <Card className="h-[calc(100vh-4rem)] flex flex-col">
+            <Card.Body className="flex gap-6 grow min-h-0">
+                <OffersListSection />
+                <OfferConfigurationSection />
+            </Card.Body>
+        </Card>
+    );
+}
+
+function OfferCard({ offerTitle, startDate, endDate, status, handleClick }: OfferProps) {
     const statusClass: Record<OfferProps["status"], string> = {
         enabled: "bg-crimson text-cream font-bold",
         disabled: "bg-slate-light text-cream font-bold",
@@ -41,7 +67,7 @@ function OfferCard({ offerTitle, startDate, endDate, status }: OfferProps) {
     return (
         <Card
             className="hover:opacity-75 active:opacity-100 hover:cursor-pointer hover:scale-102 active:scale-100 transition-transform"
-            onClick={() => {}}
+            onClick={handleClick}
         >
             <Card.Body className="flex gap-3 justify-between">
                 <div className="flex flex-col gap-3">
@@ -54,6 +80,7 @@ function OfferCard({ offerTitle, startDate, endDate, status }: OfferProps) {
                     <div className={`w-fit px-3 py-1 rounded-xl ${statusClass[status]}`}>{status}</div>
                 </div>
                 <div className="flex h-fit gap-1 pt-1">
+                    {/* Overwritten Buttons for customized no background buttons */}
                     <Button
                         variant="secondary"
                         rightIcon={CreateIcon}
@@ -73,16 +100,29 @@ function OfferCard({ offerTitle, startDate, endDate, status }: OfferProps) {
 }
 
 function OffersListSection() {
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    const { values, submit } = useFormSearchParams({ search: "" });
+
     return (
         <div className="w-[25%] flex flex-col gap-4 h-full min-h-0">
-            <SearchInput placeholder="Search Offers" />
+            <Form onSubmit={submit()}>
+                <SearchInput name="search" placeholder="Search Offers" defaultValue={values.search} />
+            </Form>
             <section className="flex flex-col gap-6 pr-3 grow overflow-y-auto min-h-0 *:shrink-0">
-                {SAMPLE_OFFERS.map((row, i) => (
+                {/* Generates the offer cards */}
+                {SAMPLE_OFFERS.filter((offer) =>
+                    offer.offerName.toLowerCase().includes(values.search.toLowerCase())
+                ).map((offer, i) => (
                     <OfferCard
-                        offerTitle={row.offerName}
-                        startDate={String(row.startDate.toLocaleDateString("en-US"))}
-                        endDate={String(row.endDate.toLocaleDateString("en-US"))}
-                        status={row.offerStatus.toLocaleLowerCase() as OfferProps["status"]}
+                        offerTitle={offer.offerName}
+                        startDate={formatFullDate(new Date(offer.startDate))}
+                        endDate={formatFullDate(new Date(offer.endDate))}
+                        status={offer.offerStatus.toLocaleLowerCase() as OfferProps["status"]}
+                        handleClick={() => {
+                            useNavigate(ROUTES.HQ_ADMIN.branchOffersEdit(String(offer.id)), true);
+                        }}
                     />
                 ))}
             </section>
@@ -91,38 +131,68 @@ function OffersListSection() {
 }
 
 function ToggleSelectBranches() {
-    const exampleBranches = ["North Manila", "South Pasay", "West Pasig", "East Ave"];
+    // Extracts the Branch Wide Offer Id from the URL Param
+    const { id } = useParams();
+
+    // Data containing all branches from a business
+    const testAllBranches = SAMPLE_OVERALL_BRANCHES;
+
+    // Extracting the branches only. The 'useMemo' is for caching.
+    const testOfferBranches = useMemo(
+        () => SAMPLE_OFFERS.find((offer) => String(offer.id) == id)?.branchWideOfferBranches,
+        [id]
+    );
 
     return (
         <Card dropShadow={false}>
             <Card.Body>
-                {exampleBranches.map((value) => (
-                    <ChoiceInput id={value}>{value}</ChoiceInput>
-                ))}
+                {testAllBranches.map((branch, i) => {
+                    // Check the current branch from the overall list is checked in the current offer (means the current branch is selected)
+                    const isChecked = testOfferBranches?.some(
+                        (offerBranch) => String(offerBranch.branchId) === String(branch.branchId)
+                    );
+
+                    return (
+                        <ChoiceInput id={String(branch.branchId)} defaultChecked={isChecked}>
+                            {branch.location}
+                        </ChoiceInput>
+                    );
+                })}
             </Card.Body>
         </Card>
     );
 }
 
 function ToggleOverallDiscountType() {
-    const [discountType, setDiscountType] = useState("Percentage");
-    const [discountAmount, setdiscountAmount] = useState(10);
+    // Extracts the Branch Wide Offer Id from the URL Param
+    const { id } = useParams();
+
+    // Extracting the branches only. The 'useMemo' is for caching.
+    // @ts-ignore
+    const { discountType, overallDiscountValue } = useMemo(
+        () => SAMPLE_OFFERS.find((offer) => String(offer.id) == id),
+        [id]
+    );
+
+    // State variables
+    const [discountTypeInput, setDiscountTypeInput] = useState(discountType ?? "PERCENTAGE");
+    const [discountAmount, setdiscountAmount] = useState(overallDiscountValue ?? 0);
 
     return (
         <div className="grid grid-cols-2 gap-x-6">
             <SelectInput
-                name="discountType"
-                defaultValue="Percentage"
+                name="discountTypeInput"
+                defaultValue={discountType ?? "PERCENTAGE"}
                 label="Discount Type"
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDiscountType(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDiscountTypeInput(e.target.value)}
             >
-                <SelectInput.Option value="Percentage">Percentage</SelectInput.Option>
-                <SelectInput.Option value="FixedValue">Fixed Value</SelectInput.Option>
+                <SelectInput.Option value="PERCENTAGE">Percentage</SelectInput.Option>
+                <SelectInput.Option value="FIXED_VALUE">Fixed Value</SelectInput.Option>
             </SelectInput>
             <GeneralInput
                 type="number"
                 placeholder="10"
-                defaultValue={10}
+                defaultValue={overallDiscountValue ?? 0}
                 label="Discount Value"
                 // TODO: Make the onChange work here
                 onChange={(e) => setdiscountAmount(Number(e.target.value))}
@@ -130,7 +200,7 @@ function ToggleOverallDiscountType() {
             <Text>
                 WARNING: This will apply a{" "}
                 <span className="font-bold ">
-                    {discountType === "Percentage" ? `${discountAmount}%` : `Php ${discountAmount}`} discount
+                    {discountTypeInput === "PERCENTAGE" ? `${discountAmount}%` : `Php ${discountAmount}`} discount
                 </span>{" "}
                 to all products.
             </Text>
@@ -139,6 +209,16 @@ function ToggleOverallDiscountType() {
 }
 
 function ToggleIndividualDiscountType() {
+    // Extracts the Branch Wide Offer Id from the URL Param
+    const { id } = useParams();
+
+    // Extracting the branches only.
+    const testSelectedProducts = useMemo(
+        () => SAMPLE_OFFERS.find((offer) => String(offer.id) == id)?.branchWideOfferProduct,
+        [id]
+    );
+
+    // Test button handlers
     const handleEdit = (id: string | number) => () => {
         alert(`Edit: ${id}`);
     };
@@ -163,6 +243,7 @@ function ToggleIndividualDiscountType() {
                 </Text>
             </Card.Header>
             <Table pagination={{ maxItems: 5 }} className="rounded-none! border-0!">
+                {/* Fixed table headers */}
                 <Table.Row borderedBottom>
                     <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
                     <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
@@ -170,57 +251,107 @@ function ToggleIndividualDiscountType() {
                     <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
                     <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
                     <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
+                    <Table.Header isPadded={false} size="small" className="px-3!" text="Discounted Subtotal" />
                     <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
                 </Table.Row>
-                <Table.Row>
-                    <Table.Data isPadded={false} size="small" text={"26"} />
-                    <Table.Data isPadded={false} size="small" text={"532-124"} />
-                    <Table.Data isPadded={false} size="small" text={"Corned Beef"} />
-                    <Table.Data isPadded={false} size="small" text={"P36.00"} />
-                    <Table.Data isPadded={false} size="small" text={"0.70"} />
-                    <Table.Data isPadded={false} size="small" text={"P52.56"} />
 
-                    <Table.Data isPadded={false}>
-                        <EditDeleteButtons id={1} size="smallest" handleEdit={handleEdit} handleDelete={handleDelete} />
-                    </Table.Data>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Data isPadded={false} size="small" text={"26"} />
-                    <Table.Data isPadded={false} size="small" text={"532-124"} />
-                    <Table.Data isPadded={false} size="small" text={"Corned Beef"} />
-                    <Table.Data isPadded={false} size="small" text={"P36.00"} />
-                    <Table.Data isPadded={false} size="small" text={"0.70"} />
-                    <Table.Data isPadded={false} size="small" text={"P52.56"} />
+                {/* Dynamically maps out data */}
+                {testSelectedProducts?.map((product, i) => (
+                    <Table.Row>
+                        <Table.Data isPadded={false} size="small" text={String(product.requiredQuantity)} />
+                        <Table.Data isPadded={false} size="small" text={String(product.id)} />
+                        <Table.Data isPadded={false} size="small" text={String(product.productName)} />
+                        <Table.Data isPadded={false} size="small" text={String(product.shelfPrice)} />
+                        <Table.Data
+                            isPadded={false}
+                            size="small"
 
-                    <Table.Data isPadded={false}>
-                        <EditDeleteButtons id={1} size="smallest" handleEdit={handleEdit} handleDelete={handleDelete} />
-                    </Table.Data>
-                </Table.Row>
+                            // @ts-ignore
+                            text={formatDiscountValue(product.discountType, product.unitDiscountValue)}
+                        />
+                        <Table.Data
+                            isPadded={false}
+                            size="small"
+                            text={calculateSubtotal(product.requiredQuantity, product.shelfPrice)}
+                        />
+                        <Table.Data
+                            isPadded={false}
+                            size="small"
+                            text={calculateDiscountedSubtotal(
+                                // @ts-ignore
+                                product.discountType,
+                                product.unitDiscountValue,
+                                product.requiredQuantity,
+                                product.shelfPrice
+                            )}
+                        />
+                        <Table.Data isPadded={false}>
+                            <EditDeleteButtons
+                                id={1}
+                                size="smallest"
+                                handleEdit={handleEdit}
+                                handleDelete={handleDelete}
+                            />
+                        </Table.Data>
+                    </Table.Row>
+                ))}
             </Table>
         </Card>
     );
 }
 
 function OfferConfigurationSection() {
-    const [toggleBranchListSelect, setToggleBranchListSelect] = useState(true);
-    const [toggleOverallDiscount, setToggleOverallDiscount] = useState(true);
+    // Extracts the Branch Wide Offer Id from the URL Param
+    const { id } = useParams();
+
+    // Extracting the test data. The 'useMemo' is for caching.
+    const testOffer = useMemo(() => SAMPLE_OFFERS.find((offer) => String(offer.id) == id), [id]);
+
+    // Checks if the current config is for selected branches only or for all
+    const isForSelectedBranches =
+        testOffer?.branchWideOfferBranches == undefined || testOffer?.branchWideOfferBranches.length <= 0
+            ? false
+            : true;
+
+    // Checks if the current config is discount for selected products only or for all
+    const isForOverallDiscount = testOffer?.offerType == "OVERALL";
+
+    // State variables used by inputs
+    const [toggleSelectedBranchList, setToggleSelectedBranchList] = useState(isForSelectedBranches);
+    const [toggleOverallDiscount, setToggleOverallDiscount] = useState(isForOverallDiscount);
+
+    // Sync state whenever the offer id changes (e.g. navigating between offers)
+    useEffect(() => {
+        setToggleSelectedBranchList(isForSelectedBranches);
+        setToggleOverallDiscount(isForOverallDiscount);
+    }, [id, testOffer]);
 
     return (
         <Card isGlass={false} className="w-[75%] h-full flex flex-col">
             <Card.Header toggleRightButton rightButton={<Button>Save Offer</Button>} bordered className="shrink-0">
                 <Text weight="bold" size="bigger">
-                    Offer Configuration
+                    Offer Configuration - {`${id ? "Edit" : "Add "}`}
                 </Text>
             </Card.Header>
 
             <Card.Body className="flex flex-col gap-4 grow overflow-y-auto min-h-0 *:shrink-0">
-                <GeneralInput type="text" label="Offer Name" />
-                <TextAreaInput label="Description" />
+                <GeneralInput
+                    key={`offerName-${id}`}
+                    type="text"
+                    label="Offer Name"
+                    defaultValue={testOffer?.offerName}
+                />
+                <TextAreaInput key={`description-${id}`} label="Description" defaultValue={testOffer?.description} />
 
                 {/* Date Range */}
                 <div className="flex gap-6 items-end">
-                    <GeneralInput type="date" label="Date Range" />
-                    <GeneralInput type="date" />
+                    <GeneralInput
+                        key={`startDate-${id}`}
+                        type="date"
+                        label="Date Range"
+                        defaultValue={testOffer?.startDate}
+                    />
+                    <GeneralInput key={`endDate-${id}`} type="date" defaultValue={testOffer?.endDate} />
                 </div>
 
                 {/* Branch Selection */}
@@ -234,8 +365,8 @@ function OfferConfigurationSection() {
                             id="allBranches"
                             name="selectBranch"
                             className="w-fit!"
-                            defaultChecked
-                            onChange={() => setToggleBranchListSelect(true)}
+                            checked={toggleSelectedBranchList == false}
+                            onChange={() => setToggleSelectedBranchList(false)}
                         >
                             All Branches
                         </ChoiceInput>
@@ -244,27 +375,42 @@ function OfferConfigurationSection() {
                             id="selectedBranches"
                             name="selectBranch"
                             className="w-fit!"
-                            onChange={() => setToggleBranchListSelect(false)}
+                            checked={toggleSelectedBranchList == true}
+                            onChange={() => setToggleSelectedBranchList(true)}
                         >
                             Select Branches
                         </ChoiceInput>
                     </div>
-
-                    {!toggleBranchListSelect && <ToggleSelectBranches />}
+                    {toggleSelectedBranchList && <ToggleSelectBranches key={id} />}
                 </div>
+
+                {/* Offer Type Selection */}
                 <ChoiceInput
                     id="offerType"
                     label="Offer Type"
                     className="w-fit!"
-                    defaultChecked
+                    checked={toggleOverallDiscount}
                     onChange={() => setToggleOverallDiscount((value) => !value)}
                 >
                     All Product Discount (Overall)
                 </ChoiceInput>
 
-                {toggleOverallDiscount ? <ToggleOverallDiscountType /> : <ToggleIndividualDiscountType />}
+                {/* Toggle for discounts: Overall or Selected Products */}
+                {toggleOverallDiscount ? (
+                    // All Products Discount
+                    <ToggleOverallDiscountType key={id} />
+                ) : (
+                    // Selected Products Discount
+                    <ToggleIndividualDiscountType key={id} />
+                )}
 
-                <SelectInput name="status" defaultValue="enabled" label="Status">
+                {/* Set status of offer */}
+                <SelectInput
+                    key={`status-${id}`}
+                    name="status"
+                    defaultValue={testOffer?.offerStatus ?? "draft"}
+                    label="Status"
+                >
                     <SelectInput.Option value="enabled">Enabled</SelectInput.Option>
                     <SelectInput.Option value="disabled">Disabled</SelectInput.Option>
                     <SelectInput.Option value="draft">Draft</SelectInput.Option>
@@ -273,16 +419,3 @@ function OfferConfigurationSection() {
         </Card>
     );
 }
-
-export function HQ_BranchWideOffers() {
-    return (
-        <Card className="h-[calc(100vh-4rem)] flex flex-col">
-            <Card.Body className="flex gap-6 grow min-h-0">
-                <OffersListSection />
-                <OfferConfigurationSection />
-            </Card.Body>
-        </Card>
-    );
-}
-
-export default HQ_BranchWideOffers;

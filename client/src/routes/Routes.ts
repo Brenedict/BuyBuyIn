@@ -34,6 +34,7 @@ export const ROUTES = {
             manageUsers: `${base}/manage-users`,
             subscriptions: `${base}/subscriptions`,
             branchOffers: `${base}/branch-offers`,
+            branchOffersEdit: (id?: string) => `${base}/branch-offers/${id}/edit`,
         };
     })(),
 

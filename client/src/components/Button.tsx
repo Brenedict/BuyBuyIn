@@ -32,23 +32,23 @@ export type ButtonColorVariant = keyof typeof ButtonColorClasses;
 
 const ButtonSizeClasses = {
     smallest: {
-        button: "px-1 py-1 m-h-4 m-w-16 lg:text-xs md:text-2xs border rounded-[10px] gap-1",
+        button: "px-1 py-1 m-h-4 m-w-16 lg:text-xs text-2xs border rounded-[10px] gap-1",
         icon: "smaller",
     },
     small: {
-        button: "px-2 py-2 m-h-4 m-w-16 lg:text-xs md:text-2xs border rounded-[10px] gap-1",
+        button: "px-2 py-2 m-h-4 m-w-16 lg:text-xs text-2xs border rounded-[10px] gap-1",
         icon: "small",
     },
     normal: {
-        button: "px-2 py-2 m-h-4 m-w-16 lg:text-sm md:text-xs border rounded-[10px] gap-1",
+        button: "px-2 py-2 m-h-4 m-w-16 lg:text-sm text-xs border rounded-[10px] gap-1",
         icon: "normal",
     },
     medium: {
-        button: "px-4 py-3 m-h-8 m-w-16 lg:text-medium md:text-description border rounded-[10px] gap-2",
+        button: "px-4 py-3 m-h-8 m-w-16 lg:text-medium text-description border rounded-[10px] gap-2",
         icon: "bigger",
     },
     large: {
-        button: "px-6 py-5 m-h-10 m-w-20 lg:text-large md:text-big rounded-[15px] gap-6",
+        button: "px-6 py-5 m-h-10 m-w-20 lg:text-large text-big rounded-[15px] gap-6",
         icon: "iconHero",
     },
 } as const;

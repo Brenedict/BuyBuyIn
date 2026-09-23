@@ -60,7 +60,7 @@ function Header({
 
     return (
         <div
-            className={`${defaultClass} w-full lg:px-6 lg:py-4 md:px-5 md:py-3 flex ${contentAlignmentClass} ${className} `}
+            className={`${defaultClass} w-full lg:px-6 lg:py-4 px-5 py-3 flex ${contentAlignmentClass} ${className} `}
             {...props}
         >
             {children}
@@ -72,7 +72,7 @@ function Header({
 function Body({ children, bordered = false, className, ...props }: CardProps) {
     const defaultClass = `${bordered == true ? "border-b-[0.3px] border-t-[0.3px] border-black" : ""}`;
     return (
-        <div className={`${defaultClass} w-full lg:px-6 lg:py-4 md:px-5 md:py-3 ${className}`} {...props}>
+        <div className={`${defaultClass} w-full lg:px-6 lg:py-4 px-5 py-3 ${className}`} {...props}>
             {children}
         </div>
     );
@@ -81,7 +81,7 @@ function Body({ children, bordered = false, className, ...props }: CardProps) {
 function Footer({ children, bordered = false, className, ...props }: CardProps) {
     const defaultClass = `${bordered == true ? "border-t-[0.3px] border-black" : ""}`;
     return (
-        <div className={`${defaultClass} w-full lg:px-6 lg:py-4 md:px-5 md:py-3 ${className}`} {...props}>
+        <div className={`${defaultClass} w-full lg:px-6 lg:py-4 px-5 py-3 ${className}`} {...props}>
             {children}
         </div>
     );

@@ -17,20 +17,28 @@ export type FontVariant = keyof typeof FontClasses;
 // ------------------------ FIXED Text Size Classes and Type ------------------------
 
 // Size Classes (Text and SVG)
-// Currently, the text sizes are downscaled two units for md size (1024x748)
+// Currently, the text sizes are downscaled in units for md size (1024x748)
+
+/**
+ * Dynamic size meaning:
+ * By default the size of the text are those without the viewport below (e.g. text-large). This design method is mobile first. Accommodates smaller screens first.
+ * The size only adjust to bigger sizes when it reaches more than or equal to 'xl' (1280px) or 'lg' (1024px).
+ * TL;DR Example (large class): by default text size is 'text-big' when the screen is lg it bumps to 'text-bigger' or when its xl it bumps to 'text-large'
+ *
+ */
 export const SizeClasses = {
-    iconHero: "lg:text-icon-hero md:text-large",
-    larger: "lg:text-larger md:text-bigger",
-    large: "lg:text-large md:text-big",
-    bigger: "lg:text-bigger md:text-medium-big",
-    big: "lg:text-big md:text-medium-small",
-    mediumBig: "lg:text-medium-big md:text-medium",
-    mediumSmall: "lg:text-medium-small md:text-normal",
-    medium: "lg:text-medium md:text-description",
-    normal: "lg:text-normal md:text-small-description",
-    description: "text-description",
+    iconHero: "xl:text-icon-hero lg:text-larger text-large",
+    larger: "xl:text-larger lg:text-large text-bigger",
+    large: "xl:text-large lg:text-bigger text-big",
+    bigger: "xl:text-bigger lg:text-big text-medium-big",
+    big: "xl:text-big lg:text-medium-big text-medium-small",
+    mediumBig: "xl:text-medium-big lg:text-medium-small text-medium",
+    mediumSmall: "xl:text-medium-small lg:text-medium text-normal",
+    medium: "xl:text-medium lg:text-normal text-description",
+    normal: "xl:text-normal lg:text-description text-small-description",
+    description: "xl:text-description lg:text-small-description text-smaller-description",
     small: "text-small-description",
-    smaller: "lg:text-smaller-description md:text-[0px]!",
+    smaller: "text-smaller-description",
     smallest: "text-smallest-description",
 } as const;
 

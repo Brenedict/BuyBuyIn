@@ -81,7 +81,7 @@ export function BaseInput({ className, error, type, ...props }: InputProp) {
                 {...props}
                 placeholder={placeholderText}
                 className={`
-                    rounded-xl! lg:text-medium! md:text-description! py-2! block font-medium border border-slate-dark 
+                    rounded-xl! xl:text-medium! text-description py-2! block font-medium border border-slate-dark 
                     [&::-webkit-search-cancel-button]:hidden calendar-icon-brown bg-cream w-full placeholder-slate-light 
                     focus:outline-none focus:ring-1 focus:ring-slate-dark
                     ${errorStyle}

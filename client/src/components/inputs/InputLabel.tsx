@@ -19,7 +19,7 @@ export function Label({ htmlFor, label, boldLabel = true, isRequired }: LabelPro
     return (
         <label
             htmlFor={htmlFor}
-            className={`lg:text-big md:text-medium-small text-big block w-full mb-1 text-brown ${boldLabel ? "font-bold" : "font-normal"}`}
+            className={`text-medium-small xl:text-big block w-full mb-1 text-brown ${boldLabel ? "font-bold" : "font-normal"}`}
         >
             {label}
             {isRequired && (

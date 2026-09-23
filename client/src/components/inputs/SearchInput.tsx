@@ -29,9 +29,9 @@ export default function SearchInput({
         <div className={`relative ${className} ${hidden ? "hidden" : ""}`}>
             <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
 
-            <BaseInput type="search" className={`pl-10 text-sm py-2 px-4 rounded-3xl `} error={error} {...props} />
+            <BaseInput type="search" className={`pl-10 py-2 px-4 rounded-3xl `} error={error} {...props} />
 
-            <SearchOutlinedIcon className={`text-big-medium stroke-0 absolute bottom-2 left-3.5 ${searchIconStyle}`} />
+            <SearchOutlinedIcon className={`text-xs stroke-0 absolute bottom-2 left-3.5 ${searchIconStyle}`} />
             <ErrorMessage error={error} />
         </div>
     );

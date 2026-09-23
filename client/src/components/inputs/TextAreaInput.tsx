@@ -57,7 +57,7 @@ export default function TextAreaInput({
                 {...props}
                 placeholder={placeholderText}
                 className={`
-                    block rounded-xl text-description font-normal px-4 py-3 scroll-px-4 scroll-py-3 border border-slate-dark
+                    block rounded-xl text-medium font-medium px-4 py-3 scroll-px-4 scroll-py-3 border border-slate-dark
                     bg-cream w-full min-h-20 resize-none placeholder-slate-light  
                     focus:outline-none focus:ring-1 focus:ring-slate-dark focus:border-slate-dark 
                     ${errorStyle} 

@@ -34,3 +34,6 @@ storybook-static
 .agents
 .claude
 .windsurf
+
+/AGENTS.MD
+opencode.json

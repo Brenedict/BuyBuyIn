@@ -7,7 +7,15 @@ import Table from "../../components/Table";
 import { useState } from "react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Icon from "../../components/Icon";
-import { AccessTime, ArrowLeftRounded, CalendarMonth, VisibilityOff, VisibilityOffOutlined } from "@mui/icons-material";
+import {
+    AccessTime,
+    Add,
+    ArrowLeftRounded,
+    CalendarMonth,
+    Remove,
+    VisibilityOff,
+    VisibilityOffOutlined,
+} from "@mui/icons-material";
 
 export function Cashier_PointOfSale() {
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
@@ -25,6 +33,14 @@ export function Cashier_PointOfSale() {
     const discAmt: number = 125.0;
     const afterVatAmt: number = 145.09;
     const itemCnt: number = 8;
+
+    type transaction = [number, string, number];
+    const transactionData: transaction[] = [
+        [2, "Tomato", 10.0],
+        [3, "Kamatis", 10.0],
+        [2, "Kalamansi", 5.0],
+        [6, "Kalamatis", 15.0],
+    ];
 
     const buttonSize = "min-w-[125px] flex-1";
     const spacing = "p-2 gap-3 m-2";
@@ -107,88 +123,23 @@ export function Cashier_PointOfSale() {
                                         <Table.Header textVariant="cream" text="Price" />
                                         <Table.Header textVariant="cream" text="Amount" />
                                     </Table.Row>
-                                    <Table.Row>
-                                        {" "}
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
-                                    <Table.Row>
-                                        <Table.Data text="2" />
-                                        <Table.Data text="something" />
-                                        <Table.Data text="90000" />
-                                        <Table.Data text="180000" />
-                                    </Table.Row>
+                                    {transactionData.map((transaction) => (
+                                        <Table.Row key={transaction[1]}>
+                                            <Table.Data>
+                                                <div className="flex flex-row justify-center gap-[10%] items-center">
+                                                    <Button size="smallest" leftIcon={Add}></Button>
+                                                    {transaction[0]}
+                                                    <Button size="smallest" leftIcon={Remove}></Button>
+                                                </div>
+                                            </Table.Data>
+                                            <Table.Data text={String(transaction[1])}></Table.Data>
+                                            <Table.Data text={String(transaction[2])}></Table.Data>
+                                            <Table.Data text={String(transaction[0] * transaction[2])}></Table.Data>
+                                        </Table.Row>
+                                    ))}
                                 </Table>
                             </div>
-                            <Card className="flex flex-col flex-0 justify-center items-center px-10">
+                            <Card className="flex flex-col flex-1 justify-center items-center px-10">
                                 <Card.Body className="flex flex-row justify-between w-full  px-0!">
                                     <div className="flex flex-col items-center  justify-center w-[45%] gap-2">
                                         <div className="flex flex-row w-full items-center justify-center gap-2">

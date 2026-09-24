@@ -163,9 +163,10 @@ function SubscriptionFormPopup({
 
 export function SuperAdmin_Subscriptions() {
     const [modal, setModal] = useState<ModalState>({ type: "none" });
+    const [rows, setRows] = useState<BusinessSubscriptionRow[]>(MOCK_SUBSCRIPTIONS);
     const closeModal = useCallback(() => setModal({ type: "none" }), []);
 
-    const findRow = (id: string | number) => MOCK_SUBSCRIPTIONS.find((r) => r.id === String(id));
+    const findRow = (id: string | number) => rows.find((r) => r.id === String(id));
 
     const handleEdit = (id: string | number) => () => {
         const row = findRow(id);
@@ -179,12 +180,31 @@ export function SuperAdmin_Subscriptions() {
 
     // TODO(#42): Call the Business Subscription API here once it exists, then refresh the table.
     const handleSave = (form: SubscriptionForm) => {
-        console.log("Save subscription", { ...form, password: "***" });
+        if (modal.type === "edit") {
+            const editedId = modal.row.id;
+            setRows((prev) =>
+                prev.map((r) =>
+                    r.id === editedId
+                        ? { ...r, businessSubscriptionLabel: form.subscriptionId, businessLabel: form.username }
+                        : r,
+                ),
+            );
+        } else if (modal.type === "add") {
+            setRows((prev) => [
+                {
+                    id: `local-${Date.now()}`,
+                    businessSubscriptionLabel: form.subscriptionId,
+                    businessLabel: form.username,
+                    statusLabel: "Active",
+                },
+                ...prev,
+            ]);
+        }
         closeModal();
     };
 
     const handleConfirmDelete = (id: string) => {
-        console.log("Delete subscription", id);
+        setRows((prev) => prev.filter((r) => r.id !== id));
         closeModal();
     };
 
@@ -230,7 +250,7 @@ export function SuperAdmin_Subscriptions() {
                                 <Table.Header text="Actions" />
                             </Table.Row>
 
-                            {MOCK_SUBSCRIPTIONS.map((row) => (
+                            {rows.map((row) => (
                                 <Table.Row key={row.id}>
                                     <Table.Data size="normal" text={row.businessSubscriptionLabel} />
                                     <Table.Data size="normal" text={row.businessLabel} />

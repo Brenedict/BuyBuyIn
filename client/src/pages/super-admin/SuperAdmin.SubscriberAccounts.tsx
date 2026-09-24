@@ -17,6 +17,14 @@ const SUBSCRIBERS_DATA = [
     { id: 5, lastName: "Villanueva", firstName: "Carlo", username: "carlovill4", businessName: "CV Office Supplies" },
     { id: 6, lastName: "Mendoza", firstName: "Daniel", username: "danmendoza", businessName: "HomeCraft Furniture" },
     { id: 7, lastName: "Lim", firstName: "Adrian", username: "adrianlim_08", businessName: "Urban Living Home Décor" },
+    { id: 8, lastName: "Navarro", firstName: "Bianca", username: "biancanav", businessName: "Luxe Beauty Essentials" },
+    { id: 9, lastName: "Villanueva", firstName: "Carlo", username: "carlovill4", businessName: "CV Office Supplies" },
+    { id: 10, lastName: "Mendoza", firstName: "Daniel", username: "danmendoza", businessName: "HomeCraft Furniture" },
+    { id: 11, lastName: "Lim", firstName: "Adrian", username: "adrianlim_08", businessName: "Urban Living Home Décor" },
+    { id: 12, lastName: "Navarro", firstName: "Bianca", username: "biancanav", businessName: "Luxe Beauty Essentials" },
+    { id: 13, lastName: "Villanueva", firstName: "Carlo", username: "carlovill4", businessName: "CV Office Supplies" },
+    { id: 14, lastName: "Mendoza", firstName: "Daniel", username: "danmendoza", businessName: "HomeCraft Furniture" },
+    { id: 15, lastName: "Lim", firstName: "Adrian", username: "adrianlim_08", businessName: "Urban Living Home Décor" },
 ];
 
 export function SuperAdmin_SubscriberAccounts() {
@@ -41,7 +49,7 @@ export function SuperAdmin_SubscriberAccounts() {
                 <Card isGlass={true}>
                     <Card.Header 
                         toggleRightButton 
-                        rightButton={<Button variant="main" className="border-none" outline-none ring-0 shadow-none >Add Subscriber</Button>} 
+                        rightButton={<Button variant="main" className="border-none" outline-none ring-0 shadow-none >Add Subscriber</Button>} // Just remove the outline border of the button
                         bordered={false}
                     >
                         <Text weight="bold" size="bigger" variant="crimson">

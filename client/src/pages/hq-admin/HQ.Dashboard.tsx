@@ -21,12 +21,15 @@ import {
     PerformanceCard,
     SalesOverviewCard,
 } from "../../components/partials/DashboardPartials";
+import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 
 export function NumberFormat(value: number, symbol?: string) {
     return `${symbol ?? ""} ${value.toLocaleString()}`;
 }
 
 export function HQ_Dashboard() {
+    const { values, handleChange } = useFormSearchParams({ timeframe: "Today" });
+
     const salesDataLabels = SALES_OVERVIEW_LABELS;
     const salesData = TABLE_BRANCHES.map((branch) => branch.totalSales);
 
@@ -54,8 +57,9 @@ export function HQ_Dashboard() {
                     <div className="w-fit">
                         <SelectInput
                             variant="button"
-                            name="roles"
-                            defaultValue="Today"
+                            name="timeframe"
+                            defaultValue={values.timeframe}
+                            onChange={handleChange}
                             className="border-0! py-1.5! text-normal! w-max"
                         >
                             <SelectInput.Option value="Today">Today</SelectInput.Option>

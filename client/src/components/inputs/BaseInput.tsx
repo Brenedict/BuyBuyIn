@@ -1,5 +1,5 @@
 // General Imports
-import {useRef} from "react"; 
+import { useRef } from "react";
 
 // Material UI Icons
 import ClearIcon from "@mui/icons-material/Clear";
@@ -71,7 +71,7 @@ export function BaseInput({ className, error, type, ...props }: InputProp) {
 
     return (
         // NOTE: Added a min width here to prevent input from being extremely short
-        <div className="relative w-full min-w-64">
+        <div className="relative w-full">
             <input
                 type={type}
                 pattern={requiresNonWhitespace ? ".*\\S+.*" : undefined}
@@ -81,7 +81,7 @@ export function BaseInput({ className, error, type, ...props }: InputProp) {
                 {...props}
                 placeholder={placeholderText}
                 className={`
-                    rounded-xl! text-medium! py-2! block font-medium border border-slate-dark 
+                    rounded-xl! xl:text-medium! text-description py-2! block font-medium border border-slate-dark 
                     [&::-webkit-search-cancel-button]:hidden calendar-icon-brown bg-cream w-full placeholder-slate-light 
                     focus:outline-none focus:ring-1 focus:ring-slate-dark
                     ${errorStyle}
@@ -102,7 +102,7 @@ export function BaseInput({ className, error, type, ...props }: InputProp) {
                     <ClearIcon />
                 </button>
             )}
-    
+
             {type === "date" && !isDisabled && <div className="absolute top-0 h-11 right-13 w-px bg-slate-dark"></div>}
         </div>
     );

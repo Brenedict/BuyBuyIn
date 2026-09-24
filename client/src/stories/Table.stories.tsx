@@ -29,13 +29,13 @@ type TableArgs = {
     headerWeight: WeightVariant;
     headerSize: SizeVariant;
     headerStyle: "capitalize" | "uppercase";
-    headerNowrap: boolean;
+    headerWrapWords: boolean;
     headerBorderedBottom: boolean;
     // Data props
     dataTextVariant: ColorVariant;
     dataWeight: WeightVariant;
     dataSize: SizeVariant;
-    dataNowrap: boolean;
+    dataWrapWords: boolean;
     dataBorderedBottom: boolean;
     // Pagination props
     maxItems: number;
@@ -135,9 +135,9 @@ const meta = {
             description: "Text transform style for headers",
             table: { category: "Header" },
         },
-        headerNowrap: {
+        headerWrapWords: {
             control: "boolean",
-            description: "Prevent text wrapping in headers",
+            description: "Allow long words to wrap within headers",
             table: { category: "Header" },
         },
         headerBorderedBottom: {
@@ -164,9 +164,9 @@ const meta = {
             description: "Font size for data cells",
             table: { category: "Data" },
         },
-        dataNowrap: {
+        dataWrapWords: {
             control: "boolean",
-            description: "Prevent text wrapping in data cells",
+            description: "Allow long words to wrap within data cells",
             table: { category: "Data" },
         },
         dataBorderedBottom: {
@@ -229,13 +229,13 @@ const meta = {
         headerWeight: "bold",
         headerSize: "normal",
         headerStyle: "capitalize",
-        headerNowrap: true,
+        headerWrapWords: false,
         headerBorderedBottom: true,
         // Data defaults
         dataTextVariant: "brown",
         dataWeight: "medium",
         dataSize: "normal",
-        dataNowrap: true,
+        dataWrapWords: false,
         dataBorderedBottom: true,
         // Pagination defaults
         maxItems: 5,
@@ -274,7 +274,7 @@ export const Default: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Contact No."
@@ -282,7 +282,7 @@ export const Default: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Role"
@@ -290,7 +290,7 @@ export const Default: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Branch"
@@ -298,7 +298,7 @@ export const Default: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Status"
@@ -306,7 +306,7 @@ export const Default: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                 </Table.Row>
 
@@ -318,35 +318,35 @@ export const Default: Story = {
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.contact}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.role}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.branch}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.status}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                         </Table.Row>
                     ))}
@@ -369,20 +369,20 @@ export const WithoutPagination: Story = {
     render: (args) => (
         <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100!">
             <Table.Row borderedBottom>
-                <Table.Header text="Name" nowrap />
-                <Table.Header text="Contact No." nowrap />
-                <Table.Header text="Role" nowrap />
-                <Table.Header text="Branch" nowrap />
-                <Table.Header text="Status" nowrap />
+                <Table.Header text="Name" />
+                <Table.Header text="Contact No." />
+                <Table.Header text="Role" />
+                <Table.Header text="Branch" />
+                <Table.Header text="Status" />
             </Table.Row>
 
             {TABLE_SAMPLE_USERS.map((user, i) => (
                 <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
-                    <Table.Data text={user.name} nowrap />
-                    <Table.Data text={user.contact} nowrap />
-                    <Table.Data text={user.role} nowrap />
-                    <Table.Data text={user.branch} nowrap />
-                    <Table.Data text={user.status} nowrap />
+                    <Table.Data text={user.name} />
+                    <Table.Data text={user.contact} />
+                    <Table.Data text={user.role} />
+                    <Table.Data text={user.branch} />
+                    <Table.Data text={user.status} />
                 </Table.Row>
             ))}
         </Table>
@@ -406,20 +406,20 @@ export const NoTableBorderStyle: Story = {
     render: (args) => (
         <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} className="h-100!">
             <Table.Row>
-                <Table.Header text="Name" nowrap />
-                <Table.Header text="Contact No." nowrap />
-                <Table.Header text="Role" nowrap />
-                <Table.Header text="Branch" nowrap />
-                <Table.Header text="Status" nowrap />
+                <Table.Header text="Name" />
+                <Table.Header text="Contact No." />
+                <Table.Header text="Role" />
+                <Table.Header text="Branch" />
+                <Table.Header text="Status" />
             </Table.Row>
 
             {TABLE_SAMPLE_USERS.map((user, i) => (
                 <Table.Row key={i}>
-                    <Table.Data text={user.name} nowrap />
-                    <Table.Data text={user.contact} nowrap />
-                    <Table.Data text={user.role} nowrap />
-                    <Table.Data text={user.branch} nowrap />
-                    <Table.Data text={user.status} nowrap />
+                    <Table.Data text={user.name} />
+                    <Table.Data text={user.contact} />
+                    <Table.Data text={user.role} />
+                    <Table.Data text={user.branch} />
+                    <Table.Data text={user.status} />
                 </Table.Row>
             ))}
         </Table>
@@ -450,7 +450,6 @@ export const UppercaseHeaders: Story = {
                     weight={args.headerWeight}
                     size={args.headerSize}
                     style={args.headerStyle}
-                    nowrap
                 />
                 <Table.Header
                     text="Contact No."
@@ -458,7 +457,6 @@ export const UppercaseHeaders: Story = {
                     weight={args.headerWeight}
                     size={args.headerSize}
                     style={args.headerStyle}
-                    nowrap
                 />
                 <Table.Header
                     text="Role"
@@ -466,7 +464,6 @@ export const UppercaseHeaders: Story = {
                     weight={args.headerWeight}
                     size={args.headerSize}
                     style={args.headerStyle}
-                    nowrap
                 />
                 <Table.Header
                     text="Branch"
@@ -474,7 +471,6 @@ export const UppercaseHeaders: Story = {
                     weight={args.headerWeight}
                     size={args.headerSize}
                     style={args.headerStyle}
-                    nowrap
                 />
                 <Table.Header
                     text="Status"
@@ -482,17 +478,16 @@ export const UppercaseHeaders: Story = {
                     weight={args.headerWeight}
                     size={args.headerSize}
                     style={args.headerStyle}
-                    nowrap
                 />
             </Table.Row>
 
             {TABLE_SAMPLE_USERS.map((user, i) => (
                 <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
-                    <Table.Data text={user.name} nowrap />
-                    <Table.Data text={user.contact} nowrap />
-                    <Table.Data text={user.role} nowrap />
-                    <Table.Data text={user.branch} nowrap />
-                    <Table.Data text={user.status} nowrap />
+                    <Table.Data text={user.name} />
+                    <Table.Data text={user.contact} />
+                    <Table.Data text={user.role} />
+                    <Table.Data text={user.branch} />
+                    <Table.Data text={user.status} />
                 </Table.Row>
             ))}
         </Table>
@@ -529,20 +524,20 @@ export const CustomPaginationColors: Story = {
         return (
             <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
                 <Table.Row borderedBottom={args.headerBorderedBottom}>
-                    <Table.Header text="Name" nowrap />
-                    <Table.Header text="Contact No." nowrap />
-                    <Table.Header text="Role" nowrap />
-                    <Table.Header text="Branch" nowrap />
-                    <Table.Header text="Status" nowrap />
+                    <Table.Header text="Name" />
+                    <Table.Header text="Contact No." />
+                    <Table.Header text="Role" />
+                    <Table.Header text="Branch" />
+                    <Table.Header text="Status" />
                 </Table.Row>
 
                 {TABLE_SAMPLE_USERS.map((user, i) => (
                     <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
-                        <Table.Data text={user.name} nowrap />
-                        <Table.Data text={user.contact} nowrap />
-                        <Table.Data text={user.role} nowrap />
-                        <Table.Data text={user.branch} nowrap />
-                        <Table.Data text={user.status} nowrap />
+                        <Table.Data text={user.name} />
+                        <Table.Data text={user.contact} />
+                        <Table.Data text={user.role} />
+                        <Table.Data text={user.branch} />
+                        <Table.Data text={user.status} />
                     </Table.Row>
                 ))}
             </Table>
@@ -575,20 +570,20 @@ export const WithFooter: Story = {
         return (
             <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
                 <Table.Row borderedBottom>
-                    <Table.Header text="Name" nowrap />
-                    <Table.Header text="Contact No." nowrap />
-                    <Table.Header text="Role" nowrap />
-                    <Table.Header text="Branch" nowrap />
-                    <Table.Header text="Status" nowrap />
+                    <Table.Header text="Name" />
+                    <Table.Header text="Contact No." />
+                    <Table.Header text="Role" />
+                    <Table.Header text="Branch" />
+                    <Table.Header text="Status" />
                 </Table.Row>
 
                 {TABLE_SAMPLE_USERS.map((user, i) => (
                     <Table.Row key={i} borderedBottom={args.dataBorderedBottom}>
-                        <Table.Data text={user.name} nowrap />
-                        <Table.Data text={user.contact} nowrap />
-                        <Table.Data text={user.role} nowrap />
-                        <Table.Data text={user.branch} nowrap />
-                        <Table.Data text={user.status} nowrap />
+                        <Table.Data text={user.name} />
+                        <Table.Data text={user.contact} />
+                        <Table.Data text={user.role} />
+                        <Table.Data text={user.branch} />
+                        <Table.Data text={user.status} />
                     </Table.Row>
                 ))}
 
@@ -629,11 +624,11 @@ export const EmptyDataTable: Story = {
         return (
             <Table bordered={args.bordered} rounded={args.rounded} shadow={args.shadow} pagination={paginationConfig}>
                 <Table.Row borderedBottom>
-                    <Table.Header text="Name" nowrap />
-                    <Table.Header text="Contact No." nowrap />
-                    <Table.Header text="Role" nowrap />
-                    <Table.Header text="Branch" nowrap />
-                    <Table.Header text="Status" nowrap />
+                    <Table.Header text="Name" />
+                    <Table.Header text="Contact No." />
+                    <Table.Header text="Role" />
+                    <Table.Header text="Branch" />
+                    <Table.Header text="Status" />
                 </Table.Row>
             </Table>
         );
@@ -670,7 +665,7 @@ export const WithActionButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Contact No."
@@ -678,7 +673,7 @@ export const WithActionButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Role"
@@ -686,7 +681,7 @@ export const WithActionButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Branch"
@@ -694,7 +689,7 @@ export const WithActionButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Status"
@@ -702,7 +697,7 @@ export const WithActionButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Actions"
@@ -710,7 +705,7 @@ export const WithActionButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                 </Table.Row>
 
@@ -722,35 +717,35 @@ export const WithActionButtons: Story = {
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.contact}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.role}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.branch}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.status}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data>
                                 <ActionButtons
@@ -804,7 +799,7 @@ export const WithEditAndDeleteButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Contact No."
@@ -812,7 +807,7 @@ export const WithEditAndDeleteButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Role"
@@ -820,7 +815,7 @@ export const WithEditAndDeleteButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Branch"
@@ -828,7 +823,7 @@ export const WithEditAndDeleteButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Status"
@@ -836,7 +831,7 @@ export const WithEditAndDeleteButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                     <Table.Header
                         text="Actions"
@@ -844,7 +839,7 @@ export const WithEditAndDeleteButtons: Story = {
                         weight={args.headerWeight}
                         size={args.headerSize}
                         style={args.headerStyle}
-                        nowrap={args.headerNowrap}
+                        wrapWords={args.headerWrapWords}
                     />
                 </Table.Row>
 
@@ -856,35 +851,35 @@ export const WithEditAndDeleteButtons: Story = {
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.contact}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.role}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.branch}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data
                                 text={user.status}
                                 textVariant={args.dataTextVariant}
                                 weight={args.dataWeight}
                                 size={args.dataSize}
-                                nowrap={args.dataNowrap}
+                                wrapWords={args.dataWrapWords}
                             />
                             <Table.Data>
                                 <EditDeleteButtons

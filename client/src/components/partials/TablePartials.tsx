@@ -41,7 +41,7 @@ export function ActionButtons({
 }: {
     id: string | number;
     actions: ButtonActions[];
-    size: string;
+    size?: string;
 }) {
     const buttonSizeClass = size === "default" ? "small" : "smallest";
 
@@ -100,7 +100,7 @@ export function EditDeleteButtons({
 
 function NormalText({ text }: { text: string }) {
     return (
-        <Text size="normal" variant="brown" weight="medium">
+        <Text size="normal" variant="brown" weight="medium" align="center">
             {text}
         </Text>
     );
@@ -108,7 +108,7 @@ function NormalText({ text }: { text: string }) {
 
 function SubText({ text }: { text: string }) {
     return (
-        <Text size="description" variant="slate-light" weight="medium">
+        <Text size="description" variant="slate-light" weight="medium" align="center">
             {text}
         </Text>
     );

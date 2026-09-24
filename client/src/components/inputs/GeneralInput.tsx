@@ -23,8 +23,6 @@ export default function GeneralInput({
     // Sets to default false, ensures that when 'required' is not passed it is set to false instead of undefined
     const isRequired = required;
 
-    console.log(id, " & ", props.id);
-
     return (
         <div className={`w-full ${hidden ? "hidden" : ""}`}>
             <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />

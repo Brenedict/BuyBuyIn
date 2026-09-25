@@ -13,7 +13,7 @@ import GeneralInput from "../../components/inputs/GeneralInput";
 import TextAreaInput from "../../components/inputs/TextAreaInput";
 import ChoiceInput from "../../components/inputs/ChoiceInput";
 import SelectInput from "../../components/inputs/SelectInput";
-import { EditDeleteButtons } from "../../components/TablePartials";
+import { EditDeleteButtons } from "../../components/partials/TablePartials";
 
 // Material UI Icons
 import AddIcon from "@mui/icons-material/Add";
@@ -66,10 +66,10 @@ function OfferCard({ offerTitle, startDate, endDate, status, handleClick }: Offe
 
     return (
         <Card
-            className="hover:opacity-75 active:opacity-100 hover:cursor-pointer hover:scale-102 active:scale-100 transition-transform"
+            className="hover:opacity-80 active:opacity-100 hover:cursor-pointer hover:scale-99 transition-transform"
             onClick={handleClick}
         >
-            <Card.Body className="flex gap-3 justify-between">
+            <Card.Body className="flex xl:flex-row md:flex-col gap-3 justify-between">
                 <div className="flex flex-col gap-3">
                     <Text weight="extraBold" size="big" className="col-span-2">
                         {shortenedTitle}
@@ -77,7 +77,11 @@ function OfferCard({ offerTitle, startDate, endDate, status, handleClick }: Offe
                     <Text variant="slate-light">
                         {startDate} - {endDate}
                     </Text>
-                    <div className={`w-fit px-3 py-1 rounded-xl ${statusClass[status]}`}>{status}</div>
+                    <div
+                        className={`w-fit px-3 py-1 rounded-xl lg:text-normal md:text-small-description ${statusClass[status]}`}
+                    >
+                        {status}
+                    </div>
                 </div>
                 <div className="flex h-fit gap-1 pt-1">
                     {/* Overwritten Buttons for customized no background buttons */}
@@ -266,8 +270,10 @@ function ToggleIndividualDiscountType() {
                             isPadded={false}
                             size="small"
 
-                            // @ts-ignore
-                            text={formatDiscountValue(product.discountType, product.unitDiscountValue)}
+                            text={formatDiscountValue(
+                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
+                                product.unitDiscountValue
+                            )}
                         />
                         <Table.Data
                             isPadded={false}
@@ -278,8 +284,7 @@ function ToggleIndividualDiscountType() {
                             isPadded={false}
                             size="small"
                             text={calculateDiscountedSubtotal(
-                                // @ts-ignore
-                                product.discountType,
+                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
                                 product.unitDiscountValue,
                                 product.requiredQuantity,
                                 product.shelfPrice

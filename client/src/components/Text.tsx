@@ -16,6 +16,7 @@ import {
     type svgPosition,
     GapClasses,
     type GapVariant,
+    AlignClasses,
 } from "../types/common.ts";
 
 interface HeadingProp extends React.HTMLAttributes<HTMLParagraphElement> {
@@ -54,7 +55,7 @@ export function Text({
         >
             {svg && <Icon icon={svg.icon} size={svg.size} variant={svg.variant || variant} bg={svg.bg} />}
             <p
-                className={`${SizeClasses[size]} ${ColorClasses[variant].text} ${WeightClasses[weight]} ${FontClasses[font]} `}
+                className={`${SizeClasses[size]} ${ColorClasses[variant].text} ${WeightClasses[weight]} ${FontClasses[font]} ${AlignClasses[align]}`}
             >
                 {children}
             </p>

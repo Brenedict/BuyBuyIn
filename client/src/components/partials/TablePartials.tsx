@@ -1,11 +1,11 @@
-import type { ColorVariant, MaterialIcon } from "../types/common";
-import { Button, type ButtonColorVariant } from "./Button";
-import Table from "./Table";
-import { Text } from "./Text";
+import type { ColorVariant, MaterialIcon } from "../../types/common";
+import { Button, type ButtonColorVariant } from "../Button";
+import Table from "../Table";
+import { Text } from "../Text";
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import { formatFullDate, formatShortDate, formatTime } from "../utils/dateUtils";
+import { formatFullDate, formatShortDate, formatTime } from "../../utils/dateUtils";
 
 export interface ButtonActions {
     text: string;
@@ -41,7 +41,7 @@ export function ActionButtons({
 }: {
     id: string | number;
     actions: ButtonActions[];
-    size: string;
+    size?: string;
 }) {
     const buttonSizeClass = size === "default" ? "small" : "smallest";
 
@@ -100,7 +100,7 @@ export function EditDeleteButtons({
 
 function NormalText({ text }: { text: string }) {
     return (
-        <Text size="normal" variant="brown" weight="medium">
+        <Text size="normal" variant="brown" weight="medium" align="center">
             {text}
         </Text>
     );
@@ -108,7 +108,7 @@ function NormalText({ text }: { text: string }) {
 
 function SubText({ text }: { text: string }) {
     return (
-        <Text size="description" variant="slate-light" weight="medium">
+        <Text size="description" variant="slate-light" weight="medium" align="center">
             {text}
         </Text>
     );

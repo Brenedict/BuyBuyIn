@@ -6,7 +6,7 @@ import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-import { EditDeleteButtons } from "../../components/TablePartials";
+import { EditDeleteButtons } from "../../components/partials/TablePartials";
 
 // Mock Data
 const SUBSCRIBERS_DATA = [
@@ -46,7 +46,7 @@ export function SuperAdmin_SubscriberAccounts() {
                         </Text>
                     </div>
 
-                <Card isGlass={true}>
+                <Card isGlass={false}>
                     <Card.Header 
                         toggleRightButton 
                         rightButton={<Button variant="main" className="border-none" outline-none ring-0 shadow-none >Add Subscriber</Button>} // Just remove the outline border of the button
@@ -57,21 +57,8 @@ export function SuperAdmin_SubscriberAccounts() {
                         </Text>
                     </Card.Header>
 
-                    <Card.Body>
-                        <Table 
-                            bordered 
-                            rounded 
-                            shadow 
-                            pagination={{
-                                bgVariant: 'cream-muted',
-                                borderVariant: 'brown',
-                                borderedTop: true,
-                                maxItems: 6,
-                                textSize: 'description',
-                                textVariant: 'crimson',
-                                textWeight: 'medium'
-                            }}
-                        >
+                    <Card.Body className="flex flex-col gap-4" removePadding bordered={false}>
+                         <Table pagination={{ maxItems: 8 }} rounded={false} bordered={false}>
                             <Table.Row borderedBottom>
                                 <Table.Header text="Last Name" />
                                 <Table.Header text="First Name" />

@@ -8,7 +8,7 @@ import Table from "../../components/Table";
 import { Card } from "../../components/Card";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import { Button } from "../../components/Button";
-import { DateText, EditDeleteButtons, PrimarySecondaryText } from "../../components/TablePartials";
+import { DateText, EditDeleteButtons, PrimarySecondaryText } from "../../components/partials/TablePartials";
 
 import SearchInput from "../../components/inputs/SearchInput";
 import SelectInput from "../../components/inputs/SelectInput";
@@ -119,13 +119,13 @@ export function Page2() {
                 </Form>
                 <Table bordered rounded shadow pagination={{}}>
                     <Table.Row borderedBottom>
-                        <Table.Header text="Name" nowrap />
-                        <Table.Header text="Contact No." nowrap />
-                        <Table.Header text="Role" nowrap />
-                        <Table.Header text="Branch" nowrap />
-                        <Table.Header text="Status" nowrap />
-                        <Table.Header text="Created At" nowrap />
-                        <Table.Header text="Action" nowrap />
+                        <Table.Header text="Name" />
+                        <Table.Header text="Contact No." />
+                        <Table.Header text="Role" />
+                        <Table.Header text="Branch" />
+                        <Table.Header text="Status" />
+                        <Table.Header text="Created At" />
+                        <Table.Header text="Action" />
                     </Table.Row>
 
                     {/*
@@ -143,16 +143,16 @@ export function Page2() {
                             user.status.toLowerCase().includes(values.search.toLowerCase())
                     ).map((user, i) => (
                         <Table.Row key={i}>
-                            <Table.Data text={user.name} nowrap />
-                            <Table.Data text={user.contact} nowrap />
-                            <Table.Data text={user.role} nowrap />
+                            <Table.Data text={user.name} />
+                            <Table.Data text={user.contact} />
+                            <Table.Data text={user.role} />
                             <Table.Data>
                                 {(() => {
                                     const splitted = user.branch.split(", ");
                                     return <PrimarySecondaryText primary={splitted?.[0]} secondary={splitted?.[1]} />;
                                 })()}
                             </Table.Data>
-                            <Table.Data text={user.status} nowrap />
+                            <Table.Data text={user.status} />
                             <Table.Data>
                                 <DateText date={user.createdAt} type="datetime" />
                             </Table.Data>

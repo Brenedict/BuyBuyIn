@@ -15,9 +15,8 @@ export const ButtonColorClasses = {
         icon: "black",
         iconExtra: "group-active:text-cream group-hover:text-cream",
     },
-    //TODO: Make custom styling for the main Login button
     login: {
-        button: "bg-crimson text-cream font-bold",
+        button: "bg-crimson text-cream font-bold rounded-full border-0 hover:opacity-90 hover:cursor-pointer active:bg-maroon active:opacity-100",
         icon: "cream",
         iconExtra: "",
     },

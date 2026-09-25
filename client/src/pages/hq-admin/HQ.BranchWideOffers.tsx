@@ -13,7 +13,7 @@ import GeneralInput from "../../components/inputs/GeneralInput";
 import TextAreaInput from "../../components/inputs/TextAreaInput";
 import ChoiceInput from "../../components/inputs/ChoiceInput";
 import SelectInput from "../../components/inputs/SelectInput";
-import { EditDeleteButtons } from "../../components/TablePartials";
+import { EditDeleteButtons } from "../../components/partials/TablePartials";
 
 // Material UI Icons
 import AddIcon from "@mui/icons-material/Add";
@@ -270,8 +270,10 @@ function ToggleIndividualDiscountType() {
                             isPadded={false}
                             size="small"
 
-                            // @ts-ignore
-                            text={formatDiscountValue(product.discountType, product.unitDiscountValue)}
+                            text={formatDiscountValue(
+                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
+                                product.unitDiscountValue
+                            )}
                         />
                         <Table.Data
                             isPadded={false}
@@ -282,8 +284,7 @@ function ToggleIndividualDiscountType() {
                             isPadded={false}
                             size="small"
                             text={calculateDiscountedSubtotal(
-                                // @ts-ignore
-                                product.discountType,
+                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
                                 product.unitDiscountValue,
                                 product.requiredQuantity,
                                 product.shelfPrice

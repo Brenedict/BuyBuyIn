@@ -1,32 +1,14 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { useState } from "react";
+import { Form } from "react-router";
 
 import { BuyBuyInWordmark } from "../../components/BuyBuyInWordmark";
 import PasswordInput from "../../components/inputs/PasswordInput";
-import { ROUTES } from "../../routes/Routes";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import { Button } from "../../components/Button";
 import SelectInput from "../../components/inputs/SelectInput";
 
-const ROLE_OPTIONS = [
-    { value: "cashier", label: "Cashier", path: ROUTES.CASHIER.dashboard },
-    { value: "branch-manager", label: "Branch Manager", path: ROUTES.BRANCH_MANAGER.dashboard },
-    { value: "hq-admin", label: "HQ Admin", path: ROUTES.HQ_ADMIN.dashboard },
-    { value: "super-admin", label: "Super Admin", path: ROUTES.SUPER_ADMIN.plans },
-] as const;
-
 export function Login() {
-    const navigate = useNavigate();
-    const [role, setRole] = useState("");
-
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const selected = ROLE_OPTIONS.find((option) => option.value === role);
-        if (selected) {
-            navigate(selected.path);
-        }
-    };
+    const [role, setRole] = useState("cashier");
 
     return (
         <main className="relative flex min-h-screen w-screen items-center justify-center overflow-hidden bg-[#e4e2d4] px-4 py-10 sm:px-8">
@@ -47,10 +29,10 @@ export function Login() {
                 <section className="login-card relative z-[3] flex w-full max-w-[26.5rem] items-center overflow-hidden rounded-[1.75rem] px-8 py-8 sm:px-10 lg:absolute lg:top-0 lg:right-0 lg:h-full lg:w-[50%] lg:max-w-none">
                     <div aria-hidden className="login-card-spot" />
                     <div aria-hidden className="login-card-wash" />
-                    <form className="relative z-20 flex w-full flex-col gap-5" onSubmit={handleSubmit}>
+                    <Form method="post" className="relative z-20 flex w-full flex-col gap-5">
                         <div className="w-full">
                             <label
-                                htmlFor="username"
+                                htmlFor="email"
                                 className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
                             >
                                 Email
@@ -58,12 +40,12 @@ export function Login() {
                             <GeneralInput
                                 id="email"
                                 name="email"
-                                type="text"
+                                type="email"
                                 autoComplete="email"
-                                placeholder="Enter email"
+                                placeholder="Enter Email"
                                 required
                                 className="login-input"
-                            ></GeneralInput>
+                            />
                         </div>
 
                         <div className="login-password w-full">
@@ -96,7 +78,7 @@ export function Login() {
                                     name="role"
                                     onChange={(e) => setRole(e.target.value)}
                                     required
-                                    defaultValue={"cashier"}
+                                    defaultValue={role}
                                     options={{
                                         "Super Admin": "superadmin",
                                         "HQ Admin": "hqadmin",
@@ -122,7 +104,7 @@ export function Login() {
                                 </a>
                             </div>
                         </div>
-                    </form>
+                    </Form>
                 </section>
             </div>
         </main>

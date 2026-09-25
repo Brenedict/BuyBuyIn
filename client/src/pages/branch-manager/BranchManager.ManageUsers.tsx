@@ -167,23 +167,25 @@ interface EmployeeListProps {
 function EmployeeListSection({ users }: EmployeeListProps) {
     return (
         <Card isGlass={false}>
-            <Card.Body className="flex flex-col gap-4">
+            <Card.Body>
                 <Text weight="bold" size="big" variant="crimson">
                     Employee List
                 </Text>
+            </Card.Body>
 
-                <Table pagination={{ maxItems: 3 }}>
+            <Card.Body className="flex flex-col gap-4" removePadding bordered={false}>
+                <Table pagination={{ maxItems: 3 }} rounded={false} bordered={false}>
                     <Table.Row borderedBottom>
-                        <Table.Header text="Name" textVariant="crimson" bgVariant="cream" />
-                        <Table.Header text="Contact No." textVariant="crimson" bgVariant="cream" />
-                        <Table.Header text="Role" textVariant="crimson" bgVariant="cream" />
-                        <Table.Header text="Branch" textVariant="crimson" bgVariant="cream" />
-                        <Table.Header text="Status" textVariant="crimson" bgVariant="cream" />
-                        <Table.Header text="Actions" textVariant="crimson" bgVariant="cream" />
+                        <Table.Header text="Name" />
+                        <Table.Header text="Contact No." />
+                        <Table.Header text="Role" />
+                        <Table.Header text="Branch" />
+                        <Table.Header text="Status" />
+                        <Table.Header text="Actions" />
                     </Table.Row>
 
                     {users.map((user) => (
-                        <Table.Row key={user.id} borderedBottom bgVariant="cream">
+                        <Table.Row key={user.id} borderedBottom>
                             <Table.Data text={user.name} />
                             <Table.Data text={user.contact} />
                             <Table.Data text={user.role} />

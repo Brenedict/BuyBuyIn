@@ -1,6 +1,6 @@
 // General Import
 import { useEffect, useMemo, useState } from "react";
-import { Form, useParams } from "react-router";
+import { Form, Outlet, useParams } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
@@ -46,12 +46,15 @@ interface OfferProps {
 // Main Page Exported
 export default function HQ_BranchWideOffers() {
     return (
-        <Card className="h-[calc(100vh-4rem)] flex flex-col">
-            <Card.Body className="flex gap-6 grow min-h-0">
-                <OffersListSection />
-                <OfferConfigurationSection />
-            </Card.Body>
-        </Card>
+        <>
+            <Card className="h-[calc(100vh-4rem)] flex flex-col">
+                <Card.Body className="flex gap-6 grow min-h-0">
+                    <OffersListSection />
+                    <OfferConfigurationSection />
+                </Card.Body>
+            </Card>
+            <Outlet />
+        </>
     );
 }
 

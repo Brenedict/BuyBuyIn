@@ -69,7 +69,11 @@ export const protectedRoutes: RouteObject[] = [
                     { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory /> },
                     { path: ROUTES.HQ_ADMIN.manageUsers, element: <HQ_ManageUsers /> },
                     { path: ROUTES.HQ_ADMIN.subscriptions, element: <HQ_Subscriptions /> },
-                    { path: ROUTES.HQ_ADMIN.branchOffers, element: <HQ_BranchWideOffers /> },
+                    {
+                        path: ROUTES.HQ_ADMIN.branchOffers,
+                        element: <HQ_BranchWideOffers />,
+                        children: [{ path: ":id/edit", element: <HQ_BranchWideOffers /> }],
+                    },
 
                     // Super Admin Routes: /super-admin
                     { path: ROUTES.SUPER_ADMIN.plans, element: <SuperAdmin_Plans /> },

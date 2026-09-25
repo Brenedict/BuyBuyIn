@@ -188,11 +188,12 @@ function ToggleOverallDiscountType() {
                 name="discountTypeInput"
                 defaultValue={discountType ?? "PERCENTAGE"}
                 label="Discount Type"
+                options={{
+                    Percentage: "PERCENTAGE",
+                    "Fixed Value": "FIXED_VALUE",
+                }}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDiscountTypeInput(e.target.value)}
-            >
-                <SelectInput.Option value="PERCENTAGE">Percentage</SelectInput.Option>
-                <SelectInput.Option value="FIXED_VALUE">Fixed Value</SelectInput.Option>
-            </SelectInput>
+            />
             <GeneralInput
                 type="number"
                 placeholder="10"
@@ -411,15 +412,15 @@ function OfferConfigurationSection() {
 
                 {/* Set status of offer */}
                 <SelectInput
-                    key={`status-${id}`}
                     name="status"
-                    defaultValue={testOffer?.offerStatus ?? "draft"}
+                    defaultValue="enabled"
                     label="Status"
-                >
-                    <SelectInput.Option value="enabled">Enabled</SelectInput.Option>
-                    <SelectInput.Option value="disabled">Disabled</SelectInput.Option>
-                    <SelectInput.Option value="draft">Draft</SelectInput.Option>
-                </SelectInput>
+                    options={{
+                        Enabled: "enabled",
+                        Disabled: "disabled",
+                        Draft: "draft",
+                    }}
+                />
             </Card.Body>
         </Card>
     );

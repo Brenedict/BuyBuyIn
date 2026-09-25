@@ -27,7 +27,7 @@ function CardContainer({
     return (
         <div
             onClick={onClick}
-            className={`border border-slate-dark rounded-2xl ${isGlass ? "card-glass-effect" : "bg-cream"} ${dropShadow ? "card-drop-shadow" : ""}  ${className} overflow-hidden min-w-0`}
+            className={`border border-slate-dark rounded-2xl ${isGlass ? "card-glass-effect" : "bg-off-white"} ${dropShadow ? "card-drop-shadow" : ""}  ${className} `}
             {...props}
         >
             {children}

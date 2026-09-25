@@ -2,6 +2,9 @@
 import React from "react";
 import { NavLink } from "react-router";
 
+//BuyBuyinIcon
+import { BuyBuyInWordmark } from "./BuyBuyInWordmark";
+
 // Components
 import Icon from "./Icon";
 import { Text } from "./Text";
@@ -17,12 +20,13 @@ import BranchOfferIcon from "@mui/icons-material/AddBusiness";
 import XReadIcon from "@mui/icons-material/Receipt";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { BusinessCenter, ManageAccounts, NextPlanSharp } from "@mui/icons-material";
 
 // Types / Utils
 import { ROUTES } from "../routes/Routes";
 import type { MaterialIcon } from "../types/common";
 
-export type UserRoles = "hqadmin" | "branchmanager" | "cashier";
+export type UserRoles = "super_admin" | "hqadmin" | "branchmanager" | "cashier";
 
 interface NavItem {
     label: string;
@@ -35,6 +39,28 @@ interface NavBarProps {
 }
 
 const NavItems: Record<UserRoles, NavItem[]> = {
+    super_admin: [
+        {
+            label: "Plans",
+            icon: NextPlanSharp,
+            path: ROUTES.SUPER_ADMIN.plans,
+        },
+        {
+            label: "businesses",
+            icon: BusinessCenter,
+            path: ROUTES.SUPER_ADMIN.businesses,
+        },
+        {
+            label: "subscriptions",
+            icon: SubscriptionsIcon,
+            path: ROUTES.SUPER_ADMIN.subscriptions,
+        },
+        {
+            label: "subscriber_accounts",
+            icon: ManageAccounts,
+            path: ROUTES.SUPER_ADMIN.subscriberAccounts,
+        },
+    ],
     hqadmin: [
         {
             label: "Dashboard",
@@ -119,150 +145,96 @@ export function NavBar({ role }: NavBarProps) {
     const items = NavItems[role];
 
     const iconSize = `
-        text-medium!
-        lg:text-big!
-        xl:text-bigger!
-        2xl:text-large!
-        hover:text-big!
-        hover:lg:text-bigger!
-        hover:xl:text-large!
-        hover:2xl:text-larger!
-    `;
+        text-regular!
+        lg:text-medium!!
+        xl:text-big!
+        2xl:text-bigger!
+   `;
 
     return (
         <nav
             className="
-                min-w-12
-                md:min-w-14
-                lg:min-w-16
-                xl:min-w-18
-                2xl:min-w-20
-
-                hover:md:min-w-16
-                hover:lg:min-w-18
-                hover:xl:min-w-20
-                hover:2xl:min-w-22
-
-                min-h-[70%]
-                max-h-[85%]
-
-                card-drop-shadow
-                card-glass-effect
-                rounded-[10px]
-
-                transition-[min-width]
+                max-w-full
                 duration-200
-
+                group
                 z-999
             "
         >
             <div
                 className="
                     flex
-                    flex-col
+                    flex-row
                     justify-between
                     items-center
 
                     h-full
                     w-full
 
-                    p-4
-                    md:p-3
-                    lg:p-4
+                    p-1
+                    md:p-1
+                    md:px-3
+                    lg:p-2
+                    lg:px-4
 
-                    rounded-[10px]
                     card-glass-effect
-                    bg-crimson/40
-                    hover:bg-crimson/60
+                    bg-slate-dark/95
+                    hover:bg-slate-dark
 
                     transition-colors
                     duration-200
                 "
             >
                 {/* Logo */}
-                <div className="flex flex-col items-center gap-3">
-                    <Icon
-                        icon={BuyBuyInIcon}
-                        variant="cream"
-                        size="bigger"
-                        className="group"
-                        iconClassName={iconSize}
-                    />
-
-                    <div className="bg-cream w-full h-px" />
-                </div>
+                <Icon icon={BuyBuyInIcon} variant="cream" size="bigger" iconClassName={iconSize} />
 
                 {/* Navigation Items */}
                 <div
                     className="
                         flex
-                        flex-col
-                        justify-center
+                        flex-row
+                        justify-between
                         items-center
 
-                        gap-3
+                        w-[30%]
+                        md:gap-3
                         lg:gap-4
                         xl:gap-5
                     "
                 >
                     {items.map((item) => (
-                        <NavLink key={item.path} to={item.path} className="group relative">
+                        <NavLink key={item.path} to={item.path} className="">
                             {({ isActive }) => (
-                                <>
+                                <div className="flex flex-col gap-[0.2rem] justify-center items-center group/icon ">
                                     <Icon
                                         icon={item.icon}
-                                        variant="cream"
+                                        variant="off-white"
                                         size="bigger"
                                         bg={
                                             isActive
                                                 ? {
-                                                      variant: "crimson",
+                                                      variant: "slate-medium",
                                                       type: "normal",
                                                       padding: "small",
                                                   }
                                                 : undefined
                                         }
-                                        className="transition-transform duration-150"
+                                        className="transition-transform duration-150 hover:scale-110"
                                         iconClassName={`
                                             ${iconSize}
-                                            group-hover:text-cream!
+                                            group-hover:text-off-white!
                                         `}
                                     />
-
-                                    {/* Hover Label */}
-                                    <div
-                                        className="
-                                            absolute
-                                            left-full
-                                            top-1/2
-                                            -translate-y-1/2
-                                            ml-2
-
-                                            hidden
-                                            group-hover:block
-
-                                            whitespace-nowrap
-
-                                            bg-crimson/85
-                                            text-cream
-                                            font-bold
-
-                                            px-3
-                                            py-2
-
-                                            rounded-[10px]
-
-                                            card-glass-effect
-                                            card-drop-shadow
-
-                                            z-50
-                                        "
-                                    >
-                                        <Text variant="cream" weight="bold">
+                                    <div className="">
+                                        <Text
+                                            className={`text-[8px]! ${isActive ? "" : "hidden"}  text-center group-hover/icon:block`}
+                                            variant="off-white"
+                                            weight="bold"
+                                            size="smaller"
+                                        >
                                             {item.label}
                                         </Text>
                                     </div>
-                                </>
+                                </div>
                             )}
                         </NavLink>
                     ))}
@@ -274,6 +246,10 @@ export function NavBar({ role }: NavBarProps) {
                         group
                         relative
                         hover:cursor-pointer
+                        flex
+                        flex-col
+                        justify-center
+                        items-center
                     "
                 >
                     <Icon
@@ -285,38 +261,6 @@ export function NavBar({ role }: NavBarProps) {
                             group-hover:text-cream!
                         `}
                     />
-                    <div
-                        className="
-                            absolute
-                            left-full
-                            top-1/2
-                            -translate-y-1/2
-                            ml-2
-
-                            hidden
-                            group-hover:block
-
-                            whitespace-nowrap
-
-                            bg-crimson/85
-                            text-cream
-                            font-bold
-
-                            px-3
-                            py-2
-
-                            rounded-[10px]
-
-                            card-glass-effect
-                            card-drop-shadow
-
-                            z-50
-                        "
-                    >
-                        <Text variant="cream" weight="bold">
-                            Log Out
-                        </Text>
-                    </div>
                 </button>
             </div>
         </nav>

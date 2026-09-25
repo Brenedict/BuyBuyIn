@@ -18,11 +18,11 @@ function StaticLayout() {
          * */
 
         <main
-            className="w-screen h-screen overflow-hidden flex antialiased bg-cover bg-center"
+            className="w-screen h-screen overflow-hidden flex antialiased bg-cover bg-center flex flex-col"
             style={{ backgroundImage: `url(${testBg})` }}
         >
             {/* Insert Nav */}
-            <NavBar role="hqadmin"></NavBar>
+            <NavBar role="branchmanager"></NavBar>
 
             <section className="p-8 grow overflow-y-auto overscroll-y-auto">
                 <Outlet />

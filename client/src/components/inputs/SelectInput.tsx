@@ -33,8 +33,8 @@ function SelectInputDefaultVariant({ isOpen, setIsOpen, selectedLabel, className
         <section
             onClick={() => setIsOpen((open) => !open)}
             className={`
-                flex justify-between items-center px-4 border   
-                bg-cream w-full min-w-48 placeholder-slate-light hover:bg-off-white-border transition-colors 
+                flex justify-between items-center px-4 border border-[#cfcabd]  
+                bg-off-white w-full min-w-48 placeholder-slate-light hover:bg-off-white-border transition-colors 
                 ${isOpenStyle}              
                 ${className}
             `}
@@ -45,7 +45,7 @@ function SelectInputDefaultVariant({ isOpen, setIsOpen, selectedLabel, className
 
             <div className="flex self-stretch gap-4">
                 {/* Vertical Line Separator */}
-                <div className={`self-stretch bg-slate-dark ${isOpen ? "w-0.5" : "w-px"}`} />
+                <div className={`self-stretch  ${isOpen ? "w-0.5 bg-slate-dark" : "w-px bg-[#cfcabd]"}`} />
 
                 <span className="flex items-center">
                     <div className="bg-crimson rounded-sm">

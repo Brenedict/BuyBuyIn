@@ -3,9 +3,11 @@ import { useNavigate } from "react-router";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import { BuyBuyInWordmark } from "../../components/BuyBuyInWordmark";
-import { BaseInput } from "../../components/inputs/BaseInput";
 import PasswordInput from "../../components/inputs/PasswordInput";
 import { ROUTES } from "../../routes/Routes";
+import GeneralInput from "../../components/inputs/GeneralInput";
+import { Button } from "../../components/Button";
+import SelectInput from "../../components/inputs/SelectInput";
 
 const ROLE_OPTIONS = [
     { value: "cashier", label: "Cashier", path: ROUTES.CASHIER.dashboard },
@@ -47,22 +49,28 @@ export function Login() {
                     <div aria-hidden className="login-card-wash" />
                     <form className="relative z-20 flex w-full flex-col gap-5" onSubmit={handleSubmit}>
                         <div className="w-full">
-                            <label htmlFor="username" className="mb-2 block font-sans-flex text-normal font-bold text-crimson">
-                                Username
+                            <label
+                                htmlFor="username"
+                                className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
+                            >
+                                Email
                             </label>
-                            <BaseInput
-                                id="username"
-                                name="username"
+                            <GeneralInput
+                                id="email"
+                                name="email"
                                 type="text"
-                                autoComplete="username"
-                                placeholder="Enter Username"
+                                autoComplete="email"
+                                placeholder="Enter email"
                                 required
                                 className="login-input"
-                            />
+                            ></GeneralInput>
                         </div>
 
                         <div className="login-password w-full">
-                            <label htmlFor="password" className="mb-2 block font-sans-flex text-normal font-bold text-crimson">
+                            <label
+                                htmlFor="password"
+                                className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
+                            >
                                 Password
                             </label>
                             <PasswordInput
@@ -76,37 +84,33 @@ export function Login() {
                         </div>
 
                         <div className="w-full">
-                            <label htmlFor="role" className="mb-2 block font-sans-flex text-normal font-bold text-crimson">
+                            <label
+                                htmlFor="role"
+                                className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
+                            >
                                 Role
                             </label>
                             <div className="relative">
-                                <select
+                                <SelectInput
                                     id="role"
                                     name="role"
+                                    onChange={(e) => setRole(e.target.value)}
                                     required
-                                    value={role}
-                                    onChange={(event) => setRole(event.target.value)}
-                                    className={`login-input w-full appearance-none pr-12 text-medium font-regular ${role ? "text-black" : "text-slate-medium"}`}
-                                >
-                                    <option value="" disabled>
-                                        -- Role --
-                                    </option>
-                                    {ROLE_OPTIONS.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <span className="pointer-events-none absolute top-1/2 right-3 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-[0.3rem] bg-crimson text-cream">
-                                    <KeyboardArrowDownIcon sx={{ fontSize: 18 }} />
-                                </span>
+                                    defaultValue={"cashier"}
+                                    options={{
+                                        "Super Admin": "superadmin",
+                                        "HQ Admin": "hqadmin",
+                                        "Branch Manager": "branchmanager",
+                                        Cashier: "cashier",
+                                    }}
+                                />
                             </div>
                         </div>
 
                         <div className="mt-3 flex flex-col items-center gap-4">
-                            <button type="submit" className="login-submit">
+                            <Button type="submit" variant="login">
                                 LOG IN
-                            </button>
+                            </Button>
 
                             <div className="text-center font-sans-flex text-small-description text-slate-dark">
                                 <a href="#forgot-password" className="underline underline-offset-2">

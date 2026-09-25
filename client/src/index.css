@@ -81,7 +81,8 @@
     .calendar-icon-brown::-webkit-calendar-picker-indicator {
         filter: invert(16%) sepia(21%) saturate(2206%) hue-rotate(338deg) brightness(96%) contrast(89%);
     }
-
+}
+@layer loginComponents {
     .login-panel,
     .login-card {
         border: 1px solid rgba(255, 255, 255, 0.55);
@@ -211,58 +212,6 @@
     .login-input:focus {
         outline: none;
         box-shadow: 0 0 0 1px #393534;
-    }
-
-    .login-password label.cursor-pointer,
-    .login-password label.cursor-pointer:hover {
-        background: transparent;
-        padding: 0;
-    }
-
-    .login-password .text-brown {
-        color: var(--color-crimson);
-    }
-
-    .login-submit {
-        position: relative;
-        height: 3rem;
-        min-width: 11.5rem;
-        padding: 0 2.4rem 0 1.75rem;
-        border: 0;
-        border-radius: 999px 0 0 999px;
-        background: var(--color-crimson);
-        color: var(--color-cream);
-        font-family: var(--font-sans-flex);
-        font-size: 1rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        cursor: pointer;
-    }
-
-    .login-submit::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: -1.15rem;
-        border-top: 1.5rem solid transparent;
-        border-bottom: 1.5rem solid transparent;
-        border-left: 1.15rem solid var(--color-crimson);
-    }
-
-    .login-submit:hover {
-        background: #b43320;
-    }
-
-    .login-submit:hover::after {
-        border-left-color: #b43320;
-    }
-
-    .login-submit:active {
-        background: var(--color-maroon);
-    }
-
-    .login-submit:active::after {
-        border-left-color: var(--color-maroon);
     }
 }
 

@@ -1,8 +1,8 @@
 // General Imports
-import React, { useState } from "react";
+import React from "react";
 // Components
 import Icon from "./Icon";
-import type { MaterialIcon, ColorVariant } from "../types/common";
+import type { MaterialIcon } from "../types/common";
 
 export const ButtonColorClasses = {
     main: {
@@ -16,7 +16,7 @@ export const ButtonColorClasses = {
         iconExtra: "group-active:text-cream group-hover:text-cream",
     },
     login: {
-        button: "bg-crimson text-cream font-bold rounded-full border-0 hover:opacity-90 hover:cursor-pointer active:bg-maroon active:opacity-100",
+        button: "bg-crimson text-cream font-bold",
         icon: "cream",
         iconExtra: "",
     },
@@ -54,7 +54,6 @@ const ButtonSizeClasses = {
 
 type ButtonSizeVariant = keyof typeof ButtonSizeClasses;
 
-// Properties that can be passed to the button component
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonColorVariant;
     size?: ButtonSizeVariant;
@@ -65,7 +64,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     transition?: boolean;
 }
 
-// Main logic of the Button component
 export function Button({
     variant = "main",
     size = "medium",
@@ -79,11 +77,15 @@ export function Button({
 }: ButtonProps) {
     const transitionClass = transition ? "hover:scale-102 active:scale-100 transition-transform transition-color" : "";
 
+    let buttonClass: string;
+    if (variant === "login") {
+        buttonClass = `group ${ButtonColorClasses.login.button} h-[3rem] min-w-[11.5rem] py-0 pr-[2.4rem] pl-[1.75rem] rounded-tl-[999px] rounded-tr-[0] rounded-br-[0] rounded-bl-[999px] relative overflow-visible hover:bg-[#b43320] active:bg-[var(--color-maroon)] ${className}`;
+    } else {
+        buttonClass = `group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${transitionClass} ${className} flex items-center justify-center `;
+    }
+
     return (
-        <button
-            className={` group ${ButtonColorClasses[variant].button} ${ButtonSizeClasses[size].button} ${transitionClass} ${className} flex items-center justify-center `}
-            {...props}
-        >
+        <button className={buttonClass} {...props}>
             {leftIcon && (
                 <Icon
                     icon={leftIcon}
@@ -100,6 +102,9 @@ export function Button({
                     iconClassName={`${ButtonColorClasses[variant].iconExtra} ${iconExtraClass}`}
                     size={ButtonSizeClasses[size].icon}
                 />
+            )}
+            {variant === "login" && (
+                <span className="absolute top-0 right-[-1.15rem] h-0 w-0 border-y-[1.5rem] border-l-[1.15rem] border-y-transparent border-l-crimson group-hover:border-l-[#b43320] group-active:border-l-[var(--color-maroon)]" />
             )}
         </button>
     );

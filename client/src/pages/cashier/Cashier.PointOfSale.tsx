@@ -4,7 +4,7 @@ import { Button } from "../../components/Button";
 import { Calculator } from "../../components/Calculator";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Icon from "../../components/Icon";
 import {
@@ -19,11 +19,19 @@ import {
 
 export function Cashier_PointOfSale() {
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
+    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date().toLocaleTimeString());
+        }, 1000);
+
+        // Clean up the timer when the component unmounts
+        return () => clearInterval(timer);
+    }, []);
 
     const date = new Date();
     const current = date.toDateString();
-
-    const time = new Date().toLocaleTimeString();
 
     const terminalNumber: number = 1;
     const cashierNum: number = 1;
@@ -76,7 +84,7 @@ export function Cashier_PointOfSale() {
                         <div className="flex flex-row">
                             <Icon icon={AccessTime} size="bigger" variant="crimson"></Icon>
                             <Text size="big" variant="crimson" weight="bold">
-                                {time}
+                                {currentTime}
                             </Text>
                         </div>
 
@@ -89,7 +97,7 @@ export function Cashier_PointOfSale() {
                     {/* Amount Due Display */}
                     <div className={`flex flex-row w-full h-full px-0! ${spacing}`}>
                         <div className={`flex flex-col flex-1 gap-2 h-full`}>
-                            <Card isGlass={false} dropShadow className="flex-1 h-1/5 max-h-[20vh] bg-off-white">
+                            <Card isGlass={false} dropShadow className="flex-1 h-fit! bg-off-white">
                                 <Card.Body>
                                     <Text variant="crimson" weight="bold" size="big">
                                         TOTAL AMOUNT DUE
@@ -101,18 +109,16 @@ export function Cashier_PointOfSale() {
                                         <Text variant="crimson" weight="medium" size="normal">
                                             Transaction #: {transNum}
                                         </Text>
-                                        <div className="pb-2">
-                                            <Text variant="crimson" weight="medium" size="small">
-                                                Discount : {discAmt}
-                                            </Text>
-                                            <Text variant="crimson" weight="medium" size="small">
-                                                {" "}
-                                                VAT 12% : {afterVatAmt}
-                                            </Text>
-                                            <Text variant="crimson" weight="medium" size="small">
-                                                Items: {itemCnt}
-                                            </Text>
-                                        </div>
+                                        <Text variant="crimson" weight="medium" size="small">
+                                            Discount : {discAmt}
+                                        </Text>
+                                        <Text variant="crimson" weight="medium" size="small">
+                                            {" "}
+                                            VAT 12% : {afterVatAmt}
+                                        </Text>
+                                        <Text variant="crimson" weight="medium" size="small">
+                                            Items: {itemCnt}
+                                        </Text>
                                     </div>
                                 </Card.Body>
                             </Card>
@@ -145,8 +151,8 @@ export function Cashier_PointOfSale() {
 
                             {/* Actions panel */}
                             <Card className="flex flex-col flex-1 justify-center items-center px-10">
-                                <Card.Body className="flex flex-row justify-between w-full  px-0!">
-                                    <div className="flex flex-col items-center  justify-center w-[45%] gap-2">
+                                <Card.Body className="flex flex-row justify-between w-full">
+                                    <div className="flex flex-col items-center justify-center w-[45%] gap-2">
                                         <div className="flex flex-row w-full items-center justify-center gap-2">
                                             <div className="bg-brown h-[2px] w-full flex-1"></div>
                                             <Text className="" variant="crimson" size="medium" weight="bold">
@@ -188,6 +194,7 @@ export function Cashier_PointOfSale() {
                                         </div>
                                     </div>
                                 </Card.Body>
+                                <Card.Body></Card.Body>
                                 <div className="w-full mb-3">
                                     <Button className="w-full!" variant="main" size="medium">
                                         Pay

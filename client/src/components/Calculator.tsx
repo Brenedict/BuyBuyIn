@@ -1,6 +1,6 @@
 import { useState, type ReactElement, type ReactNode } from "react";
 import { Text } from "./Text";
-import { Button, type ButtonProps } from "./Button";
+import { Button } from "./Button";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { VisibilityOffOutlined } from "@mui/icons-material";
 
@@ -23,7 +23,7 @@ function CalculatorBtn({
     variant: CalculatorBtnColorClassesVariant;
 }) {
     const variantclass =
-        "cursor-pointer rounded-[5px] py-3 px-2 w-full h-full border border-1 text-medium-big font-bold" +
+        "cursor-pointer rounded-[5px] w-full h-full border border-1 font-bold xl:py-3 xl:px-2 3xl:text-medium-big text-normal" +
         " " +
         className +
         " " +
@@ -40,7 +40,7 @@ function CalculatorBtn({
 
 export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<React.SetStateAction<boolean>> }) {
     const calcClass =
-        "flex flex-col justify-center items-center min-h-[680px] p-5 card-glass-effect min-w-[400px] max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
+        "flex flex-col justify-center items-center h-fit p-5 card-glass-effect min-w-[400px] max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
 
     const [displayCurrent, setDisplayCurrent] = useState<string>("");
     const [displayHistory, setDisplayHistory] = useState<string>("");
@@ -67,9 +67,9 @@ export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<Reac
 
     return (
         <div className={calcClass}>
-            <section className="flex flex-col gap-3 justify-center items-center">
+            <section className="flex flex-col gap-3 w-full justify-center items-center">
                 <input
-                    className="order border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-off-white w-full"
+                    className="order border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-off-white w-full!"
                     type="text"
                     name="display"
                     value={displayCurrent}

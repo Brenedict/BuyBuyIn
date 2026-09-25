@@ -247,61 +247,63 @@ function ToggleIndividualDiscountType() {
                     Included Products
                 </Text>
             </Card.Header>
-            <Table pagination={{ maxItems: 5 }} className="rounded-none! border-0!">
-                {/* Fixed table headers */}
-                <Table.Row borderedBottom>
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Discounted Subtotal" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
-                </Table.Row>
-
-                {/* Dynamically maps out data */}
-                {testSelectedProducts?.map((product, i) => (
-                    <Table.Row>
-                        <Table.Data isPadded={false} size="small" text={String(product.requiredQuantity)} />
-                        <Table.Data isPadded={false} size="small" text={String(product.id)} />
-                        <Table.Data isPadded={false} size="small" text={String(product.productName)} />
-                        <Table.Data isPadded={false} size="small" text={String(product.shelfPrice)} />
-                        <Table.Data
-                            isPadded={false}
-                            size="small"
-
-                            text={formatDiscountValue(
-                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
-                                product.unitDiscountValue
-                            )}
-                        />
-                        <Table.Data
-                            isPadded={false}
-                            size="small"
-                            text={calculateSubtotal(product.requiredQuantity, product.shelfPrice)}
-                        />
-                        <Table.Data
-                            isPadded={false}
-                            size="small"
-                            text={calculateDiscountedSubtotal(
-                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
-                                product.unitDiscountValue,
-                                product.requiredQuantity,
-                                product.shelfPrice
-                            )}
-                        />
-                        <Table.Data isPadded={false}>
-                            <EditDeleteButtons
-                                id={1}
-                                size="smallest"
-                                handleEdit={handleEdit}
-                                handleDelete={handleDelete}
-                            />
-                        </Table.Data>
+            <Card.Body className="p-0! overflow-hidden!">
+                <Table pagination={{ maxItems: 5 }} className="rounded-none! border-0!">
+                    {/* Fixed table headers */}
+                    <Table.Row borderedBottom>
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Discounted Subtotal" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
                     </Table.Row>
-                ))}
-            </Table>
+
+                    {/* Dynamically maps out data */}
+                    {testSelectedProducts?.map((product, i) => (
+                        <Table.Row>
+                            <Table.Data isPadded={false} size="small" text={String(product.requiredQuantity)} />
+                            <Table.Data isPadded={false} size="small" text={String(product.id)} />
+                            <Table.Data isPadded={false} size="small" text={String(product.productName)} />
+                            <Table.Data isPadded={false} size="small" text={String(product.shelfPrice)} />
+                            <Table.Data
+                                isPadded={false}
+                                size="small"
+
+                                text={formatDiscountValue(
+                                    product.discountType as "FIXED_VALUE" | "PERCENTAGE",
+                                    product.unitDiscountValue
+                                )}
+                            />
+                            <Table.Data
+                                isPadded={false}
+                                size="small"
+                                text={calculateSubtotal(product.requiredQuantity, product.shelfPrice)}
+                            />
+                            <Table.Data
+                                isPadded={false}
+                                size="small"
+                                text={calculateDiscountedSubtotal(
+                                    product.discountType as "FIXED_VALUE" | "PERCENTAGE",
+                                    product.unitDiscountValue,
+                                    product.requiredQuantity,
+                                    product.shelfPrice
+                                )}
+                            />
+                            <Table.Data isPadded={false}>
+                                <EditDeleteButtons
+                                    id={1}
+                                    size="smallest"
+                                    handleEdit={handleEdit}
+                                    handleDelete={handleDelete}
+                                />
+                            </Table.Data>
+                        </Table.Row>
+                    ))}
+                </Table>
+            </Card.Body>
         </Card>
     );
 }

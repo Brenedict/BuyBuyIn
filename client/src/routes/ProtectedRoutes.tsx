@@ -79,19 +79,18 @@ export const protectedRoutes: RouteObject[] = [
                                 path: "save",
                                 element: <SaveConfirmationPopup />,
                             },
+                        ],
+                    },
+                    {
+                        path: ROUTES.HQ_ADMIN.branchOffers + "/:id/edit",
+                        element: <HQ_BranchWideOffers />,
+                        children: [
                             {
-                                path: ":id/edit",
-                                element: <HQ_BranchWideOffers />,
-                                children: [
-                                    {
-                                        path: "save",
-                                        element: <SaveConfirmationPopup isFromEditPage />,
-                                    },
-                                ],
+                                path: "save",
+                                element: <SaveConfirmationPopup isFromEditPage />,
                             },
                         ],
                     },
-
                     // Super Admin Routes: /super-admin
                     { path: ROUTES.SUPER_ADMIN.plans, element: <SuperAdmin_Plans /> },
                     { path: ROUTES.SUPER_ADMIN.businesses, element: <SuperAdmin_Businesses /> },

@@ -363,12 +363,14 @@ function OfferConfigurationSection() {
                     type="text"
                     label="Offer Name"
                     defaultValue={testOffer?.offerName}
+                    required
                 />
                 <TextAreaInput
                     name="description"
                     key={`description-${id}`}
                     label="Description"
                     defaultValue={testOffer?.description}
+                    required
                 />
 
                 {/* Date Range */}
@@ -379,8 +381,15 @@ function OfferConfigurationSection() {
                         type="date"
                         label="Date Range"
                         defaultValue={testOffer?.startDate}
+                        required
                     />
-                    <GeneralInput name="endDate" key={`endDate-${id}`} type="date" defaultValue={testOffer?.endDate} />
+                    <GeneralInput
+                        name="endDate"
+                        key={`endDate-${id}`}
+                        type="date"
+                        defaultValue={testOffer?.endDate}
+                        required
+                    />
                 </div>
 
                 {/* Branch Selection */}

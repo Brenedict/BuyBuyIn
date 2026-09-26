@@ -3,14 +3,13 @@ import { Label, type LabelProp } from "./InputLabel";
 import { ErrorMessage, InputStyles } from "./BaseInput";
 
 interface TextAreaProp extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-    boldLabel?: boolean;
     hidden?: boolean;
     error?: string;
 }
 
 export default function TextAreaInput({
     label,
-    boldLabel,
+    labelVariant,
     className = "",
     hidden = false,
     error,
@@ -47,7 +46,7 @@ export default function TextAreaInput({
     return (
         // NOTE: Added a min width here to prevent input from being extremely short
         <div className={`w-full min-w-64 ${hidden ? "hidden" : ""}`}>
-            <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
+            <Label htmlFor={props.id} label={label} labelVariant={labelVariant} isRequired={isRequired} />
 
             <textarea
                 required={isRequired}

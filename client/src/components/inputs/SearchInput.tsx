@@ -9,7 +9,7 @@ export default function SearchInput({
     className = "",
     hidden = false,
     label,
-    boldLabel,
+    labelVariant,
     error,
     ...props
 }: LabelProp & InputProp) {
@@ -27,7 +27,7 @@ export default function SearchInput({
 
     return (
         <div className={`relative ${className} ${hidden ? "hidden" : ""}`}>
-            <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
+            <Label htmlFor={props.id} label={label} labelVariant={labelVariant} isRequired={isRequired} />
 
             <BaseInput type="search" className={`pl-10 py-2 px-4 rounded-3xl `} error={error} {...props} />
 

@@ -6,7 +6,7 @@ import { ColorClasses, type ColorVariant, type SizeVariant, type WeightVariant }
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import KeyboardArrowRightOutlinedIcon from "@mui/icons-material/KeyboardArrowRightOutlined";
 import { useTablePagination } from "../hooks/useTablePagination";
-import { EmptyData } from "./TablePartials";
+import { EmptyData } from "./partials/TablePartials";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -40,13 +40,13 @@ interface HeaderProps extends Omit<React.ThHTMLAttributes<HTMLTableCellElement>,
     size?: SizeVariant;
     style?: "capitalize" | "uppercase";
     text: string;
-    nowrap?: boolean;
+    wrapWords?: boolean;
     isPadded?: boolean;
 }
 
 function Header({
     text,
-    nowrap = false,
+    wrapWords = false,
     textVariant = "off-white",
     bgVariant = "slate-medium",
     weight = "bold",
@@ -58,7 +58,7 @@ function Header({
     return (
         <th
             {...props}
-            className={`${nowrap ? "whitespace-nowrap" : ""} ${style} ${isPadded ? "px-16 py-4" : "px-2 py-4"} ${ColorClasses[bgVariant].bg} ${props.className} `}
+            className={`${wrapWords ? "wrap-anywhere" : ""} ${style} ${isPadded ? "px-16 py-4" : "px-2 py-4"} ${ColorClasses[bgVariant].bg} ${props.className} `}
         >
             <Text size={size} weight={weight} align="center" variant={textVariant}>
                 {text}
@@ -69,7 +69,7 @@ function Header({
 
 interface DataProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
     children?: ReactNode;
-    nowrap?: boolean;
+    wrapWords?: boolean;
     text?: string;
     textVariant?: ColorVariant;
     weight?: WeightVariant;
@@ -79,7 +79,7 @@ interface DataProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
 
 function Data({
     children,
-    nowrap = false,
+    wrapWords = false,
     text,
     textVariant = "brown",
     weight = "medium",
@@ -90,7 +90,7 @@ function Data({
     return (
         <td
             {...props}
-            className={`${nowrap ? "whitespace-nowrap" : ""} ${isPadded ? "px-4 py-4" : "px-2 py-2"} border-0 ${props.className} `}
+            className={`${wrapWords ? "wrap-anywhere" : ""} ${isPadded ? "px-4 py-4" : "px-2 py-2"} border-0 ${props.className} `}
         >
             {text && (
                 <Text variant={textVariant} weight={weight} size={size} align="center">
@@ -208,7 +208,7 @@ function Table({
              * FROM BINAS: I Kept this classname for the table div, for some reason pag kinukuha ko yung
              * from dev branch di properly lumalabas yung pagination
              */}
-            <div className="overflow-auto overscroll-none">
+            <div className="min-h-0 flex-1 overflow-auto overscroll-none">
                 <table className="w-full table-auto">
                     <thead className="[&_th]:sticky [&_th]:top-0 [&_th]:z-10">{header}</thead>
 

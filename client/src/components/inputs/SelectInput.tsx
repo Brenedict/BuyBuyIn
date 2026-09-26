@@ -15,6 +15,7 @@ interface SelectInputProp extends LabelProp, React.SelectHTMLAttributes<HTMLSele
     children: ReactNode;
     defaultValue: string;
     variant?: "default" | "button";
+    onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
 // Context provider for updating input when an option is selected

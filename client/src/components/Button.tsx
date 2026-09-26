@@ -11,7 +11,7 @@ export const ButtonColorClasses = {
         iconExtra: "",
     },
     secondary: {
-        button: "bg-cream text-black border-2 border-black font-bold hover:bg-brown hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-brown active:text-cream active:border-cream",
+        button: "bg-cream text-black border-2 border-black font-bold hover:bg-slate-dark/75 hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-slate-dark active:text-cream active:border-cream",
         icon: "black",
         iconExtra: "group-active:text-cream group-hover:text-cream",
     },
@@ -36,11 +36,11 @@ const ButtonSizeClasses = {
         icon: "smaller",
     },
     small: {
-        button: "px-2 py-2 m-h-4 m-w-16 lg:text-xs text-2xs border rounded-[10px] gap-1",
+        button: "px-3 py-2 m-h-4 m-w-16 lg:text-xs text-2xs border rounded-[10px] gap-1",
         icon: "small",
     },
     normal: {
-        button: "px-2 py-2 m-h-4 m-w-16 lg:text-sm text-xs border rounded-[10px] gap-1",
+        button: "px-3 py-2 m-h-4 m-w-16 lg:text-sm text-xs border rounded-[10px] gap-1",
         icon: "normal",
     },
     medium: {

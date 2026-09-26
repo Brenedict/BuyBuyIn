@@ -122,7 +122,6 @@ export default function SelectInput({
     id,
     name,
     label,
-    boldLabel,
     children,
     defaultValue,
     variant = "default",
@@ -156,7 +155,7 @@ export default function SelectInput({
 
     return (
         <div className="w-full relative" ref={selectInputParentRef}>
-            <Label htmlFor={id} label={label} boldLabel={boldLabel} />
+            <Label htmlFor={id} label={label} />
             <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, setSelectedValue, onChange, name }}>
                 {/* hidden input that holds data of dropdown */}
                 <input hidden type="text" name={name} value={selectedValue} />

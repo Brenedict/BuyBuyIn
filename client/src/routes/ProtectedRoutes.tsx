@@ -6,6 +6,7 @@ import StaticLayout from "../pages/shared/StaticLayout";
 
 // Static Access Checker before entering any page
 import { AccessValidator } from "../pages/shared/AccessValidator";
+import { primaryAuthLoader } from "../api/authService";
 
 // Branch Manager Pages
 import BranchManager_BranchWideOffers from "../pages/branch-manager/BranchManager.BranchWideOffers";
@@ -45,6 +46,7 @@ export const protectedRoutes: RouteObject[] = [
     {
         id: "protected",
         path: "/",
+        loader: primaryAuthLoader,
         element: <AccessValidator />,
         children: [
             {

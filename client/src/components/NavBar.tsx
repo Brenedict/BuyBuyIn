@@ -21,6 +21,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 // Types / Utils
 import { ROUTES } from "../routes/Routes";
 import type { MaterialIcon } from "../types/common";
+import { logoutAction, logoutService } from "../api/authService";
+import useNavigatePage from "../hooks/useNavigatePage";
 
 export type UserRoles = "hqadmin" | "branchmanager" | "cashier";
 
@@ -116,6 +118,15 @@ const NavItems: Record<UserRoles, NavItem[]> = {
 };
 
 export function NavBar({ role }: NavBarProps) {
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    // Temp logout reroute
+    const handleLogout = async () => {
+        await logoutService();
+        useNavigate(ROUTES.AUTH);
+    };
+
     const items = NavItems[role];
 
     const iconSize = `
@@ -275,6 +286,7 @@ export function NavBar({ role }: NavBarProps) {
                         relative
                         hover:cursor-pointer
                     "
+                    onClick={handleLogout}
                 >
                     <Icon
                         icon={LogoutIcon}

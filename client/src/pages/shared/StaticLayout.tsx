@@ -18,7 +18,7 @@ function StaticLayout() {
          * */
 
         <main
-            className="w-screen h-screen overflow-hidden flex antialiased bg-cover bg-center"
+            className="w-screen h-screen min-w-[1024px] min-h-[768px] overflow-hidden flex antialiased bg-cover bg-center"
             style={{ backgroundImage: `url(${testBg})` }}
         >
             {/* Insert Nav */}

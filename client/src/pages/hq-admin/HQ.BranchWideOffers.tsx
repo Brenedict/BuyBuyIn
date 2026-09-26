@@ -1,6 +1,6 @@
 // General Import
 import { useEffect, useMemo, useState } from "react";
-import { Form, useParams } from "react-router";
+import { Form, Outlet, useParams } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
@@ -46,12 +46,17 @@ interface OfferProps {
 // Main Page Exported
 export default function HQ_BranchWideOffers() {
     return (
-        <Card className="h-[calc(100vh-4rem)] flex flex-col">
-            <Card.Body className="flex gap-6 grow min-h-0">
-                <OffersListSection />
-                <OfferConfigurationSection />
-            </Card.Body>
-        </Card>
+        <>
+            <Card className="h-[calc(100vh-4rem)] flex flex-col">
+                <Card.Body className="flex gap-6 grow min-h-0">
+                    <OffersListSection />
+                    <OfferConfigurationSection />
+                </Card.Body>
+            </Card>
+
+            {/* This is where the URL Based PopUp Appears */}
+            <Outlet />
+        </>
     );
 }
 
@@ -312,6 +317,13 @@ function OfferConfigurationSection() {
     // Extracts the Branch Wide Offer Id from the URL Param
     const { id } = useParams();
 
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    // Save offer navigation. Varies between create and edit view.
+    const saveOfferPopupNavigate = id ? ROUTES.HQ_ADMIN.branchOffersEditSave(id) : ROUTES.HQ_ADMIN.branchOffersSave;
+    const handleSave = () => useNavigate(saveOfferPopupNavigate, true);
+
     // Extracting the test data. The 'useMemo' is for caching.
     const testOffer = useMemo(() => SAMPLE_OFFERS.find((offer) => String(offer.id) == id), [id]);
 
@@ -336,7 +348,12 @@ function OfferConfigurationSection() {
 
     return (
         <Card isGlass={false} className="w-[75%] h-full flex flex-col">
-            <Card.Header toggleRightButton rightButton={<Button>Save Offer</Button>} bordered className="shrink-0">
+            <Card.Header
+                toggleRightButton
+                rightButton={<Button onClick={handleSave}>Save Offer</Button>}
+                bordered
+                className="shrink-0"
+            >
                 <Text weight="bold" size="bigger">
                     Offer Configuration - {`${id ? "Edit" : "Add "}`}
                 </Text>
@@ -344,22 +361,38 @@ function OfferConfigurationSection() {
 
             <Card.Body className="flex flex-col gap-4 grow overflow-y-auto min-h-0 *:shrink-0">
                 <GeneralInput
+                    name="offerName"
                     key={`offerName-${id}`}
                     type="text"
                     label="Offer Name"
                     defaultValue={testOffer?.offerName}
+                    required
                 />
-                <TextAreaInput key={`description-${id}`} label="Description" defaultValue={testOffer?.description} />
+                <TextAreaInput
+                    name="description"
+                    key={`description-${id}`}
+                    label="Description"
+                    defaultValue={testOffer?.description}
+                    required
+                />
 
                 {/* Date Range */}
                 <div className="flex gap-6 items-end">
                     <GeneralInput
+                        name="startDate"
                         key={`startDate-${id}`}
                         type="date"
                         label="Date Range"
                         defaultValue={testOffer?.startDate}
+                        required
                     />
-                    <GeneralInput key={`endDate-${id}`} type="date" defaultValue={testOffer?.endDate} />
+                    <GeneralInput
+                        name="endDate"
+                        key={`endDate-${id}`}
+                        type="date"
+                        defaultValue={testOffer?.endDate}
+                        required
+                    />
                 </div>
 
                 {/* Branch Selection */}
@@ -395,6 +428,7 @@ function OfferConfigurationSection() {
                 {/* Offer Type Selection */}
                 <ChoiceInput
                     id="offerType"
+                    name="offerType"
                     label="Offer Type"
                     className="w-fit!"
                     checked={toggleOverallDiscount}
@@ -414,8 +448,9 @@ function OfferConfigurationSection() {
 
                 {/* Set status of offer */}
                 <SelectInput
-                    name="status"
-                    defaultValue="enabled"
+                    key={`status-${id}`}
+                    name="offerStatus"
+                    defaultValue={testOffer?.offerStatus ?? "draft"}
                     label="Status"
                     options={{
                         Enabled: "enabled",

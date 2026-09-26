@@ -82,7 +82,6 @@ export default function SelectInput({
     id,
     name,
     label,
-    boldLabel,
     options,
     defaultValue,
     variant = "default",
@@ -131,7 +130,7 @@ export default function SelectInput({
 
     return (
         <div className="w-full relative" ref={selectInputParentRef}>
-            <Label htmlFor={id} label={label} boldLabel={boldLabel} />
+            <Label htmlFor={id} label={label} />
             <select id={id} ref={selectInputRef} hidden name={name} value={selectedValue} onChange={onChange}>
                 {optionEntries.map(([label, value]) => (
                     <option key={label} value={value}>

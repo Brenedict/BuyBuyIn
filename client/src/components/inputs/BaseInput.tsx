@@ -14,7 +14,6 @@ export const InputStyles = {
 };
 
 export interface InputProp extends React.InputHTMLAttributes<HTMLInputElement> {
-    boldLabel?: boolean;
     error?: string;
 }
 

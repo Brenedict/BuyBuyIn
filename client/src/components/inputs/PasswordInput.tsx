@@ -1,9 +1,9 @@
 // General Imports
-import {useState} from "react";
+import { useState } from "react";
 
 // Components
 import Icon from "../Icon";
-import {BaseInput, type InputProp, ErrorMessage} from "./BaseInput"
+import { BaseInput, type InputProp, ErrorMessage } from "./BaseInput";
 import { Label, type LabelProp } from "./InputLabel";
 
 // Material UI Icons
@@ -13,6 +13,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOffOutlined";
 export default function PasswordInput({
     placeholder,
     label,
+    labelVariant,
     className = "",
     hidden = false,
     error,
@@ -32,7 +33,7 @@ export default function PasswordInput({
 
     return (
         <div className={`text-dark-blue w-full ${hidden ? "hidden" : ""}`}>
-            <Label htmlFor={props.id} label={label} isRequired={isRequired} />
+            <Label htmlFor={props.id} label={label} labelVariant={labelVariant} isRequired={isRequired} />
             <div className="relative">
                 <BaseInput
                     type={visible ? "text" : "password"}

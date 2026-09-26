@@ -26,7 +26,7 @@ import { BusinessCenter, ManageAccounts, NextPlanSharp } from "@mui/icons-materi
 import { ROUTES } from "../routes/Routes";
 import type { MaterialIcon } from "../types/common";
 
-export type UserRoles = "super_admin" | "hqadmin" | "branchmanager" | "cashier";
+export type UserRoles = "superadmin" | "hqadmin" | "branchmanager" | "cashier";
 
 interface NavItem {
     label: string;
@@ -39,24 +39,24 @@ interface NavBarProps {
 }
 
 const NavItems: Record<UserRoles, NavItem[]> = {
-    super_admin: [
+    superadmin: [
         {
             label: "Plans",
             icon: NextPlanSharp,
             path: ROUTES.SUPER_ADMIN.plans,
         },
         {
-            label: "businesses",
+            label: "Businesses",
             icon: BusinessCenter,
             path: ROUTES.SUPER_ADMIN.businesses,
         },
         {
-            label: "subscriptions",
+            label: "Subscriptions",
             icon: SubscriptionsIcon,
             path: ROUTES.SUPER_ADMIN.subscriptions,
         },
         {
-            label: "subscriber_accounts",
+            label: "Subscriber Accounts",
             icon: ManageAccounts,
             path: ROUTES.SUPER_ADMIN.subscriberAccounts,
         },
@@ -171,9 +171,9 @@ export function NavBar({ role }: NavBarProps) {
                     w-full
 
                     p-1
-                    md:p-1
+                    md:p-2
                     md:px-3
-                    lg:p-2
+                    lg:p-3
                     lg:px-4
 
                     card-glass-effect

@@ -39,6 +39,8 @@ import { ROUTES } from "./Routes";
 
 // TEMP File
 import { Page2 } from "../pages/branch-manager/Page2";
+import { PopUp } from "../components/PopUp";
+import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
 
 export const protectedRoutes: RouteObject[] = [
     {
@@ -74,9 +76,23 @@ export const protectedRoutes: RouteObject[] = [
                     {
                         path: ROUTES.HQ_ADMIN.branchOffers,
                         element: <HQ_BranchWideOffers />,
-                        children: [{ path: ":id/edit", element: <HQ_BranchWideOffers /> }],
+                        children: [
+                            {
+                                path: "save",
+                                element: <SaveConfirmationPopup />,
+                            },
+                        ],
                     },
-
+                    {
+                        path: ROUTES.HQ_ADMIN.branchOffers + "/:id/edit",
+                        element: <HQ_BranchWideOffers />,
+                        children: [
+                            {
+                                path: "save",
+                                element: <SaveConfirmationPopup isFromEditPage />,
+                            },
+                        ],
+                    },
                     // Super Admin Routes: /super-admin
                     { path: ROUTES.SUPER_ADMIN.plans, element: <SuperAdmin_Plans /> },
                     { path: ROUTES.SUPER_ADMIN.businesses, element: <SuperAdmin_Businesses /> },

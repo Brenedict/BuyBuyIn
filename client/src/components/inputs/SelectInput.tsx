@@ -82,7 +82,6 @@ export default function SelectInput({
     id,
     name,
     label,
-    boldLabel,
     options,
     defaultValue,
     variant = "default",

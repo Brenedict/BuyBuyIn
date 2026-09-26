@@ -56,23 +56,32 @@ function FormSection() {
             </Text>
             <Form onChange={handleFormChange} onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-4">
-                    <SelectInput name="roles" defaultValue="cashier">
-                        <SelectInput.Option value="hqadmin">hqadmin</SelectInput.Option>
-                        <SelectInput.Option value="cashier">cashier</SelectInput.Option>
-                        <SelectInput.Option value="branchManager">branchManager</SelectInput.Option>
-                        <SelectInput.Option value="owner">owner</SelectInput.Option>
-                    </SelectInput>
-                    <SelectInput variant="button" name="feeling" defaultValue="happy">
-                        <SelectInput.Option value="sad">sad</SelectInput.Option>
-                        <SelectInput.Option value="happy">happy</SelectInput.Option>
-                        <SelectInput.Option value="angry">angry</SelectInput.Option>
-                        <SelectInput.Option value="ecstatic">ecstatic</SelectInput.Option>
-                        <SelectInput.Option value="jolly">jolly</SelectInput.Option>
-                        <SelectInput.Option value="brave">brave</SelectInput.Option>
-                        <SelectInput.Option value="classy">classy</SelectInput.Option>
-                        <SelectInput.Option value="loner">loner</SelectInput.Option>
-                        <SelectInput.Option value="insertText">insertText</SelectInput.Option>
-                    </SelectInput>
+                    <SelectInput
+                        name="roles"
+                        defaultValue="cashier"
+                        options={{
+                            hqadmin: "hqadmin",
+                            cashier: "cashier",
+                            branchManager: "branchManager",
+                            owner: "owner",
+                        }}
+                    />
+                    <SelectInput
+                        variant="button"
+                        name="feeling"
+                        defaultValue="happy"
+                        options={{
+                            sad: "sad",
+                            happy: "happy",
+                            angry: "angry",
+                            ecstatic: "ecstatic",
+                            jolly: "jolly",
+                            brave: "brave",
+                            classy: "classy",
+                            loner: "loner",
+                            insertText: "insertText",
+                        }}
+                    />
                 </div>
                 <GeneralInput name="email" type="email" label="Email" required id="email" />
                 <PasswordInput name="password" label="Password" required id="password" />

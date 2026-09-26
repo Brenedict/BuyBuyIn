@@ -22,6 +22,48 @@ datasource db {
     provider = "postgresql"
 }
 
+enum PackageType {
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum RoleType {
+  SUPERADMIN
+  HQADMIN
+  BRANCHMANAGER
+  CASHIER
+}
+
+enum PaymentMethodType {
+  CASH
+  ECASH
+  CARD
+}
+
+enum TransactionStatusType {
+  VOID
+  COMPLETE
+  REFUNDED
+}
+
+
+enum OfferStatusType {
+  ENABLED
+  DISABLED
+  DRAFT
+}
+
+enum OfferType {
+  OVERALL
+  INDIVIDUAL
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXEDVALUE 
+}
+
 model User {
     id Int @id @default(autoincrement())
 
@@ -40,10 +82,128 @@ model User {
     /// @zod.string.min(1, { message: "Last Name cannot be empty" }).max(256)
     lastName String @db.VarChar(256)
 
+    role RoleType @default(CASHIER)
+
     createdAt DateTime @default(now()) @db.Timestamptz(0)
-    updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+    upDateTimedAt DateTime @default(now()) @db.Timestamptz(0)
     fullName  String?  @default(dbgenerated()) @db.VarChar(256)
+
+    resetToken String? @unique
+    resetTokenExpiresAt DateTime?
 
     @@index([fullName])
     @@index([createdAt(sort: Desc)])
+}
+
+model Subscription {
+  id Int @id @default(autoincrement())
+  packageType PackageType 
+  packageName String 
+  numberBranches Int 
+  baseCost Float 
+  baseAccountLimit Int 
+  duration Int 
+}
+
+model BusinessSubscription {
+  id Int @id @default(autoincrement())
+  subscriptionID String 
+  businessID String 
+  dateApplied DateTime 
+  additionalBranches Int 
+  totalCost Float 
+  totalAccountLimit Int 
+}
+
+model Business {
+  id Int @id @default(autoincrement())
+  name String 
+  location String 
+}
+
+model Branch {
+  id Int @id @default(autoincrement())
+  businessID String 
+  location String 
+  accountLimit Int 
+}
+
+
+model BranchInventoryItem {
+  id Int @id @default(autoincrement())
+  productID String 
+  branchID String 
+  quantity Int 
+  reorderThreshold Int 
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+  branchID String 
+  userID String 
+  totalPrice Float 
+  dateofTransaction DateTime 
+  paymentMethod PaymentMethodType 
+  status TransactionStatusType 
+  discount Float 
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  supplierID String 
+  productName String 
+  basePrice Float 
+  shelfPrice Float 
+}
+
+model TransactionItem {
+  id Int @id @default(autoincrement())
+  transactionId String 
+  branchWideOfferId Int?
+  productId Int?
+  quantity Int 
+  currentPrice Float 
+  isBundle Boolean 
+}
+
+model Supplier {
+  id Int @id @default(autoincrement())
+  supplierName String 
+  contactInfo String 
+}
+
+model ProductCategory {
+  id Int @id @default(autoincrement())
+  productId Int?
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  categoryName String 
+}
+
+model BranchWideOfferProduct {
+  id Int @id @default(autoincrement())
+  productId String 
+  unitDiscountValue Float 
+  requiredQuantity Int 
+  discountType DiscountType
+}
+
+model BranchWideOffer {
+  id Int @id @default(autoincrement())
+  offerName String 
+  description String 
+  startDate DateTime 
+  endDate DateTime
+  isExclusive Boolean 
+  offerStatus OfferStatusType 
+  offerType OfferType 
+  discountType DiscountType 
+  overallDiscountValue Float 
+}
+
+model BranchWideOfferBranches {
+  id Int @id @default(autoincrement())
+  branchId String 
 }

@@ -5,6 +5,7 @@ import { Outlet, useRouteLoaderData } from "react-router";
 // API Services
 import type { primaryAuthLoader } from "../../api/authService";
 import InMemoryStore from "../../api/inMemoryStore";
+import { GlobalUserContextProvider } from "../../context/GlobalUserContext";
 
 export function AccessValidator() {
     const data = useRouteLoaderData<typeof primaryAuthLoader>("protected");
@@ -18,7 +19,11 @@ export function AccessValidator() {
         console.log("No access token found");
     }
 
-    return <Outlet />;
+    return (
+        <GlobalUserContextProvider>
+            <Outlet />;
+        </GlobalUserContextProvider>
+    );
 }
 
 export default AccessValidator;

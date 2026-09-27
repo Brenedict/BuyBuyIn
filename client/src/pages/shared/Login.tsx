@@ -1,11 +1,14 @@
+// General Imports
 import { useState } from "react";
 import { Form } from "react-router";
 
+// Components
 import { BuyBuyInWordmark } from "../../components/BuyBuyInWordmark";
 import PasswordInput from "../../components/inputs/PasswordInput";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import { Button } from "../../components/Button";
 import SelectInput from "../../components/inputs/SelectInput";
+import { Text } from "../../components/Text";
 
 export function Login() {
     const [role, setRole] = useState("cashier");
@@ -93,6 +96,14 @@ export function Login() {
                             <Button type="submit" variant="login">
                                 LOG IN
                             </Button>
+                            <div className="flex flex-col justify-center">
+                                <p className="text-center">
+                                    <b>Test Email:</b> johndoe@gmail.com
+                                </p>
+                                <p className="text-center">
+                                    <b>Test Pass:</b> password123
+                                </p>
+                            </div>
 
                             <div className="text-center font-sans-flex text-small-description text-slate-dark">
                                 <a href="#forgot-password" className="underline underline-offset-2">

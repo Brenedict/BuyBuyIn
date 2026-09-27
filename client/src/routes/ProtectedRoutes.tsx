@@ -53,7 +53,7 @@ export const protectedRoutes: RouteObject[] = [
                 path: "",
                 element: <StaticLayout />,
                 children: [
-                    { path: "", element: <Page2 /> },
+                    // { path: "", element: <Page2 /> },
 
                     // Branch Manager Routes: /branch-manager
                     {

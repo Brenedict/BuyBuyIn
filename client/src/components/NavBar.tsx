@@ -1,6 +1,6 @@
 // General Imports
 import React from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 
 // Components
 import Icon from "./Icon";
@@ -121,10 +121,12 @@ export function NavBar({ role }: NavBarProps) {
     // Used for redirecting
     const useNavigate = useNavigatePage();
 
+    const location = useLocation();
+    const logoutPath = `${location.pathname.replace(/\/$/, "")}/logout`;
+
     // Temp logout reroute
     const handleLogout = async () => {
-        await logoutService();
-        useNavigate(ROUTES.AUTH);
+        useNavigate(logoutPath);
     };
 
     const items = NavItems[role];

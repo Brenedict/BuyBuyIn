@@ -1,17 +1,28 @@
+// General Imports
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+
+// Components
 import { Card } from "./Card";
 import { Text } from "./Text";
 import { Button } from "./Button";
 
+// Hooks
+import useNavigatePage from "../hooks/useNavigatePage";
+
 type PopUpProps = {
-    onClose: () => void | Promise<void>;
     className?: string;
     title?: string;
     children?: ReactNode;
 };
 
-export function PopUp({ onClose, className, title = "Add a title", children = "Insert Body" }: PopUpProps) {
+export function PopUp({ className, title = "Add a title", children = "Insert Body" }: PopUpProps) {
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    // When triggered, returns the page to the root (exiting the popup)
+    const handleClose = () => useNavigate();
+
     const modalRef = useRef<HTMLDivElement>(null);
 
     const [position, setPosition] = useState({
@@ -29,7 +40,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
     useEffect(() => {
         const handleEscapeKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                void onClose();
+                void handleClose();
             }
         };
 
@@ -38,7 +49,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
         return () => {
             document.removeEventListener("keydown", handleEscapeKey);
         };
-    }, [onClose]);
+    }, []);
 
     const handleOnPress = (e: React.PointerEvent) => {
         const target = e.target as HTMLElement;
@@ -94,7 +105,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
             className="fixed inset-0 z-9999 bg-slate-dark/50"
             onPointerMove={handlePointerMove}
             onPointerUp={handleOnRelease}
-            onClick={onClose}
+            onClick={handleClose}
         >
             <div
                 ref={modalRef}
@@ -120,7 +131,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
                         className="bg-crimson "
                         toggleRightButton
                         rightButton={
-                            <Button type="button" aria-label="Close" size="small" onClick={onClose}>
+                            <Button type="button" aria-label="Close" size="small" onClick={handleClose}>
                                 ✕
                             </Button>
                         }

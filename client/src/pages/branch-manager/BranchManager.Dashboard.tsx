@@ -20,12 +20,13 @@ import { formatShortDate } from "../../utils/dateUtils";
 
 // Material UI Icons
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
+import { Outlet } from "react-router";
 
 export function NumberFormat(value: number, symbol?: string) {
     return `${symbol ?? ""} ${value.toLocaleString()}`;
 }
 
-export function HQ_Dashboard() {
+export function BranchManager_Dashboard() {
     const { values, handleChange } = useFormSearchParams({ timeframe: "Today" });
 
     const salesDataLabels = SALES_OVERVIEW_LABELS;
@@ -178,8 +179,13 @@ export function HQ_Dashboard() {
                     </Card.Body>
                 </Card>
             </Card.Body>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }
 
-export default HQ_Dashboard;
+export default BranchManager_Dashboard;

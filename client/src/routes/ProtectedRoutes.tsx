@@ -39,8 +39,8 @@ import { ROUTES } from "./Routes";
 
 // TEMP File
 import { Page2 } from "../pages/branch-manager/Page2";
-import { PopUp } from "../components/PopUp";
 import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
+import { globalPopups } from "./GlobalPopupRoutes";
 
 export const protectedRoutes: RouteObject[] = [
     {
@@ -56,23 +56,47 @@ export const protectedRoutes: RouteObject[] = [
                     { path: "", element: <Page2 /> },
 
                     // Branch Manager Routes: /branch-manager
-                    { path: ROUTES.BRANCH_MANAGER.dashboard, element: <BranchManager_Dashboard /> },
-                    { path: ROUTES.BRANCH_MANAGER.inventory, element: <BranchManager_Inventory /> },
-                    { path: ROUTES.BRANCH_MANAGER.manageUsers, element: <BranchManager_ManageUsers /> },
-                    { path: ROUTES.BRANCH_MANAGER.branchOffers, element: <BranchManager_BranchWideOffers /> },
-                    { path: ROUTES.BRANCH_MANAGER.transactions, element: <BranchManager_Transactions /> },
+                    {
+                        path: ROUTES.BRANCH_MANAGER.dashboard,
+                        element: <BranchManager_Dashboard />,
+                        children: [...globalPopups],
+                    },
+                    {
+                        path: ROUTES.BRANCH_MANAGER.inventory,
+                        element: <BranchManager_Inventory />,
+                        children: [...globalPopups],
+                    },
+                    {
+                        path: ROUTES.BRANCH_MANAGER.manageUsers,
+                        element: <BranchManager_ManageUsers />,
+                        children: [...globalPopups],
+                    },
+                    {
+                        path: ROUTES.BRANCH_MANAGER.branchOffers,
+                        element: <BranchManager_BranchWideOffers />,
+                        children: [...globalPopups],
+                    },
+                    {
+                        path: ROUTES.BRANCH_MANAGER.transactions,
+                        element: <BranchManager_Transactions />,
+                        children: [...globalPopups],
+                    },
 
                     // Cashier Routes: /cashier
-                    { path: ROUTES.CASHIER.dashboard, element: <Cashier_Dashboard /> },
-                    { path: ROUTES.CASHIER.transactions, element: <Cashier_Transactions /> },
-                    { path: ROUTES.CASHIER.pointOfSale, element: <Cashier_PointOfSale /> },
-                    { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead /> },
+                    { path: ROUTES.CASHIER.dashboard, element: <Cashier_Dashboard />, children: [...globalPopups] },
+                    {
+                        path: ROUTES.CASHIER.transactions,
+                        element: <Cashier_Transactions />,
+                        children: [...globalPopups],
+                    },
+                    { path: ROUTES.CASHIER.pointOfSale, element: <Cashier_PointOfSale />, children: [...globalPopups] },
+                    { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead />, children: [...globalPopups] },
 
                     // HQ Admin Routes: /hq-admin
-                    { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard /> },
-                    { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory /> },
-                    { path: ROUTES.HQ_ADMIN.manageUsers, element: <HQ_ManageUsers /> },
-                    { path: ROUTES.HQ_ADMIN.subscriptions, element: <HQ_Subscriptions /> },
+                    { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard />, children: [...globalPopups] },
+                    { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory />, children: [...globalPopups] },
+                    { path: ROUTES.HQ_ADMIN.manageUsers, element: <HQ_ManageUsers />, children: [...globalPopups] },
+                    { path: ROUTES.HQ_ADMIN.subscriptions, element: <HQ_Subscriptions />, children: [...globalPopups] },
                     {
                         path: ROUTES.HQ_ADMIN.branchOffers,
                         element: <HQ_BranchWideOffers />,
@@ -81,6 +105,7 @@ export const protectedRoutes: RouteObject[] = [
                                 path: "save",
                                 element: <SaveConfirmationPopup />,
                             },
+                            ...globalPopups,
                         ],
                     },
                     {
@@ -89,15 +114,28 @@ export const protectedRoutes: RouteObject[] = [
                         children: [
                             {
                                 path: "save",
-                                element: <SaveConfirmationPopup isFromEditPage />,
+                                element: <SaveConfirmationPopup />,
                             },
+                            ...globalPopups,
                         ],
                     },
                     // Super Admin Routes: /super-admin
-                    { path: ROUTES.SUPER_ADMIN.plans, element: <SuperAdmin_Plans /> },
-                    { path: ROUTES.SUPER_ADMIN.businesses, element: <SuperAdmin_Businesses /> },
-                    { path: ROUTES.SUPER_ADMIN.subscriptions, element: <SuperAdmin_Subscriptions /> },
-                    { path: ROUTES.SUPER_ADMIN.subscriberAccounts, element: <SuperAdmin_SubscriberAccounts /> },
+                    { path: ROUTES.SUPER_ADMIN.plans, element: <SuperAdmin_Plans />, children: [...globalPopups] },
+                    {
+                        path: ROUTES.SUPER_ADMIN.businesses,
+                        element: <SuperAdmin_Businesses />,
+                        children: [...globalPopups],
+                    },
+                    {
+                        path: ROUTES.SUPER_ADMIN.subscriptions,
+                        element: <SuperAdmin_Subscriptions />,
+                        children: [...globalPopups],
+                    },
+                    {
+                        path: ROUTES.SUPER_ADMIN.subscriberAccounts,
+                        element: <SuperAdmin_SubscriberAccounts />,
+                        children: [...globalPopups],
+                    },
                 ],
             },
         ],

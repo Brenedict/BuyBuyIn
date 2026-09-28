@@ -1,7 +1,6 @@
 // General Imports
-import { Outlet, Link } from "react-router";
+import { Outlet } from "react-router";
 import "../../index.css";
-import { useContext } from "react";
 
 // Temporary
 import testBg from "../../assets/testbg.png";
@@ -13,16 +12,16 @@ import { NavBar } from "../../components/NavBar";
 import type { RoleType } from "@buybuyin/shared/prisma/enums";
 
 // Context
-import { UserGlobalContext } from "../../context/GlobalUserContext";
+import { useGlobalContext } from "./AccessValidator";
+
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
 
 function StaticLayout() {
     // Temporary: Currently not using InMemoryStore
-    const user = useContext(UserGlobalContext);
-    let role: RoleType = "CASHIER";
+    const { user } = useGlobalContext();
 
-    if (user) {
-        role = user.role;
-    }
+    let role: RoleType = user?.role ?? "CASHIER";
 
     return (
         /**

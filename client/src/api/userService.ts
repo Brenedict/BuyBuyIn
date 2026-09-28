@@ -2,8 +2,11 @@
 import { apiFetch } from "./httpClient";
 import { logoutService } from "./authService";
 
+// BuyBuyIn Shared Imports
+import { type UserGlobalContextSchemaType } from "@buybuyin/shared/schema/user";
+
 // GET: Fetches the data of the currently logged-in user. If the user is not authenticated, it will log them out and return null.
-export const getUserContextLoader = async (): Promise<any> => {
+export const getUserContextLoader = async (): Promise<UserGlobalContextSchemaType | null> => {
     try {
         const res = await apiFetch("/user/me", {
             retry: true,
@@ -21,7 +24,6 @@ export const getUserContextLoader = async (): Promise<any> => {
 
         return res.json();
     } catch (err) {
-        console.error(err);
         await logoutService();
         return null;
     }

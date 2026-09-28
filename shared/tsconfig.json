@@ -8,11 +8,6 @@
         "allowImportingTsExtensions": true,
         "emitDeclarationOnly": true
     },
-    "include": [
-        "schema/**/*.ts"
-    ],
-    "exclude": [
-        "prisma",
-        "zod"
-    ]
+    "include": ["**/*.ts"],
+    "exclude": ["dist", "node_modules"]
 }

@@ -1,12 +1,15 @@
 // General Imports
-import { type RouteObject } from "react-router";
+import { Navigate, type RouteObject } from "react-router";
 
 // Static Layout Page
 import StaticLayout from "../pages/shared/StaticLayout";
 
 // Static Access Checker before entering any page
 import { AccessValidator } from "../pages/shared/AccessValidator";
-import { primaryAuthLoader } from "../api/authService";
+import { primaryAuthLoader, homeRedirectLoader } from "../api/authService";
+
+// Global Pages and Popups
+import { globalPopups } from "./GlobalPopupRoutes";
 
 // Branch Manager Pages
 import BranchManager_BranchWideOffers from "../pages/branch-manager/BranchManager.BranchWideOffers";
@@ -21,12 +24,14 @@ import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
 import Cashier_Transactions from "../pages/cashier/Cashier.Transactions";
 import Cashier_XRead from "../pages/cashier/Cashier.XRead";
 
-// HQ Admin Pages
+// HQ Admin Pages and Popups
 import HQ_BranchWideOffers from "../pages/hq-admin/HQ.BranchWideOffers";
 import HQ_Dashboard from "../pages/hq-admin/HQ.Dashboard";
 import HQ_Inventory from "../pages/hq-admin/HQ.Inventory";
 import HQ_ManageUsers from "../pages/hq-admin/HQ.ManageUsers";
 import HQ_Subscriptions from "../pages/hq-admin/HQ.Subscriptions";
+
+import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
 
 // Super Admin Pages
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -35,12 +40,9 @@ import SuperAdmin_Subscriptions from "../pages/super-admin/SuperAdmin.Subscripti
 import SuperAdmin_SubscriberAccounts from "../pages/super-admin/SuperAdmin.SubscriberAccounts";
 
 // Predefined Routes
-import { ROUTES } from "./Routes";
+import { ROLE_HOME, ROUTES } from "./Routes";
 
-// TEMP File
-import { Page2 } from "../pages/branch-manager/Page2";
-import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
-import { globalPopups } from "./GlobalPopupRoutes";
+import { RoleType } from "@buybuyin/shared/prisma/enums";
 
 export const protectedRoutes: RouteObject[] = [
     {
@@ -53,7 +55,29 @@ export const protectedRoutes: RouteObject[] = [
                 path: "",
                 element: <StaticLayout />,
                 children: [
-                    // { path: "", element: <Page2 /> },
+                    // Index Route: "/" -> landing page of the user's own role
+                    {
+                        index: true,
+                        loader: homeRedirectLoader,
+                    },
+
+                    // Adds redirect when users go to ":role/" (no specific page). Ensures users go to their respective home pages.
+                    {
+                        path: ROUTES.BRANCH_MANAGER.root,
+                        element: <Navigate to={ROLE_HOME[RoleType.BRANCHMANAGER]} replace />,
+                    },
+                    {
+                        path: ROUTES.CASHIER.root,
+                        element: <Navigate to={ROLE_HOME[RoleType.CASHIER]} replace />,
+                    },
+                    {
+                        path: ROUTES.HQ_ADMIN.root,
+                        element: <Navigate to={ROLE_HOME[RoleType.HQADMIN]} replace />,
+                    },
+                    {
+                        path: ROUTES.SUPER_ADMIN.root,
+                        element: <Navigate to={ROLE_HOME[RoleType.SUPERADMIN]} replace />,
+                    },
 
                     // Branch Manager Routes: /branch-manager
                     {

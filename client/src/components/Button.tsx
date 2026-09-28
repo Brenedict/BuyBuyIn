@@ -104,7 +104,7 @@ export function Button({
                 />
             )}
             {variant === "login" && (
-                <span className="absolute top-0 right-[-1.15rem] h-0 w-0 border-y-[1.5rem] border-l-[1.15rem] border-y-transparent border-l-crimson group-hover:border-l-[#b43320] group-active:border-l-[var(--color-maroon)]" />
+                <span className="absolute top-0 right-[-1.1rem] h-0 w-0 border-y-[1.5rem] border-l-[1.15rem] border-y-transparent border-l-crimson group-hover:border-l-[#b43320] group-active:border-l-[var(--color-maroon)]" />
             )}
         </button>
     );

@@ -14,14 +14,23 @@ type PopUpProps = {
     className?: string;
     title?: string;
     children?: ReactNode;
+    handleCloseProp?: () => void;
 };
 
-export function PopUp({ className, title = "Add a title", children = "Insert Body" }: PopUpProps) {
+export function PopUp({ className, title = "Add a title", children = "Insert Body", handleCloseProp }: PopUpProps) {
     // Used for redirecting
     const useNavigate = useNavigatePage();
 
-    // When triggered, returns the page to the root (exiting the popup)
-    const handleClose = () => useNavigate();
+    // Default close: go up one level, exiting the popup.
+    // handleCloseProp is only really necessary when it is provided (meaning you want to navigate somewhere specific or trigger a state)
+    const handleClose = () => (handleCloseProp ? handleCloseProp() : useNavigate());
+
+    // The escape listener is registered once, so it would otherwise close with a stale handleCloseProp
+    const handleCloseRef = useRef(handleClose);
+
+    useEffect(() => {
+        handleCloseRef.current = handleClose;
+    });
 
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +49,7 @@ export function PopUp({ className, title = "Add a title", children = "Insert Bod
     useEffect(() => {
         const handleEscapeKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                void handleClose();
+                handleCloseRef.current();
             }
         };
 

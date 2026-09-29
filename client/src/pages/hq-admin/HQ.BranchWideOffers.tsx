@@ -450,9 +450,8 @@ function OfferConfigurationSection() {
 
                 {/* Set status of offer */}
                 <SelectInput
-                    key={`status-${id}`}
-                    name="offerStatus"
-                    defaultValue={testOffer?.offerStatus ?? "draft"}
+                    name="status"
+                    defaultValue="enabled"
                     label="Status"
                     options={{
                         Enabled: "enabled",

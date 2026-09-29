@@ -19,6 +19,7 @@ import PauseCircleOutlinedIcon from "@mui/icons-material/PauseCircleOutlined";
 import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Icon from "../../components/Icon";
+import { Outlet } from "react-router";
 
 // SUB COMPONENTS
 interface StatCardsProps {
@@ -262,6 +263,11 @@ export default function BranchManager_ManageUsers() {
                     <EmployeeListSection users={filteredUsers} />
                 </Card.Body>
             </Card>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </main>
     );
 }

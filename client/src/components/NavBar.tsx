@@ -1,6 +1,8 @@
 // General Imports
-import React from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
+
+// BuyBuyIn Shared Imports
+import type { RoleType } from "@buybuyin/shared/prisma/enums";
 
 // Components
 import Icon from "./Icon";
@@ -21,8 +23,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 // Types / Utils
 import { ROUTES } from "../routes/Routes";
 import type { MaterialIcon } from "../types/common";
-
-export type UserRoles = "hqadmin" | "branchmanager" | "cashier";
+import useNavigatePage from "../hooks/useNavigatePage";
 
 interface NavItem {
     label: string;
@@ -31,11 +32,11 @@ interface NavItem {
 }
 
 interface NavBarProps {
-    role: UserRoles;
+    role: RoleType;
 }
 
-const NavItems: Record<UserRoles, NavItem[]> = {
-    hqadmin: [
+const NavItems: Record<RoleType, NavItem[]> = {
+    HQADMIN: [
         {
             label: "Dashboard",
             icon: DashboardIcon,
@@ -63,7 +64,7 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         },
     ],
 
-    branchmanager: [
+    BRANCHMANAGER: [
         {
             label: "Dashboard",
             icon: DashboardIcon,
@@ -91,7 +92,7 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         },
     ],
 
-    cashier: [
+    CASHIER: [
         {
             label: "Dashboard",
             icon: DashboardIcon,
@@ -113,9 +114,23 @@ const NavItems: Record<UserRoles, NavItem[]> = {
             path: ROUTES.CASHIER.pointOfSale,
         },
     ],
+
+    // TODO: Add superadmin stuff here from the nav PR feat/#58
+    SUPERADMIN: [],
 };
 
 export function NavBar({ role }: NavBarProps) {
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    const location = useLocation();
+    const logoutPath = `${location.pathname.replace(/\/$/, "")}/logout`;
+
+    // Temp logout reroute
+    const handleLogout = async () => {
+        useNavigate(logoutPath);
+    };
+
     const items = NavItems[role];
 
     const iconSize = `
@@ -275,6 +290,7 @@ export function NavBar({ role }: NavBarProps) {
                         relative
                         hover:cursor-pointer
                     "
+                    onClick={handleLogout}
                 >
                     <Icon
                         icon={LogoutIcon}

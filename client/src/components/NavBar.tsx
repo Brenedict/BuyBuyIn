@@ -273,7 +273,6 @@ export function NavBar({ role }: NavBarProps) {
                         size="bigger"
                         iconClassName={`
                             ${iconSize}
-                            group-hover:text-cream!
                         `}
                     />
                 </button>

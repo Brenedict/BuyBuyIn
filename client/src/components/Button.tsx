@@ -11,7 +11,7 @@ export const ButtonColorClasses = {
         iconExtra: "",
     },
     secondary: {
-        button: "bg-cream text-black border-2 border-black font-bold hover:bg-slate-dark/75 hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-slate-dark active:text-cream active:border-cream",
+        button: "bg-cream text-black border-1 border-black font-bold hover:bg-slate-dark/75 hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-slate-dark active:text-cream active:border-cream",
         icon: "black",
         iconExtra: "group-active:text-cream group-hover:text-cream",
     },

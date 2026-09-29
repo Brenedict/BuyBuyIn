@@ -185,9 +185,9 @@ export function NavBar({ role }: NavBarProps) {
                     w-full
 
                     p-1
-                    md:p-2
+                    md:py-1
                     md:px-3
-                    lg:p-3
+                    lg:py-2
                     lg:px-4
 
                     card-glass-effect

@@ -1,24 +1,31 @@
 // General Imports
 import { useSyncExternalStore } from "react";
-import { Outlet, useRouteLoaderData } from "react-router";
+import { Link, Outlet, useRouteLoaderData } from "react-router";
 
 // API Services
-import type { primaryAuthLoader } from "../../api/authService";
+import { type primaryAuthLoader } from "../../api/authService";
 import InMemoryStore from "../../api/inMemoryStore";
+import { ROUTES } from "../../routes/Routes";
 
-export function AccessValidator() {
+export async function AccessValidator() {
     const data = useRouteLoaderData<typeof primaryAuthLoader>("protected");
-
     const accessToken = useSyncExternalStore(InMemoryStore.subscribe, InMemoryStore.getAccessToken);
 
+    // TODO: Temporary force log out logic
     if (!data?.isAuthenticated || !accessToken) {
-        // NOTE: Temporary login access
-        // throw new Error("Access token not found");
-
-        console.log("No access token found");
+        InMemoryStore.setAccessToken(null);
+        InMemoryStore.setUserContext(null);
+        return <Link to={ROUTES.AUTH} />;
     }
 
     return <Outlet />;
 }
 
 export default AccessValidator;
+
+// TODO:: Add more here in the future for additional global context not limited to the user
+export const useGlobalContext = () => {
+    const user = useSyncExternalStore(InMemoryStore.subscribe, InMemoryStore.getUserContext);
+
+    return { user };
+};

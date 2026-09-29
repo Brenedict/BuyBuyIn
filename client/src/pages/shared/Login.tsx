@@ -1,14 +1,37 @@
-import { useState } from "react";
-import { Form } from "react-router";
+// General Imports
+import { useEffect, useState } from "react";
+import { Form, useSearchParams } from "react-router";
 
+// Components
 import { BuyBuyInWordmark } from "../../components/BuyBuyInWordmark";
 import PasswordInput from "../../components/inputs/PasswordInput";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import { Button } from "../../components/Button";
-import SelectInput from "../../components/inputs/SelectInput";
+import { LoginNotifPopup } from "../../components/popups/global/AccountPopups";
 
 export function Login() {
-    const [role, setRole] = useState("cashier");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [loginNotif, setloginNotif] = useState<string>("");
+    const [notifModalOpen, setNotifModalOpen] = useState(false);
+
+    useEffect(() => {
+        const statusKey = searchParams.get("NOTIF");
+
+        if (statusKey) {
+            setloginNotif(statusKey);
+            setNotifModalOpen(true);
+
+            // Clean up query param from URL
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete("NOTIF");
+            setSearchParams(newParams, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
+
+    const handleCloseModal = () => {
+        setNotifModalOpen(false);
+        setloginNotif(""); // Reset string state on close
+    };
 
     return (
         <main className="relative flex min-h-screen w-screen items-center justify-center overflow-hidden bg-[#e4e2d4] px-4 py-10 sm:px-8">
@@ -65,30 +88,6 @@ export function Login() {
                             />
                         </div>
 
-                        <div className="w-full">
-                            <label
-                                htmlFor="role"
-                                className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
-                            >
-                                Role
-                            </label>
-                            <div className="relative">
-                                <SelectInput
-                                    id="role"
-                                    name="role"
-                                    onChange={(e) => setRole(e.target.value)}
-                                    required
-                                    defaultValue={role}
-                                    options={{
-                                        "Super Admin": "superadmin",
-                                        "HQ Admin": "hqadmin",
-                                        "Branch Manager": "branchmanager",
-                                        Cashier: "cashier",
-                                    }}
-                                />
-                            </div>
-                        </div>
-
                         <div className="mt-3 flex flex-col items-center gap-4">
                             <Button type="submit" variant="login">
                                 LOG IN
@@ -105,6 +104,9 @@ export function Login() {
                             </div>
                         </div>
                     </Form>
+
+                    {/* Render based on notifModalOpen boolean state */}
+                    {notifModalOpen && <LoginNotifPopup handleClose={handleCloseModal} description={loginNotif} />}
                 </section>
             </div>
         </main>

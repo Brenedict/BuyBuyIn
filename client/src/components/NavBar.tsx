@@ -1,6 +1,8 @@
 // General Imports
-import React from "react";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
+
+// BuyBuyIn Shared Imports
+import type { RoleType } from "@buybuyin/shared/prisma/enums";
 
 //BuyBuyinIcon
 import { BuyBuyInWordmark } from "./BuyBuyInWordmark";
@@ -25,8 +27,7 @@ import { BusinessCenter, ManageAccounts, NextPlanSharp } from "@mui/icons-materi
 // Types / Utils
 import { ROUTES } from "../routes/Routes";
 import type { MaterialIcon } from "../types/common";
-
-export type UserRoles = "superadmin" | "hqadmin" | "branchmanager" | "cashier";
+import useNavigatePage from "../hooks/useNavigatePage";
 
 interface NavItem {
     label: string;
@@ -35,33 +36,11 @@ interface NavItem {
 }
 
 interface NavBarProps {
-    role: UserRoles;
+    role: RoleType;
 }
 
-const NavItems: Record<UserRoles, NavItem[]> = {
-    superadmin: [
-        {
-            label: "Plans",
-            icon: NextPlanSharp,
-            path: ROUTES.SUPER_ADMIN.plans,
-        },
-        {
-            label: "Businesses",
-            icon: BusinessCenter,
-            path: ROUTES.SUPER_ADMIN.businesses,
-        },
-        {
-            label: "Subscriptions",
-            icon: SubscriptionsIcon,
-            path: ROUTES.SUPER_ADMIN.subscriptions,
-        },
-        {
-            label: "Subscriber Accounts",
-            icon: ManageAccounts,
-            path: ROUTES.SUPER_ADMIN.subscriberAccounts,
-        },
-    ],
-    hqadmin: [
+const NavItems: Record<RoleType, NavItem[]> = {
+    HQADMIN: [
         {
             label: "Dashboard",
             icon: DashboardIcon,
@@ -89,7 +68,7 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         },
     ],
 
-    branchmanager: [
+    BRANCHMANAGER: [
         {
             label: "Dashboard",
             icon: DashboardIcon,
@@ -117,7 +96,7 @@ const NavItems: Record<UserRoles, NavItem[]> = {
         },
     ],
 
-    cashier: [
+    CASHIER: [
         {
             label: "Dashboard",
             icon: DashboardIcon,
@@ -139,9 +118,44 @@ const NavItems: Record<UserRoles, NavItem[]> = {
             path: ROUTES.CASHIER.pointOfSale,
         },
     ],
+
+    // TODO: Add superadmin stuff here from the nav PR feat/#58
+    SUPERADMIN: [
+        {
+            label: "Plans",
+            icon: NextPlanSharp,
+            path: ROUTES.SUPER_ADMIN.plans,
+        },
+        {
+            label: "Businesses",
+            icon: BusinessCenter,
+            path: ROUTES.SUPER_ADMIN.businesses,
+        },
+        {
+            label: "Subscriptions",
+            icon: SubscriptionsIcon,
+            path: ROUTES.SUPER_ADMIN.subscriptions,
+        },
+        {
+            label: "Subscriber Accounts",
+            icon: ManageAccounts,
+            path: ROUTES.SUPER_ADMIN.subscriberAccounts,
+        },
+    ],
 };
 
 export function NavBar({ role }: NavBarProps) {
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    const location = useLocation();
+    const logoutPath = `${location.pathname.replace(/\/$/, "")}/logout`;
+
+    // Temp logout reroute
+    const handleLogout = async () => {
+        useNavigate(logoutPath);
+    };
+
     const items = NavItems[role];
 
     const iconSize = `
@@ -251,6 +265,7 @@ export function NavBar({ role }: NavBarProps) {
                         justify-center
                         items-center
                     "
+                    onClick={handleLogout}
                 >
                     <Icon
                         icon={LogoutIcon}

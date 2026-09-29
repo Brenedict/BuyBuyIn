@@ -54,8 +54,10 @@ export default function HQ_BranchWideOffers() {
                 </Card.Body>
             </Card>
 
-            {/* This is where the URL Based PopUp Appears */}
-            <Outlet />
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </>
     );
 }

@@ -1,17 +1,37 @@
+// General Imports
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+
+// Components
 import { Card } from "./Card";
 import { Text } from "./Text";
 import { Button } from "./Button";
 
+// Hooks
+import useNavigatePage from "../hooks/useNavigatePage";
+
 type PopUpProps = {
-    onClose: () => void | Promise<void>;
     className?: string;
     title?: string;
     children?: ReactNode;
+    handleCloseProp?: () => void;
 };
 
-export function PopUp({ onClose, className, title = "Add a title", children = "Insert Body" }: PopUpProps) {
+export function PopUp({ className, title = "Add a title", children = "Insert Body", handleCloseProp }: PopUpProps) {
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    // Default close: go up one level, exiting the popup.
+    // handleCloseProp is only really necessary when it is provided (meaning you want to navigate somewhere specific or trigger a state)
+    const handleClose = () => (handleCloseProp ? handleCloseProp() : useNavigate());
+
+    // The escape listener is registered once, so it would otherwise close with a stale handleCloseProp
+    const handleCloseRef = useRef(handleClose);
+
+    useEffect(() => {
+        handleCloseRef.current = handleClose;
+    });
+
     const modalRef = useRef<HTMLDivElement>(null);
 
     const [position, setPosition] = useState({
@@ -29,7 +49,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
     useEffect(() => {
         const handleEscapeKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                void onClose();
+                handleCloseRef.current();
             }
         };
 
@@ -38,7 +58,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
         return () => {
             document.removeEventListener("keydown", handleEscapeKey);
         };
-    }, [onClose]);
+    }, []);
 
     const handleOnPress = (e: React.PointerEvent) => {
         const target = e.target as HTMLElement;
@@ -94,7 +114,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
             className="fixed inset-0 z-9999 bg-slate-dark/50"
             onPointerMove={handlePointerMove}
             onPointerUp={handleOnRelease}
-            onClick={onClose}
+            onClick={handleClose}
         >
             <div
                 ref={modalRef}
@@ -120,7 +140,7 @@ export function PopUp({ onClose, className, title = "Add a title", children = "I
                         className="bg-crimson "
                         toggleRightButton
                         rightButton={
-                            <Button type="button" aria-label="Close" size="small" onClick={onClose}>
+                            <Button type="button" aria-label="Close" size="small" onClick={handleClose}>
                                 ✕
                             </Button>
                         }

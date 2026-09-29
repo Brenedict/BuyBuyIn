@@ -1,7 +1,10 @@
+import { type UserGlobalContextSchemaType } from "@buybuyin/shared/schema/user";
+
 class InMemoryStore {
     private accessToken: string | null = null;
 
     private listeners = new Set<() => void>();
+    private userContext: UserGlobalContextSchemaType | null = null;
 
     public subscribe = (listener: () => void) => {
         this.listeners.add(listener);
@@ -21,6 +24,14 @@ class InMemoryStore {
     };
 
     public getAccessToken = () => this.accessToken;
+
+    public setUserContext = (user: UserGlobalContextSchemaType | null) => {
+        this.userContext = user;
+    };
+
+    public getUserContext = () => {
+        return this.userContext;
+    };
 }
 
 export default new InMemoryStore();

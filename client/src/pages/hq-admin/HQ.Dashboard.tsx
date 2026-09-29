@@ -22,6 +22,7 @@ import {
     SalesOverviewCard,
 } from "../../components/partials/DashboardPartials";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+import { Outlet } from "react-router";
 
 export function NumberFormat(value: number, symbol?: string) {
     return `${symbol ?? ""} ${value.toLocaleString()}`;
@@ -139,6 +140,11 @@ export function HQ_Dashboard() {
                     </Card.Body>
                 </Card>
             </Card.Body>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }

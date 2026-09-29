@@ -28,7 +28,6 @@ export const loginAction = async ({ request }: ActionFunctionArgs) => {
 
     if (res.ok) {
         const payload = (await res.json().catch(() => null)) as { accessToken?: string } | null;
-
         if (payload?.accessToken) {
             InMemoryStore.setAccessToken(payload.accessToken);
             return redirect(PROTECTED_ROOT);
@@ -36,8 +35,10 @@ export const loginAction = async ({ request }: ActionFunctionArgs) => {
     }
 
     if (res.status === 401) {
+        const data = await res.json();
+
         InMemoryStore.setAccessToken(null);
-        return redirect(ROUTES.AUTH);
+        return redirect(`${ROUTES.AUTH}?NOTIF=${data.message}`);
     }
 
     return null;

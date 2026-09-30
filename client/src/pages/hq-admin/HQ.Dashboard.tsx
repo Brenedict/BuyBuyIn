@@ -22,6 +22,7 @@ import {
     SalesOverviewCard,
 } from "../../components/partials/DashboardPartials";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+import { Outlet } from "react-router";
 
 export function NumberFormat(value: number, symbol?: string) {
     return `${symbol ?? ""} ${value.toLocaleString()}`;
@@ -61,13 +62,14 @@ export function HQ_Dashboard() {
                             defaultValue={values.timeframe}
                             onChange={handleChange}
                             className="border-0! py-1.5! text-normal! w-max"
-                        >
-                            <SelectInput.Option value="Today">Today</SelectInput.Option>
-                            <SelectInput.Option value="Last Week">Last Week</SelectInput.Option>
-                            <SelectInput.Option value="Last Month">Last Month</SelectInput.Option>
-                            <SelectInput.Option value="Last 6 Months">Last 6 Months</SelectInput.Option>
-                            <SelectInput.Option value="Last Year">Last Year</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                Today: "today",
+                                "Last Week": "lastweek",
+                                "Last Month": "lastmonth",
+                                "Last 6 Months": "lasthalfyear",
+                                "Last Year": "lastyear",
+                            }}
+                        />
                     </div>
                 </div>
 
@@ -138,6 +140,11 @@ export function HQ_Dashboard() {
                     </Card.Body>
                 </Card>
             </Card.Body>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }

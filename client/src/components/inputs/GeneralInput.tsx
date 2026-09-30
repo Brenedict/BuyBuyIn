@@ -3,7 +3,6 @@ import { BaseInput, ErrorMessage, type InputProp } from "./BaseInput";
 import { Label, type LabelProp } from "./InputLabel";
 
 interface GeneralInputProp extends LabelProp, InputProp {
-    boldLabel?: boolean;
     type: "text" | "email" | "number" | "time" | "date" | "datetime-local";
 }
 
@@ -11,7 +10,7 @@ export default function GeneralInput({
     type,
     placeholder,
     label,
-    boldLabel,
+    labelVariant,
     className = "",
     hidden = false,
     error,
@@ -25,7 +24,7 @@ export default function GeneralInput({
 
     return (
         <div className={`w-full ${hidden ? "hidden" : ""}`}>
-            <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
+            <Label htmlFor={props.id} label={label} labelVariant={labelVariant} isRequired={isRequired} />
             <BaseInput
                 type={type}
                 placeholder={placeholder}

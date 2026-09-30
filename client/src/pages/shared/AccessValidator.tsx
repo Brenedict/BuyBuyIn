@@ -1,11 +1,31 @@
 // General Imports
-import { Outlet, useRouteLoaderData } from "react-router";
+import { useSyncExternalStore } from "react";
+import { Link, Outlet, useRouteLoaderData } from "react-router";
 
-export function AccessValidator() {
-    return (
-        // TODO: This div should be a context provider in the future. This should check if the user is authorized.
-        <div>
-            <Outlet />
-        </div>
-    );
+// API Services
+import { type primaryAuthLoader } from "../../api/authService";
+import InMemoryStore from "../../api/inMemoryStore";
+import { ROUTES } from "../../routes/Routes";
+
+export async function AccessValidator() {
+    const data = useRouteLoaderData<typeof primaryAuthLoader>("protected");
+    const accessToken = useSyncExternalStore(InMemoryStore.subscribe, InMemoryStore.getAccessToken);
+
+    // TODO: Temporary force log out logic
+    if (!data?.isAuthenticated || !accessToken) {
+        InMemoryStore.setAccessToken(null);
+        InMemoryStore.setUserContext(null);
+        return <Link to={ROUTES.AUTH} />;
+    }
+
+    return <Outlet />;
 }
+
+export default AccessValidator;
+
+// TODO:: Add more here in the future for additional global context not limited to the user
+export const useGlobalContext = () => {
+    const user = useSyncExternalStore(InMemoryStore.subscribe, InMemoryStore.getUserContext);
+
+    return { user };
+};

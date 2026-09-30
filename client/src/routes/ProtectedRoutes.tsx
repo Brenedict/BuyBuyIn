@@ -44,7 +44,7 @@ import SuperAdmin_SubscriberAccounts from "../pages/super-admin/SuperAdmin.Subsc
 import { ROLE_HOME, ROUTES } from "./Routes";
 
 import { RoleType } from "@buybuyin/shared/prisma/enums";
-import { PlansAddEditPopup, PlansDeletePopup } from "../components/popups/super-admins/PlansPopups";
+import { PlansAddEditPopup, PlansDeletePopup } from "../components/popups/super-admin/PlansPopups";
 
 export const protectedRoutes: RouteObject[] = [
     {

@@ -98,13 +98,15 @@ export function HQ_Dashboard() {
                     </div>
                 </div>
                 <Card className="mb-12">
-                    <Card.Body className="flex flex-col py-6 px-10">
-                        <Text variant="crimson" size="bigger" weight="extraBold" className="mb-4">
+                    <Card.Body>
+                        <Text variant="crimson" size="bigger" weight="extraBold">
                             Branches
                         </Text>
+                    </Card.Body>
 
+                    <Card.Body removePadding bordered={false}>
                         <Table
-                            bordered
+                            bordered={false}
                             pagination={{
                                 bgVariant: "cream-muted",
                                 borderVariant: "brown",
@@ -114,7 +116,7 @@ export function HQ_Dashboard() {
                                 textVariant: "crimson",
                                 textWeight: "medium",
                             }}
-                            rounded
+                            rounded={false}
                             shadow
                         >
                             <Table.Row borderedBottom>

@@ -57,6 +57,9 @@ export const ROUTES = {
             plansDelete: (id?: string) => `${base}/plans/${id}/delete`,
             businesses: `${base}/businesses`,
             subscriptions: `${base}/subscriptions`,
+            subscriptionsAdd: `${base}/subscriptions/add`,
+            subscriptionsEdit: (id: string) => `${base}/subscriptions/${id}/edit`,
+            subscriptionsDelete: (id: string) => `${base}/subscriptions/${id}/delete`,
             subscriberAccounts: `${base}/subscriber-accounts`,
         };
     })(),

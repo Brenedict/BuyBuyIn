@@ -56,6 +56,7 @@ export function SubscriptionFormPopup({ mode }: { mode: "add" | "edit" }) {
                     name="subscriptionId"
                     type="text"
                     label="Business Subscription ID"
+                    labelVariant="small"
                     placeholder="ABCD-EFGH-123"
                     className="rounded-lg!"
                     value={form.subscriptionId}
@@ -66,6 +67,7 @@ export function SubscriptionFormPopup({ mode }: { mode: "add" | "edit" }) {
                     name="username"
                     type="text"
                     label="Username"
+                    labelVariant="small"
                     placeholder="Maria Santos"
                     className="rounded-lg!"
                     required
@@ -76,6 +78,7 @@ export function SubscriptionFormPopup({ mode }: { mode: "add" | "edit" }) {
                     id="password"
                     name="password"
                     label="Password"
+                    labelVariant="small"
                     placeholder="Enter password"
                     className="rounded-lg!"
                     required

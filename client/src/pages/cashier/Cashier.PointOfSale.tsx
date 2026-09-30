@@ -1,21 +1,19 @@
+// General Imports
+import { Outlet } from "react-router";
+import { useState, useEffect } from "react";
+
+// Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import { Calculator } from "../../components/Calculator";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
-import { useState, useEffect } from "react";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Icon from "../../components/Icon";
-import {
-    AccessTime,
-    Add,
-    ArrowLeftRounded,
-    CalendarMonth,
-    Remove,
-    VisibilityOff,
-    VisibilityOffOutlined,
-} from "@mui/icons-material";
+
+// Material UI Icons
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/icons-material";
 
 export function Cashier_PointOfSale() {
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
@@ -219,6 +217,11 @@ export function Cashier_PointOfSale() {
                     </div>
                 </div>
             </section>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </div>
     );
 }

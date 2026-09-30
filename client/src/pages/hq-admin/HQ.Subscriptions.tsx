@@ -21,10 +21,7 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 import { formatFullDate } from "../../utils/dateUtils";
 
 // Test Data
-import {
-    HQ_SUBSCRIPTION,
-    HQ_BRANCH_SUBSCRIPTIONS,
-} from "../../TESTINGDATA/subscriptionsData";
+import { HQ_SUBSCRIPTION, HQ_BRANCH_SUBSCRIPTIONS } from "../../TESTINGDATA/subscriptionsData";
 import type { BranchSubscription } from "../../TESTINGDATA/subscriptionsData";
 
 // Hooks
@@ -63,28 +60,14 @@ function SubscriptionHeaderSection() {
     return (
         <div className="flex justify-between items-start">
             <div className="flex flex-col gap-1">
-                <Text
-                    align="left"
-                    font="default"
-                    size="larger"
-                    variant="crimson"
-                    weight="extraBold"
-                >
+                <Text align="left" font="default" size="larger" variant="crimson" weight="extraBold">
                     SUBSCRIPTION DETAILS
                 </Text>
 
-                <Text
-                    align="left"
-                    font="default"
-                    size="mediumBig"
-                    variant="slate-medium"
-                    weight="medium"
-                >
+                <Text align="left" font="default" size="mediumBig" variant="slate-medium" weight="medium">
                     Monitor and manage branch subscriptions
                 </Text>
             </div>
-
-            
         </div>
     );
 }
@@ -97,29 +80,14 @@ function CurrentPlanSection() {
         <Card isGlass={false} dropShadow={false} className="w-full">
             <Card.Body className="flex justify-between items-start">
                 <div className="flex flex-col gap-2">
-                    <Text
-                        align="left"
-                        font="default"
-                        size="bigger"
-                        variant="crimson"
-                        weight="medium"
-                    >
+                    <Text align="left" font="default" size="bigger" variant="crimson" weight="medium">
                         HQ CURRENT PLAN
                     </Text>
 
                     <div className="flex items-center gap-3">
-                        <StorefrontIcon
-                            className="text-crimson"
-                            fontSize="large"
-                        />
+                        <StorefrontIcon className="text-crimson" fontSize="large" />
 
-                        <Text
-                            align="left"
-                            font="default"
-                            size="larger"
-                            variant="crimson"
-                            weight="extraBold"
-                        >
+                        <Text align="left" font="default" size="larger" variant="crimson" weight="extraBold">
                             {testPlan?.planName}
                         </Text>
 
@@ -132,18 +100,12 @@ function CurrentPlanSection() {
                 <div className="flex flex-col gap-2 text-right">
                     <div className="flex gap-8 justify-end">
                         <Text variant="slate-light">Next Billing Date</Text>
-                        <Text weight="bold">
-                            {formatFullDate(
-                                new Date(testPlan?.nextBillingDate)
-                            )}
-                        </Text>
+                        <Text weight="bold">{formatFullDate(new Date(testPlan?.nextBillingDate))}</Text>
                     </div>
 
                     <div className="flex gap-8 justify-end">
                         <Text variant="slate-light">Payment Method</Text>
-                        <Text weight="bold">
-                            {testPlan?.paymentMethod}
-                        </Text>
+                        <Text weight="bold">{testPlan?.paymentMethod}</Text>
                     </div>
 
                     <a
@@ -164,11 +126,8 @@ function BranchSubscriptionSection() {
     // Filters the branch list based on the search param
     const filteredBranches = useMemo(
         () =>
-            HQ_BRANCH_SUBSCRIPTIONS.filter(
-                (branch: BranchSubscription) =>
-                    branch.branchName
-                        .toLowerCase()
-                        .includes(values.search.toLowerCase())
+            HQ_BRANCH_SUBSCRIPTIONS.filter((branch: BranchSubscription) =>
+                branch.branchName.toLowerCase().includes(values.search.toLowerCase())
             ),
         [values.search]
     );
@@ -178,12 +137,7 @@ function BranchSubscriptionSection() {
             <Card.Header
                 toggleRightButton
                 rightButton={
-                    <Button
-                        size="normal"
-                        variant="main"
-                        leftIcon={AddIcon}
-                        className="border-none shadow-none"
-                    >
+                    <Button size="normal" variant="main" leftIcon={AddIcon} className="border-none shadow-none">
                         Add Branch
                     </Button>
                 }
@@ -219,7 +173,7 @@ function BranchSubscriptionSection() {
             </Card.Body>
 
             <Table
-                bordered
+                bordered={false}
                 pagination={{
                     bgVariant: "cream-muted",
                     borderVariant: "brown",
@@ -229,45 +183,24 @@ function BranchSubscriptionSection() {
                     textVariant: "crimson",
                     textWeight: "medium",
                 }}
-                rounded
+                rounded={false}
                 shadow={false}
             >
                 <Table.Row borderedBottom>
-                    <Table.Header
-                        text="Branch Details"
-                        className="w-[70%] text-center"
-                    />
-
-                    <Table.Header
-                        text="Status"
-                        className="w-[30%] text-center"
-                    />
+                    <Table.Header text="Branch" className="w-[25%] text-center" />
+                    <Table.Header text="Location" className="w-[50%] text-center" />
+                    <Table.Header text="Status" className="w-[25%] text-center" />
                 </Table.Row>
 
                 {filteredBranches.map((branch: BranchSubscription) => (
                     <Table.Row key={branch.id}>
-                        <Table.Data className="w-[70%]">
-                            <div className="flex flex-col">
-                                <Text weight="bold">
-                                    {branch.branchName}
-                                </Text>
+                        <Table.Data text={branch.branchName} className="w-[25%]"></Table.Data>
 
-                                <Text
-                                    variant="slate-light"
-                                    size="description"
-                                >
-                                    {branch.branchAddress}
-                                </Text>
-                            </div>
-                        </Table.Data>
+                        <Table.Data text={branch.branchAddress} className="w-[50%]"></Table.Data>
 
-                        <Table.Data className="w-[30%]">
+                        <Table.Data className="w-[25%]">
                             <div className="flex justify-center">
-                                <BranchStatusBadge
-                                    status={
-                                        branch.status as BranchStatusProps["status"]
-                                    }
-                                />
+                                <BranchStatusBadge status={branch.status as BranchStatusProps["status"]} />
                             </div>
                         </Table.Data>
                     </Table.Row>
@@ -278,18 +211,13 @@ function BranchSubscriptionSection() {
 }
 
 function BranchStatusBadge({ status }: BranchStatusProps) {
-    const statusClass: Record<
-        BranchStatusProps["status"],
-        string
-    > = {
+    const statusClass: Record<BranchStatusProps["status"], string> = {
         active: "border border-crimson text-crimson",
         inactive: "bg-crimson text-cream",
     };
 
     return (
-        <div
-            className={`w-fit px-4 py-1 rounded-full font-bold text-small-description ${statusClass[status]}`}
-        >
+        <div className={`w-fit px-4 py-1 rounded-full font-bold text-small-description ${statusClass[status]}`}>
             {status === "active" ? "Active" : "Inactive"}
         </div>
     );
@@ -300,8 +228,7 @@ function BranchStatsSection() {
     const totalBranches = HQ_BRANCH_SUBSCRIPTIONS.length;
 
     const activeBranches = HQ_BRANCH_SUBSCRIPTIONS.filter(
-        (branch: BranchSubscription) =>
-            branch.status === "active"
+        (branch: BranchSubscription) => branch.status === "active"
     ).length;
 
     const inactiveBranches = totalBranches - activeBranches;
@@ -325,77 +252,41 @@ function BranchStatsSection() {
                 label="Inactive Branches"
             />
 
-            <StatCard
-                icon={StorefrontIcon}
-                count={totalBranches}
-                label="Total Branches"
-            />
+            <StatCard icon={StorefrontIcon} count={totalBranches} label="Total Branches" />
         </div>
     );
 }
 
-function StatCard({
-    icon: Icon,
-    badgeIcon: BadgeIcon,
-    badgeVariant,
-    count,
-    label,
-    caption,
-}: StatCardProps) {
-    const badgeClass: Record<
-        NonNullable<StatCardProps["badgeVariant"]>,
-        string
-    > = {
+function StatCard({ icon: Icon, badgeIcon: BadgeIcon, badgeVariant, count, label, caption }: StatCardProps) {
+    const badgeClass: Record<NonNullable<StatCardProps["badgeVariant"]>, string> = {
         active: "text-crimson",
         inactive: "text-crimson",
     };
 
     return (
-        <Card
-            isGlass={false}
-            dropShadow={false}
-            className="relative"
-        >
+        <Card isGlass={false} dropShadow={false} className="relative">
             <Card.Body className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-cream">
-                        <Icon
-                            className="text-crimson"
-                            fontSize="medium"
-                        />
+                        <Icon className="text-crimson" fontSize="medium" />
                     </div>
 
                     {caption && (
-                        <Text
-                            align="right"
-                            size="description"
-                            variant="crimson"
-                        >
+                        <Text align="right" size="description" variant="crimson">
                             {caption}
                         </Text>
                     )}
                 </div>
 
                 {BadgeIcon && badgeVariant && (
-                    <BadgeIcon
-                        className={`absolute top-2 right-2 ${badgeClass[badgeVariant]}`}
-                        fontSize="small"
-                    />
+                    <BadgeIcon className={`absolute top-2 right-2 ${badgeClass[badgeVariant]}`} fontSize="small" />
                 )}
 
-                <Text
-                    weight="extraBold"
-                    size="larger"
-                    variant="crimson"
-                >
+                <Text weight="extraBold" size="larger" variant="crimson">
                     {count}
                 </Text>
 
-                <Text
-                    weight="bold"
-                    size="description"
-                    variant="crimson"
-                >
+                <Text weight="bold" size="description" variant="crimson">
                     {label.toUpperCase()}
                 </Text>
             </Card.Body>

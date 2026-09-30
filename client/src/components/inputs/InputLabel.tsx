@@ -16,8 +16,7 @@ export interface LabelProp {
 export function Label({ htmlFor, label, labelVariant = "default", isRequired }: LabelProp) {
     if (!label) return null;
 
-    const labelClass =
-        labelVariant === "default" ? "text-medium-small xl:text-big text-brown font-bold" : "text-crimson font-medium";
+    const labelClass = labelVariant === "default" ? "text-medium-small xl:text-big text-brown font-bold" : "";
 
     return (
         <label htmlFor={htmlFor} className={`block w-full mb-1 ${labelClass} `}>

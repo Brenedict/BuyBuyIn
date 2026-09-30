@@ -6,12 +6,12 @@ import type { MaterialIcon } from "../types/common";
 
 export const ButtonColorClasses = {
     main: {
-        button: "bg-crimson text-cream font-bold hover:opacity-75 active:bg-maroon active:opacity-100 hover:cursor-pointer",
+        button: "bg-crimson text-cream font-bold border-1 border-crimson hover:opacity-75 active:bg-maroon active:opacity-100 hover:cursor-pointer",
         icon: "cream",
         iconExtra: "",
     },
     secondary: {
-        button: "bg-cream text-black border-1 border-black font-bold hover:bg-slate-dark/75 hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-slate-dark active:text-cream active:border-cream",
+        button: "bg-off-white text-black border-1 border-black font-bold hover:bg-slate-dark/75 hover:text-cream hover:border-cream hover:cursor-pointer hover:opacity-75 active:opacity-100 active:bg-slate-dark active:text-cream active:border-cream",
         icon: "black",
         iconExtra: "group-active:text-cream group-hover:text-cream",
     },

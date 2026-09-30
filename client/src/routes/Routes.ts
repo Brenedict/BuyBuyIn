@@ -52,6 +52,9 @@ export const ROUTES = {
         return {
             root: `${base}/`,
             plans: `${base}/plans`,
+            plansAdd: `${base}/plans/add`,
+            plansEdit: (id?: string) => `${base}/plans/${id}/edit`,
+            plansDelete: (id?: string) => `${base}/plans/${id}/delete`,
             businesses: `${base}/businesses`,
             subscriptions: `${base}/subscriptions`,
             subscriptionsAdd: `${base}/subscriptions/add`,

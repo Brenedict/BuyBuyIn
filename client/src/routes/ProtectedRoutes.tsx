@@ -32,6 +32,7 @@ import HQ_ManageUsers from "../pages/hq-admin/HQ.ManageUsers";
 import HQ_Subscriptions from "../pages/hq-admin/HQ.Subscriptions";
 
 import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
+import { DeleteSubscriptionPopup, SubscriptionFormPopup } from "../components/popups/super-admin/SubscriptionsPopups";
 
 // Super Admin Pages
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -153,7 +154,12 @@ export const protectedRoutes: RouteObject[] = [
                     {
                         path: ROUTES.SUPER_ADMIN.subscriptions,
                         element: <SuperAdmin_Subscriptions />,
-                        children: [...globalPopups],
+                        children: [
+                            { path: "add", element: <SubscriptionFormPopup mode="add" /> },
+                            { path: ":id/edit", element: <SubscriptionFormPopup mode="edit" /> },
+                            { path: ":id/delete", element: <DeleteSubscriptionPopup /> },
+                            ...globalPopups,
+                        ],
                     },
                     {
                         path: ROUTES.SUPER_ADMIN.subscriberAccounts,

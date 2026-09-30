@@ -7,7 +7,6 @@ import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-
 import SearchInput from "../../components/inputs/SearchInput";
 
 // Material UI Icons
@@ -23,6 +22,7 @@ import { formatFullDate } from "../../utils/dateUtils";
 // Test Data
 import { HQ_SUBSCRIPTION, HQ_BRANCH_SUBSCRIPTIONS } from "../../TESTINGDATA/subscriptionsData";
 import type { BranchSubscription } from "../../TESTINGDATA/subscriptionsData";
+import { Outlet } from "react-router";
 
 // Hooks
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
@@ -206,6 +206,10 @@ function BranchSubscriptionSection() {
                     </Table.Row>
                 ))}
             </Table>
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }

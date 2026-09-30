@@ -124,7 +124,7 @@ function SubscriptionFormPopup({
                     type="text"
                     label="Business Subscription ID"
                     placeholder="ABCD-EFGH-123"
-                    className="rounded-lg! font-['Inter',sans-serif]! text-[24px]! font-medium!"
+                    className="rounded-lg! font-['Inter',sans-serif]! text-big! font-medium!"
                     value={form.subscriptionId}
                     onChange={setField("subscriptionId")}
                 />
@@ -133,7 +133,7 @@ function SubscriptionFormPopup({
                     type="text"
                     label="Username"
                     placeholder="Maria Santos"
-                    className="rounded-lg! font-['Inter',sans-serif]! text-[24px]! font-medium!"
+                    className="rounded-lg! font-['Inter',sans-serif]! text-big! font-medium!"
                     required
                     value={form.username}
                     onChange={setField("username")}
@@ -142,7 +142,7 @@ function SubscriptionFormPopup({
                     id="password"
                     label="Password"
                     placeholder="Enter password"
-                    className="rounded-lg! font-['Inter',sans-serif]! text-[24px]! font-medium!"
+                    className="rounded-lg! font-['Inter',sans-serif]! text-big! font-medium!"
                     required
                     value={form.password}
                     onChange={setField("password")}
@@ -214,7 +214,7 @@ export function SuperAdmin_Subscriptions() {
                 <PageHeader headerText="Subscriptions" />
             </Card.Header>
             <Card.Body>
-                <Card isGlass={true}>
+                <Card isGlass={false}>
                     <Card.Header
                         toggleRightButton
                         rightButton={
@@ -228,11 +228,10 @@ export function SuperAdmin_Subscriptions() {
                             Subscriptions
                         </Text>
                     </Card.Header>
-                    <Card.Body>
+                    <Card.Body removePadding bordered={false}>
                         <Table
-                            bordered
-                            rounded
-                            shadow
+                            bordered={false}
+                            rounded={false}
                             pagination={{
                                 bgVariant: "cream-muted",
                                 borderVariant: "brown",

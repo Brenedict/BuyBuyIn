@@ -1,5 +1,5 @@
 // General Imports
-import { useCallback, useState } from "react";
+import { Outlet } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
@@ -8,77 +8,26 @@ import { Button } from "../../components/Button";
 import { PageHeader } from "../../components/PageHeader";
 import Table from "../../components/Table";
 import { EditDeleteButtons } from "../../components/partials/TablePartials";
-import {
-    DeleteSubscriptionPopup,
-    SubscriptionFormPopup,
-    type SubscriptionForm,
-} from "../../components/popups/super-admin/SubscriptionsPopups";
 
 // Test Data
 import { SAMPLE_BUSINESS_SUBSCRIPTIONS } from "../../TESTINGDATA/subscriptionsData";
 
-// TODO(#42): Replace with real data once the Business Subscription API/endpoint is available.
-// Shape is a guess based on the design (Business Subscription ID, Business, Subscription Status)
-// and should be confirmed against the actual Prisma schema / API response before wiring up fetch logic.
-interface BusinessSubscriptionRow {
-    id: string | number;
-    businessSubscriptionLabel: string;
-    businessLabel: string;
-    statusLabel: string;
-}
+// Routes
+import { ROUTES } from "../../routes/Routes";
 
-type ModalState =
-    | { type: "none" }
-    | { type: "add" }
-    | { type: "edit"; row: BusinessSubscriptionRow }
-    | { type: "delete"; row: BusinessSubscriptionRow };
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
 
 export function SuperAdmin_Subscriptions() {
-    const [modal, setModal] = useState<ModalState>({ type: "none" });
-    const [rows, setRows] = useState<BusinessSubscriptionRow[]>(SAMPLE_BUSINESS_SUBSCRIPTIONS);
-    const closeModal = useCallback(() => setModal({ type: "none" }), []);
+    // Used for redirecting
+    const navigate = useNavigatePage();
 
-    const findRow = (id: string | number) => rows.find((r) => String(r.id) === String(id));
+    const handleAdd = () => navigate(ROUTES.SUPER_ADMIN.subscriptionsAdd, true);
 
-    const handleEdit = (id: string | number) => () => {
-        const row = findRow(id);
-        if (row) setModal({ type: "edit", row });
-    };
+    const handleEdit = (id: string | number) => () => navigate(ROUTES.SUPER_ADMIN.subscriptionsEdit(String(id)), true);
 
-    const handleDelete = (id: string | number) => () => {
-        const row = findRow(id);
-        if (row) setModal({ type: "delete", row });
-    };
-
-    // TODO(#42): Call the Business Subscription API here once it exists, then refresh the table.
-    const handleSave = (form: SubscriptionForm) => {
-        if (modal.type === "edit") {
-            const editedId = modal.row.id;
-            setRows((prev) =>
-                prev.map((r) =>
-                    String(r.id) === String(editedId)
-                        ? { ...r, businessSubscriptionLabel: form.subscriptionId, businessLabel: form.username }
-                        : r
-                )
-            );
-        } else if (modal.type === "add") {
-            setRows((prev) => [
-                {
-                    id: `local-${Date.now()}`,
-                    businessSubscriptionLabel: form.subscriptionId,
-                    businessLabel: form.username,
-                    statusLabel: "Active",
-                },
-                ...prev,
-            ]);
-        }
-        closeModal();
-    };
-
-    const handleConfirmDelete = (id: BusinessSubscriptionRow["id"]) => {
-        setRows((prev) => prev.filter((r) => String(r.id) !== String(id)));
-        closeModal();
-    };
+    const handleDelete = (id: string | number) => () =>
+        navigate(ROUTES.SUPER_ADMIN.subscriptionsDelete(String(id)), true);
 
     return (
         <Card className="w-full">
@@ -90,7 +39,7 @@ export function SuperAdmin_Subscriptions() {
                     <Card.Header
                         toggleRightButton
                         rightButton={
-                            <Button size="medium" variant="main" onClick={() => setModal({ type: "add" })}>
+                            <Button size="medium" variant="main" onClick={handleAdd}>
                                 Add Business Subscription
                             </Button>
                         }
@@ -121,7 +70,7 @@ export function SuperAdmin_Subscriptions() {
                                 <Table.Header text="Actions" />
                             </Table.Row>
 
-                            {rows.map((row) => (
+                            {SAMPLE_BUSINESS_SUBSCRIPTIONS.map((row) => (
                                 <Table.Row key={row.id}>
                                     <Table.Data size="normal" text={row.businessSubscriptionLabel} />
                                     <Table.Data size="normal" text={row.businessLabel} />
@@ -140,24 +89,7 @@ export function SuperAdmin_Subscriptions() {
                 </Card>
             </Card.Body>
 
-            {modal.type === "add" && <SubscriptionFormPopup mode="add" onClose={closeModal} onSave={handleSave} />}
-
-            {modal.type === "edit" && (
-                <SubscriptionFormPopup
-                    mode="edit"
-                    initial={{
-                        subscriptionId: modal.row.businessSubscriptionLabel,
-                        username: modal.row.businessLabel,
-                        password: "",
-                    }}
-                    onClose={closeModal}
-                    onSave={handleSave}
-                />
-            )}
-
-            {modal.type === "delete" && (
-                <DeleteSubscriptionPopup onClose={closeModal} onConfirm={() => handleConfirmDelete(modal.row.id)} />
-            )}
+            <Outlet />
         </Card>
     );
 }

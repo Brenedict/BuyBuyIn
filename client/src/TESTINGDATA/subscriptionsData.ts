@@ -1,0 +1,17 @@
+export const SAMPLE_BUSINESS_SUBSCRIPTIONS = [
+    { id: 1, businessSubscriptionLabel: "BS-1001", businessLabel: "Santos Fashion Boutique", statusLabel: "Active" },
+    { id: 2, businessSubscriptionLabel: "BS-1002", businessLabel: "Reyes Hardware Supply", statusLabel: "Active" },
+    { id: 3, businessSubscriptionLabel: "BS-1003", businessLabel: "GlowUp Beauty Studio", statusLabel: "Expired" },
+    { id: 4, businessSubscriptionLabel: "BS-1004", businessLabel: "Luxe Beauty Essentials", statusLabel: "Active" },
+    { id: 5, businessSubscriptionLabel: "BS-1005", businessLabel: "CV Office Supplies", statusLabel: "Pending" },
+    { id: 6, businessSubscriptionLabel: "BS-1006", businessLabel: "HomeCraft Furniture", statusLabel: "Active" },
+    { id: 7, businessSubscriptionLabel: "BS-1007", businessLabel: "Urban Living Home Décor", statusLabel: "Active" },
+    { id: 8, businessSubscriptionLabel: "BS-1008", businessLabel: "Santos Fashion Boutique", statusLabel: "Expired" },
+    { id: 9, businessSubscriptionLabel: "BS-1009", businessLabel: "Reyes Hardware Supply", statusLabel: "Active" },
+    { id: 10, businessSubscriptionLabel: "BS-1010", businessLabel: "GlowUp Beauty Studio", statusLabel: "Pending" },
+    { id: 11, businessSubscriptionLabel: "BS-1011", businessLabel: "Luxe Beauty Essentials", statusLabel: "Active" },
+    { id: 12, businessSubscriptionLabel: "BS-1012", businessLabel: "CV Office Supplies", statusLabel: "Active" },
+    { id: 13, businessSubscriptionLabel: "BS-1013", businessLabel: "HomeCraft Furniture", statusLabel: "Expired" },
+    { id: 14, businessSubscriptionLabel: "BS-1014", businessLabel: "Urban Living Home Décor", statusLabel: "Pending" },
+    { id: 15, businessSubscriptionLabel: "BS-1015", businessLabel: "Santos Fashion Boutique", statusLabel: "Active" },
+];

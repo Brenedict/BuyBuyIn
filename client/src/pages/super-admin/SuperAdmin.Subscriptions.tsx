@@ -12,22 +12,18 @@ import { EditDeleteButtons } from "../../components/partials/TablePartials";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import PasswordInput from "../../components/inputs/PasswordInput";
 
+// Test Data
+import { SAMPLE_BUSINESS_SUBSCRIPTIONS } from "../../TESTINGDATA/subscriptionsData";
+
 // TODO(#42): Replace with real data once the Business Subscription API/endpoint is available.
 // Shape is a guess based on the design (Business Subscription ID, Business, Subscription Status)
 // and should be confirmed against the actual Prisma schema / API response before wiring up fetch logic.
 interface BusinessSubscriptionRow {
-    id: string;
+    id: string | number;
     businessSubscriptionLabel: string;
     businessLabel: string;
     statusLabel: string;
 }
-
-const MOCK_SUBSCRIPTIONS: BusinessSubscriptionRow[] = Array.from({ length: 30 }, (_, i) => ({
-    id: `mock-${i}`,
-    businessSubscriptionLabel: "Santos, Maria",
-    businessLabel: "Santos, Maria",
-    statusLabel: "Santos, Maria",
-}));
 
 // TODO(#42): Fields follow the Figma popup (Business Subscription ID, Username, Password).
 // Confirm with the team, since Username/Password look copied from Subscriber Accounts.
@@ -163,10 +159,10 @@ function SubscriptionFormPopup({
 
 export function SuperAdmin_Subscriptions() {
     const [modal, setModal] = useState<ModalState>({ type: "none" });
-    const [rows, setRows] = useState<BusinessSubscriptionRow[]>(MOCK_SUBSCRIPTIONS);
+    const [rows, setRows] = useState<BusinessSubscriptionRow[]>(SAMPLE_BUSINESS_SUBSCRIPTIONS);
     const closeModal = useCallback(() => setModal({ type: "none" }), []);
 
-    const findRow = (id: string | number) => rows.find((r) => r.id === String(id));
+    const findRow = (id: string | number) => rows.find((r) => String(r.id) === String(id));
 
     const handleEdit = (id: string | number) => () => {
         const row = findRow(id);
@@ -203,8 +199,8 @@ export function SuperAdmin_Subscriptions() {
         closeModal();
     };
 
-    const handleConfirmDelete = (id: string) => {
-        setRows((prev) => prev.filter((r) => r.id !== id));
+    const handleConfirmDelete = (id: BusinessSubscriptionRow["id"]) => {
+        setRows((prev) => prev.filter((r) => String(r.id) !== String(id)));
         closeModal();
     };
 

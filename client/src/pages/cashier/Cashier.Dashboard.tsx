@@ -1,11 +1,21 @@
+// General Imports
+import { Outlet } from "react-router";
+
+// Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
-import { Button } from "../../components/Button";
 import Icon from "../../components/Icon";
+
+// Material UI Icons
 import { Block, Campaign, LocalOffer, Paid, PriorityHigh, ShoppingCartCheckout, Whatshot } from "@mui/icons-material";
 
+// Hooks
+import { useGlobalContext } from "../shared/AccessValidator";
+
 export function Cashier_Dashboard() {
-    const cashierName = "Kenneth";
+    const { user } = useGlobalContext();
+
+    const cashierName = `${user?.username}`;
     const syncTime = "67";
     const totalSales = "8500";
     const todayTransactions = "18";
@@ -161,6 +171,11 @@ export function Cashier_Dashboard() {
                     </Card.Body>
                 </Card>
             </Card.Body>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }

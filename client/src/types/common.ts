@@ -17,17 +17,26 @@ export type FontVariant = keyof typeof FontClasses;
 // ------------------------ FIXED Text Size Classes and Type ------------------------
 
 // Size Classes (Text and SVG)
+// Currently, the text sizes are downscaled in units for md size (1024x748)
+
+/**
+ * Dynamic size meaning:
+ * By default the size of the text are those without the viewport below (e.g. text-large). This design method is mobile first. Accommodates smaller screens first.
+ * The size only adjust to bigger sizes when it reaches more than or equal to 'xl' (1280px) or 'lg' (1024px).
+ * TL;DR Example (large class): by default text size is 'text-big' when the screen is lg it bumps to 'text-bigger' or when its xl it bumps to 'text-large'
+ *
+ */
 export const SizeClasses = {
-    iconHero: "text-icon-hero",
-    larger: "text-larger",
-    large: "text-large",
-    bigger: "text-bigger",
-    big: "text-big",
-    mediumBig: "text-medium-big",
-    mediumSmall: "text-medium-small",
-    medium: "text-medium",
-    normal: "text-normal",
-    description: "text-description",
+    iconHero: "xl:text-icon-hero lg:text-larger text-large",
+    larger: "xl:text-larger lg:text-large text-bigger",
+    large: "xl:text-large lg:text-bigger text-big",
+    bigger: "xl:text-bigger lg:text-big text-medium-big",
+    big: "xl:text-big lg:text-medium-big text-medium-small",
+    mediumBig: "xl:text-medium-big lg:text-medium-small text-medium",
+    mediumSmall: "xl:text-medium-small lg:text-medium text-normal",
+    medium: "xl:text-medium lg:text-normal text-description",
+    normal: "xl:text-normal lg:text-description text-small-description",
+    description: "xl:text-description lg:text-small-description text-smaller-description",
     small: "text-small-description",
     smaller: "text-smaller-description",
     smallest: "text-smallest-description",

@@ -8,6 +8,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     children?: ReactNode;
     bordered?: true | false;
     className?: string;
+    removePadding?: boolean;
 }
 
 function CardContainer({
@@ -27,7 +28,7 @@ function CardContainer({
     return (
         <div
             onClick={onClick}
-            className={`border border-slate-dark rounded-2xl ${isGlass ? "card-glass-effect" : "bg-cream"} ${dropShadow ? "card-drop-shadow" : ""}  ${className} `}
+            className={`border border-slate-dark rounded-2xl ${isGlass ? "card-glass-effect" : "bg-off-white"} ${dropShadow ? "card-drop-shadow" : ""}  ${className} overflow-hidden min-w-0`}
             {...props}
         >
             {children}
@@ -59,17 +60,23 @@ function Header({
           : AlignFlexClasses.left;
 
     return (
-        <div className={`${defaultClass} w-full px-6 py-4 flex ${contentAlignmentClass} ${className} `} {...props}>
+        <div
+            className={`${defaultClass} w-full lg:px-6 lg:py-4 px-5 py-3 flex ${contentAlignmentClass} ${className} `}
+            {...props}
+        >
             {children}
             {toggleRightButton && rightButton}
         </div>
     );
 }
 
-function Body({ children, bordered = false, className, ...props }: CardProps) {
+function Body({ children, bordered = false, className, removePadding, ...props }: CardProps) {
     const defaultClass = `${bordered == true ? "border-b-[0.3px] border-t-[0.3px] border-black" : ""}`;
     return (
-        <div className={`${defaultClass} w-full px-6 py-4 ${className}`} {...props}>
+        <div
+            className={`${defaultClass} w-full ${removePadding ? "" : "lg:px-6 lg:py-4 px-5 py-3"} ${className}`}
+            {...props}
+        >
             {children}
         </div>
     );
@@ -78,7 +85,7 @@ function Body({ children, bordered = false, className, ...props }: CardProps) {
 function Footer({ children, bordered = false, className, ...props }: CardProps) {
     const defaultClass = `${bordered == true ? "border-t-[0.3px] border-black" : ""}`;
     return (
-        <div className={`${defaultClass} w-full px-6 py-4 ${className}`} {...props}>
+        <div className={`${defaultClass} w-full lg:px-6 lg:py-4 px-5 py-3 ${className}`} {...props}>
             {children}
         </div>
     );

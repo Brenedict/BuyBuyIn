@@ -1,6 +1,6 @@
 // General Imports
-import { BaseInput, ErrorMessage, type InputProp } from  "./BaseInput"
-import { Label, type LabelProp } from "./InputLabel"
+import { BaseInput, ErrorMessage, type InputProp } from "./BaseInput";
+import { Label, type LabelProp } from "./InputLabel";
 
 // Material UI Icons
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -9,7 +9,7 @@ export default function SearchInput({
     className = "",
     hidden = false,
     label,
-    boldLabel,
+    labelVariant,
     error,
     ...props
 }: LabelProp & InputProp) {
@@ -26,17 +26,12 @@ export default function SearchInput({
     const searchIconStyle = isDisabled ? "text-slate-light" : "text-brown";
 
     return (
-        <div className={`relative  ${hidden ? "hidden" : ""}`}>
-            <Label htmlFor={props.id} label={label} isRequired={isRequired} boldLabel={boldLabel} />
+        <div className={`relative ${className} ${hidden ? "hidden" : ""}`}>
+            <Label htmlFor={props.id} label={label} labelVariant={labelVariant} isRequired={isRequired} />
 
-            <BaseInput
-                type="search"
-                className={`pl-10 text-sm py-2 px-4 rounded-3xl ${className}`}
-                error={error}
-                {...props}
-            />
+            <BaseInput type="search" className={`pl-10 py-2 px-4 rounded-3xl `} error={error} {...props} />
 
-            <SearchOutlinedIcon className={`text-big-medium stroke-0 absolute bottom-2 left-3.5 ${searchIconStyle}`} />
+            <SearchOutlinedIcon className={`text-xs stroke-0 absolute bottom-3.5 left-3.5 ${searchIconStyle}`} />
             <ErrorMessage error={error} />
         </div>
     );

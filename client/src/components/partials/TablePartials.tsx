@@ -1,11 +1,11 @@
-import type { ColorVariant, MaterialIcon } from "../types/common";
-import { Button, type ButtonColorVariant } from "./Button";
-import Table from "./Table";
-import { Text } from "./Text";
+import type { ColorVariant, MaterialIcon } from "../../types/common";
+import { Button, type ButtonColorVariant } from "../Button";
+import Table from "../Table";
+import { Text } from "../Text";
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import { formatFullDate, formatShortDate, formatTime } from "../utils/dateUtils";
+import { formatFullDate, formatShortDate, formatTime } from "../../utils/dateUtils";
 
 export interface ButtonActions {
     text: string;
@@ -34,7 +34,17 @@ export function EmptyData({ bgVariant }: { bgVariant: ColorVariant }) {
     );
 }
 
-export function ActionButtons({ id, actions }: { id: string | number; actions: ButtonActions[] }) {
+export function ActionButtons({
+    id,
+    actions,
+    size = "default",
+}: {
+    id: string | number;
+    actions: ButtonActions[];
+    size?: string;
+}) {
+    const buttonSizeClass = size === "default" ? "small" : "smallest";
+
     return (
         <div className="flex items-center gap-2 justify-center">
             {actions.map((action, index) => (
@@ -44,8 +54,8 @@ export function ActionButtons({ id, actions }: { id: string | number; actions: B
                     rightIcon={action.rightIcon}
                     onClick={action.handleClick(id)}
                     key={index}
-                    size="small"
-                    className="border-0! text-description! shadow!"
+                    size={buttonSizeClass}
+                    className={`border-0! shadow!`}
                 >
                     {action.text}
                 </Button>
@@ -54,14 +64,17 @@ export function ActionButtons({ id, actions }: { id: string | number; actions: B
     );
 }
 
+// TODO: Currently i added a variant sa button na smallest, if the size here should have proper enumeration pasabi
 export function EditDeleteButtons({
     id,
     handleEdit,
     handleDelete,
+    size = "default",
 }: {
     id: string | number;
     handleEdit: ButtonActions["handleClick"];
     handleDelete: ButtonActions["handleClick"];
+    size?: "default" | "smallest";
 }) {
     return (
         <ActionButtons
@@ -80,13 +93,14 @@ export function EditDeleteButtons({
                     handleClick: handleDelete,
                 },
             ]}
+            size={size}
         />
     );
 }
 
 function NormalText({ text }: { text: string }) {
     return (
-        <Text size="normal" variant="brown" weight="medium">
+        <Text size="normal" variant="brown" weight="medium" align="center">
             {text}
         </Text>
     );
@@ -94,7 +108,7 @@ function NormalText({ text }: { text: string }) {
 
 function SubText({ text }: { text: string }) {
     return (
-        <Text size="description" variant="slate-light" weight="medium">
+        <Text size="description" variant="slate-light" weight="medium" align="center">
             {text}
         </Text>
     );

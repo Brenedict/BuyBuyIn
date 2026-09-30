@@ -8,7 +8,7 @@ import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import { PageHeader } from "../../components/PageHeader";
 import Table from "../../components/Table";
-import { EditDeleteButtons } from "../../components/TablePartials";
+import { EditDeleteButtons } from "../../components/partials/TablePartials";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import PasswordInput from "../../components/inputs/PasswordInput";
 
@@ -186,8 +186,8 @@ export function SuperAdmin_Subscriptions() {
                 prev.map((r) =>
                     r.id === editedId
                         ? { ...r, businessSubscriptionLabel: form.subscriptionId, businessLabel: form.username }
-                        : r,
-                ),
+                        : r
+                )
             );
         } else if (modal.type === "add") {
             setRows((prev) => [
@@ -256,7 +256,11 @@ export function SuperAdmin_Subscriptions() {
                                     <Table.Data size="normal" text={row.businessLabel} />
                                     <Table.Data size="normal" text={row.statusLabel} />
                                     <Table.Data>
-                                        <EditDeleteButtons id={row.id} handleEdit={handleEdit} handleDelete={handleDelete} />
+                                        <EditDeleteButtons
+                                            id={row.id}
+                                            handleEdit={handleEdit}
+                                            handleDelete={handleDelete}
+                                        />
                                     </Table.Data>
                                 </Table.Row>
                             ))}
@@ -294,7 +298,13 @@ export function SuperAdmin_Subscriptions() {
                             <Text>Are you sure you want to delete this subscription?</Text>
                         </div>
                         <div className="grid grid-cols-2 gap-8">
-                            <Button type="button" variant="secondary" size="normal" className="w-full" onClick={closeModal}>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="normal"
+                                className="w-full"
+                                onClick={closeModal}
+                            >
                                 Cancel
                             </Button>
                             <Button

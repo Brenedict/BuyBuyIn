@@ -1,6 +1,7 @@
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
+import { Outlet } from "react-router";
 
 export function HQ_Inventory() {
     return (
@@ -9,6 +10,11 @@ export function HQ_Inventory() {
                 <Text>HQ Admin Inventory</Text>
                 <Button>Button</Button>
             </Card.Body>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }

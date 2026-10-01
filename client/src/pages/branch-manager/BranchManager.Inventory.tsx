@@ -17,7 +17,6 @@ import {
 } from "../../TESTINGDATA/inventoryData";
 import { Outlet } from "react-router";
 
-
 import AddIcon from "@mui/icons-material/Add";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
@@ -195,7 +194,7 @@ export function BranchManager_Inventory() {
                             Out of Stock
                         </Text>
                     </Card.Header>
-                    <Card.Body className="px-0 py-0">
+                    <Card.Body removePadding>
                         <Table
                             bordered={false}
                             shadow={false}
@@ -212,37 +211,20 @@ export function BranchManager_Inventory() {
                             pageKey="out_of_stock_page"
                         >
                             <Table.Row borderedBottom>
-                                <Table.Header text="Item" bgVariant="off-white" textVariant="crimson" size="big" />
-                                <Table.Header
-                                    text="Category"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
+                                <Table.Header text="Item" size="big" />
+                                <Table.Header text="Category" size="big" />
                                 <Table.Header
                                     text="Reorder Threshold"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
+
                                     size="big"
                                 />
                                 <Table.Header
                                     text="Unit Price"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
+
                                     size="big"
                                 />
-                                <Table.Header
-                                    text="Supplier"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Actions"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
+                                <Table.Header text="Supplier" size="big" />
+                                <Table.Header text="Actions" size="big" />
                             </Table.Row>
                             {TABLE_OUT_OF_STOCK_ITEMS.map(renderOutOfStockRow)}
                         </Table>
@@ -256,7 +238,7 @@ export function BranchManager_Inventory() {
                             Current Stock Levels
                         </Text>
                     </Card.Header>
-                    <Card.Body className="px-0 py-0">
+                    <Card.Body removePadding>
                         <Table
                             bordered={false}
                             shadow={false}
@@ -273,43 +255,13 @@ export function BranchManager_Inventory() {
                             pageKey="current_stock_page"
                         >
                             <Table.Row borderedBottom>
-                                <Table.Header text="Item" bgVariant="off-white" textVariant="crimson" size="big" />
-                                <Table.Header
-                                    text="Category"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Stock Level"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Reorder Threshold"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Unit Price"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Supplier"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Actions"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
+                                <Table.Header text="Item" size="big" />
+                                <Table.Header text="Category" size="big" />
+                                <Table.Header text="Stock Level" size="big" />
+                                <Table.Header text="Reorder Threshold" size="big" />
+                                <Table.Header text="Unit Price" size="big" />
+                                <Table.Header text="Supplier" size="big" />
+                                <Table.Header text="Actions" size="big" />
                             </Table.Row>
                             {TABLE_CURRENT_STOCK_ITEMS.map((item) => (
                                 <Table.Row key={item.itemId}>
@@ -341,7 +293,7 @@ export function BranchManager_Inventory() {
                             Suppliers
                         </Text>
                     </Card.Header>
-                    <Card.Body className="px-0 py-0">
+                    <Card.Body removePadding>
                         <Table
                             bordered={false}
                             shadow={false}
@@ -358,36 +310,11 @@ export function BranchManager_Inventory() {
                             pageKey="suppliers_page"
                         >
                             <Table.Row borderedBottom>
-                                <Table.Header
-                                    text="Supplier"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Contact Person"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Contact Information"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Address"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
-                                <Table.Header
-                                    text="Actions"
-                                    bgVariant="off-white"
-                                    textVariant="crimson"
-                                    size="big"
-                                />
+                                <Table.Header text="Supplier" size="big" />
+                                <Table.Header text="Contact Person" size="big" />
+                                <Table.Header text="Contact Information" size="big" />
+                                <Table.Header text="Address" size="big" />
+                                <Table.Header text="Actions" size="big" />
                             </Table.Row>
                             {TABLE_SUPPLIERS.map((supplier) => (
                                 <Table.Row key={supplier.supplierId}>

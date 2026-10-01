@@ -73,6 +73,11 @@ function Date_Section() {
 function XREAD_Table() {
     return (
         <Card>
+            <Card.Header>
+                <Text size="big" variant="crimson" weight="extraBold">
+                    Reference Table
+                </Text>
+            </Card.Header>
             <Card.Body removePadding bordered={false}>
                 <Table
                     bordered={false}

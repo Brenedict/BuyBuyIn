@@ -57,7 +57,7 @@ function Date_Section() {
                                 className="w-[35%]"
                                 options={paymentMethods}
                                 name="paymentMethods"
-                                defaultValue="option1"
+                                defaultValue={paymentMethods.option1}
                             ></SelectInput>
                         </div>
                         <Button variant="secondary" size="medium" className="self-end">

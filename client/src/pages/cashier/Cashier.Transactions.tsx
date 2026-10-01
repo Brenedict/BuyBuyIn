@@ -7,6 +7,9 @@ import Table from "../../components/Table";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import SelectInput from "../../components/inputs/SelectInput";
 
+import { Outlet } from "react-router";
+
+
 export function Cashier_Transactions() {
     const auditTotals = {
         totalSales: "125,430.00",
@@ -214,8 +217,11 @@ export function Cashier_Transactions() {
                         </div>
                     </div>
                 </Card.Body>
-            </Card>
-        </div>
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
+        </Card>
     );
 }
 

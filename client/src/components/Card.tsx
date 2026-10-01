@@ -8,6 +8,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     children?: ReactNode;
     bordered?: true | false;
     className?: string;
+    removePadding?: boolean;
 }
 
 function CardContainer({
@@ -27,7 +28,7 @@ function CardContainer({
     return (
         <div
             onClick={onClick}
-            className={`border border-slate-dark rounded-2xl ${isGlass ? "card-glass-effect" : "bg-cream"} ${dropShadow ? "card-drop-shadow" : ""}  ${className} overflow-hidden min-w-0`}
+            className={`border border-slate-dark rounded-2xl ${isGlass ? "card-glass-effect" : "bg-off-white"} ${dropShadow ? "card-drop-shadow" : ""}  ${className} overflow-hidden min-w-0`}
             {...props}
         >
             {children}
@@ -69,10 +70,13 @@ function Header({
     );
 }
 
-function Body({ children, bordered = false, className, ...props }: CardProps) {
+function Body({ children, bordered = false, className, removePadding, ...props }: CardProps) {
     const defaultClass = `${bordered == true ? "border-b-[0.3px] border-t-[0.3px] border-black" : ""}`;
     return (
-        <div className={`${defaultClass} w-full lg:px-6 lg:py-4 px-5 py-3 ${className}`} {...props}>
+        <div
+            className={`${defaultClass} w-full ${removePadding ? "" : "lg:px-6 lg:py-4 px-5 py-3"} ${className}`}
+            {...props}
+        >
             {children}
         </div>
     );

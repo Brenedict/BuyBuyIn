@@ -1,9 +1,10 @@
-import { useCallback, useMemo, type SubmitEvent } from "react";
+import { useCallback, useMemo, type ChangeEvent, type SubmitEvent } from "react";
 import { useSearchParams } from "react-router";
 
 interface UseFormSearchParamsReturn<T extends Record<string, string>> {
     values: T;
     reset: () => void;
+    handleChange: (event: ChangeEvent<HTMLSelectElement>) => void;
     submit: (onSubmit?: (params: URLSearchParams) => void) => (event: SubmitEvent<HTMLFormElement>) => void;
 }
 
@@ -26,10 +27,8 @@ export function useFormSearchParams<T extends Record<string, string>>(defaults: 
         setSearchParams(next);
     }, [defaults, searchParams, setSearchParams]);
 
-    const submit = useCallback(
-        (onSubmit?: (params: URLSearchParams) => void) => (event: SubmitEvent<HTMLFormElement>) => {
-            event.preventDefault();
-
+    const formUpdate = useCallback(
+        (event: SubmitEvent<HTMLFormElement> | ChangeEvent<HTMLFormElement>) => {
             const form = event.currentTarget;
             const formData = new FormData(form);
 
@@ -42,7 +41,29 @@ export function useFormSearchParams<T extends Record<string, string>>(defaults: 
             }
 
             setSearchParams(params);
+            return params;
+        },
+        [defaults, searchParams, setSearchParams]
+    );
+
+    const submit = useCallback(
+        (onSubmit?: (params: URLSearchParams) => void) => (event: SubmitEvent<HTMLFormElement>) => {
+            event.preventDefault();
+
+            const params = formUpdate(event);
             onSubmit?.(params);
+        },
+        [formUpdate]
+    );
+
+    const handleChange = useCallback(
+        (event: ChangeEvent<HTMLSelectElement>) => {
+            const { name, value } = event.target;
+            if (name in defaults) {
+                const params = new URLSearchParams(searchParams);
+                params.set(name, value);
+                setSearchParams(params);
+            }
         },
         [defaults, searchParams, setSearchParams]
     );
@@ -50,6 +71,7 @@ export function useFormSearchParams<T extends Record<string, string>>(defaults: 
     return {
         values,
         reset,
+        handleChange,
         submit,
     };
 }

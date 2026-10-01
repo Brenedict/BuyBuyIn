@@ -41,7 +41,7 @@ export function Cashier_Transactions() {
 
     return (
         <div className="flex flex-col gap-6">
-            <Card className="p-6 !overflow-visible relative z-50">
+            <Card className="p-6 !overflow-visible relative z-50 flex flex-col gap-[2rem]">
                 <Card.Header className="flex flex-col gap-1">
                     <Text weight="extraBold" size="bigger" variant="crimson">
                         Sales Summary
@@ -139,36 +139,44 @@ export function Cashier_Transactions() {
                         ))}
                     </div>
                 </Card.Body>
-
-                <Card.Body>
-                    <Table
-                        pagination={{
-                            maxItems: 6,
-                        }}
-                    >
-                        <Table.Row borderedBottom>
-                            <Table.Header text="Date" />
-                            <Table.Header text="Transactions" />
-                            <Table.Header text="Total Sales" />
-                            <Table.Header text="Discounts" />
-                            <Table.Header text="Net Sales" />
-                        </Table.Row>
-
-                        {TABLE_CASHIER_TRANSACTIONS.map((row) => (
-                            <Table.Row key={row.date}>
-                                <Table.Data text={row.date} />
-                                <Table.Data text={String(row.transactions)} />
-                                <Table.Data text={`₱ ${row.totalSales}`} />
-                                <Table.Data text={`₱ ${row.discounts}`} />
-                                <Table.Data text={`₱ ${row.netSales}`} />
+                <Card>
+                    <Card.Header>
+                        <Text size="big" weight="extraBold" variant="crimson">
+                            Transactions
+                        </Text>
+                    </Card.Header>
+                    <Card.Body removePadding>
+                        <Table
+                            rounded={false}
+                            bordered={false}
+                            pagination={{
+                                maxItems: 6,
+                            }}
+                        >
+                            <Table.Row borderedBottom>
+                                <Table.Header text="Date" />
+                                <Table.Header text="Transactions" />
+                                <Table.Header text="Total Sales" />
+                                <Table.Header text="Discounts" />
+                                <Table.Header text="Net Sales" />
                             </Table.Row>
-                        ))}
-                    </Table>
-                </Card.Body>
-                {
-                    // Displays all global and page popups
-                    <Outlet />
-                }
+
+                            {TABLE_CASHIER_TRANSACTIONS.map((row) => (
+                                <Table.Row key={row.date}>
+                                    <Table.Data text={row.date} />
+                                    <Table.Data text={String(row.transactions)} />
+                                    <Table.Data text={`₱ ${row.totalSales}`} />
+                                    <Table.Data text={`₱ ${row.discounts}`} />
+                                    <Table.Data text={`₱ ${row.netSales}`} />
+                                </Table.Row>
+                            ))}
+                        </Table>
+                    </Card.Body>
+                    {
+                        // Displays all global and page popups
+                        <Outlet />
+                    }
+                </Card>
             </Card>
         </div>
     );

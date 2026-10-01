@@ -15,6 +15,8 @@ import {
     TABLE_SUPPLIERS,
     type InventoryItem,
 } from "../../TESTINGDATA/inventoryData";
+import { Outlet } from "react-router";
+
 
 import AddIcon from "@mui/icons-material/Add";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
@@ -412,6 +414,11 @@ export function BranchManager_Inventory() {
                     </Card.Body>
                 </Card>
             </Card.Body>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }

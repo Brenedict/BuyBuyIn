@@ -22,6 +22,7 @@ import {
     SalesOverviewCard,
 } from "../../components/partials/DashboardPartials";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+import { Outlet } from "react-router";
 
 export function NumberFormat(value: number, symbol?: string) {
     return `${symbol ?? ""} ${value.toLocaleString()}`;
@@ -61,13 +62,14 @@ export function HQ_Dashboard() {
                             defaultValue={values.timeframe}
                             onChange={handleChange}
                             className="border-0! py-1.5! text-normal! w-max"
-                        >
-                            <SelectInput.Option value="Today">Today</SelectInput.Option>
-                            <SelectInput.Option value="Last Week">Last Week</SelectInput.Option>
-                            <SelectInput.Option value="Last Month">Last Month</SelectInput.Option>
-                            <SelectInput.Option value="Last 6 Months">Last 6 Months</SelectInput.Option>
-                            <SelectInput.Option value="Last Year">Last Year</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                Today: "today",
+                                "Last Week": "lastweek",
+                                "Last Month": "lastmonth",
+                                "Last 6 Months": "lasthalfyear",
+                                "Last Year": "lastyear",
+                            }}
+                        />
                     </div>
                 </div>
 
@@ -96,13 +98,15 @@ export function HQ_Dashboard() {
                     </div>
                 </div>
                 <Card className="mb-12">
-                    <Card.Body className="flex flex-col py-6 px-10">
-                        <Text variant="crimson" size="bigger" weight="extraBold" className="mb-4">
+                    <Card.Body>
+                        <Text variant="crimson" size="bigger" weight="extraBold">
                             Branches
                         </Text>
+                    </Card.Body>
 
+                    <Card.Body removePadding bordered={false}>
                         <Table
-                            bordered
+                            bordered={false}
                             pagination={{
                                 bgVariant: "cream-muted",
                                 borderVariant: "brown",
@@ -112,7 +116,7 @@ export function HQ_Dashboard() {
                                 textVariant: "crimson",
                                 textWeight: "medium",
                             }}
-                            rounded
+                            rounded={false}
                             shadow
                         >
                             <Table.Row borderedBottom>
@@ -138,6 +142,11 @@ export function HQ_Dashboard() {
                     </Card.Body>
                 </Card>
             </Card.Body>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
         </Card>
     );
 }

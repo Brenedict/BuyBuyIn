@@ -1,13 +1,28 @@
 // General Imports
-import { Outlet, Link } from "react-router";
+import { Outlet } from "react-router";
 import "../../index.css";
 
+// Temporary
 import testBg from "../../assets/testbg.png";
-import { NavBar } from "../../components/NavBar";
 
 // Components
+import { NavBar } from "../../components/NavBar";
+
+// BuyBuyIn Shared Imports
+import type { RoleType } from "@buybuyin/shared/prisma/enums";
+
+// Context
+import { useGlobalContext } from "./AccessValidator";
+
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
 
 function StaticLayout() {
+    // Temporary: Currently not using InMemoryStore
+    const { user } = useGlobalContext();
+
+    let role: RoleType = user?.role ?? "CASHIER";
+
     return (
         /**
          * NOTE FROM BINAS:
@@ -18,11 +33,11 @@ function StaticLayout() {
          * */
 
         <main
-            className="w-screen h-screen overflow-hidden flex antialiased bg-cover bg-center"
+            className="w-screen h-screen overflow-hidden flex antialiased bg-cover bg-center flex flex-col min-w-[1024px]"
             style={{ backgroundImage: `url(${testBg})` }}
         >
             {/* Insert Nav */}
-            <NavBar role="hqadmin"></NavBar>
+            <NavBar role={role}></NavBar>
 
             <section className="p-8 grow overflow-y-auto overscroll-y-auto">
                 <Outlet />

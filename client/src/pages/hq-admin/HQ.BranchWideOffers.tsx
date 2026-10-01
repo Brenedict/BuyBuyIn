@@ -1,6 +1,6 @@
 // General Import
 import { useEffect, useMemo, useState } from "react";
-import { Form, useParams } from "react-router";
+import { Form, Outlet, useParams } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
@@ -46,12 +46,19 @@ interface OfferProps {
 // Main Page Exported
 export default function HQ_BranchWideOffers() {
     return (
-        <Card className="h-[calc(100vh-4rem)] flex flex-col">
-            <Card.Body className="flex gap-6 grow min-h-0">
-                <OffersListSection />
-                <OfferConfigurationSection />
-            </Card.Body>
-        </Card>
+        <>
+            <Card className="h-[calc(100vh-4rem)] flex flex-col">
+                <Card.Body className="flex gap-6 grow min-h-0">
+                    <OffersListSection />
+                    <OfferConfigurationSection />
+                </Card.Body>
+            </Card>
+
+            {
+                // Displays all global and page popups
+                <Outlet />
+            }
+        </>
     );
 }
 
@@ -188,11 +195,12 @@ function ToggleOverallDiscountType() {
                 name="discountTypeInput"
                 defaultValue={discountType ?? "PERCENTAGE"}
                 label="Discount Type"
+                options={{
+                    Percentage: "PERCENTAGE",
+                    "Fixed Value": "FIXED_VALUE",
+                }}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDiscountTypeInput(e.target.value)}
-            >
-                <SelectInput.Option value="PERCENTAGE">Percentage</SelectInput.Option>
-                <SelectInput.Option value="FIXED_VALUE">Fixed Value</SelectInput.Option>
-            </SelectInput>
+            />
             <GeneralInput
                 type="number"
                 placeholder="10"
@@ -246,61 +254,63 @@ function ToggleIndividualDiscountType() {
                     Included Products
                 </Text>
             </Card.Header>
-            <Table pagination={{ maxItems: 5 }} className="rounded-none! border-0!">
-                {/* Fixed table headers */}
-                <Table.Row borderedBottom>
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Discounted Subtotal" />
-                    <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
-                </Table.Row>
-
-                {/* Dynamically maps out data */}
-                {testSelectedProducts?.map((product, i) => (
-                    <Table.Row>
-                        <Table.Data isPadded={false} size="small" text={String(product.requiredQuantity)} />
-                        <Table.Data isPadded={false} size="small" text={String(product.id)} />
-                        <Table.Data isPadded={false} size="small" text={String(product.productName)} />
-                        <Table.Data isPadded={false} size="small" text={String(product.shelfPrice)} />
-                        <Table.Data
-                            isPadded={false}
-                            size="small"
-
-                            text={formatDiscountValue(
-                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
-                                product.unitDiscountValue
-                            )}
-                        />
-                        <Table.Data
-                            isPadded={false}
-                            size="small"
-                            text={calculateSubtotal(product.requiredQuantity, product.shelfPrice)}
-                        />
-                        <Table.Data
-                            isPadded={false}
-                            size="small"
-                            text={calculateDiscountedSubtotal(
-                                product.discountType as "FIXED_VALUE" | "PERCENTAGE",
-                                product.unitDiscountValue,
-                                product.requiredQuantity,
-                                product.shelfPrice
-                            )}
-                        />
-                        <Table.Data isPadded={false}>
-                            <EditDeleteButtons
-                                id={1}
-                                size="smallest"
-                                handleEdit={handleEdit}
-                                handleDelete={handleDelete}
-                            />
-                        </Table.Data>
+            <Card.Body className="p-0! overflow-hidden!">
+                <Table pagination={{ maxItems: 5 }} className="rounded-none! border-0!">
+                    {/* Fixed table headers */}
+                    <Table.Row borderedBottom>
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Discounted Subtotal" />
+                        <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
                     </Table.Row>
-                ))}
-            </Table>
+
+                    {/* Dynamically maps out data */}
+                    {testSelectedProducts?.map((product, i) => (
+                        <Table.Row>
+                            <Table.Data isPadded={false} size="small" text={String(product.requiredQuantity)} />
+                            <Table.Data isPadded={false} size="small" text={String(product.id)} />
+                            <Table.Data isPadded={false} size="small" text={String(product.productName)} />
+                            <Table.Data isPadded={false} size="small" text={String(product.shelfPrice)} />
+                            <Table.Data
+                                isPadded={false}
+                                size="small"
+
+                                text={formatDiscountValue(
+                                    product.discountType as "FIXED_VALUE" | "PERCENTAGE",
+                                    product.unitDiscountValue
+                                )}
+                            />
+                            <Table.Data
+                                isPadded={false}
+                                size="small"
+                                text={calculateSubtotal(product.requiredQuantity, product.shelfPrice)}
+                            />
+                            <Table.Data
+                                isPadded={false}
+                                size="small"
+                                text={calculateDiscountedSubtotal(
+                                    product.discountType as "FIXED_VALUE" | "PERCENTAGE",
+                                    product.unitDiscountValue,
+                                    product.requiredQuantity,
+                                    product.shelfPrice
+                                )}
+                            />
+                            <Table.Data isPadded={false}>
+                                <EditDeleteButtons
+                                    id={1}
+                                    size="smallest"
+                                    handleEdit={handleEdit}
+                                    handleDelete={handleDelete}
+                                />
+                            </Table.Data>
+                        </Table.Row>
+                    ))}
+                </Table>
+            </Card.Body>
         </Card>
     );
 }
@@ -308,6 +318,13 @@ function ToggleIndividualDiscountType() {
 function OfferConfigurationSection() {
     // Extracts the Branch Wide Offer Id from the URL Param
     const { id } = useParams();
+
+    // Used for redirecting
+    const useNavigate = useNavigatePage();
+
+    // Save offer navigation. Varies between create and edit view.
+    const saveOfferPopupNavigate = id ? ROUTES.HQ_ADMIN.branchOffersEditSave(id) : ROUTES.HQ_ADMIN.branchOffersSave;
+    const handleSave = () => useNavigate(saveOfferPopupNavigate, true);
 
     // Extracting the test data. The 'useMemo' is for caching.
     const testOffer = useMemo(() => SAMPLE_OFFERS.find((offer) => String(offer.id) == id), [id]);
@@ -333,7 +350,12 @@ function OfferConfigurationSection() {
 
     return (
         <Card isGlass={false} className="w-[75%] h-full flex flex-col">
-            <Card.Header toggleRightButton rightButton={<Button>Save Offer</Button>} bordered className="shrink-0">
+            <Card.Header
+                toggleRightButton
+                rightButton={<Button onClick={handleSave}>Save Offer</Button>}
+                bordered
+                className="shrink-0"
+            >
                 <Text weight="bold" size="bigger">
                     Offer Configuration - {`${id ? "Edit" : "Add "}`}
                 </Text>
@@ -341,22 +363,38 @@ function OfferConfigurationSection() {
 
             <Card.Body className="flex flex-col gap-4 grow overflow-y-auto min-h-0 *:shrink-0">
                 <GeneralInput
+                    name="offerName"
                     key={`offerName-${id}`}
                     type="text"
                     label="Offer Name"
                     defaultValue={testOffer?.offerName}
+                    required
                 />
-                <TextAreaInput key={`description-${id}`} label="Description" defaultValue={testOffer?.description} />
+                <TextAreaInput
+                    name="description"
+                    key={`description-${id}`}
+                    label="Description"
+                    defaultValue={testOffer?.description}
+                    required
+                />
 
                 {/* Date Range */}
                 <div className="flex gap-6 items-end">
                     <GeneralInput
+                        name="startDate"
                         key={`startDate-${id}`}
                         type="date"
                         label="Date Range"
                         defaultValue={testOffer?.startDate}
+                        required
                     />
-                    <GeneralInput key={`endDate-${id}`} type="date" defaultValue={testOffer?.endDate} />
+                    <GeneralInput
+                        name="endDate"
+                        key={`endDate-${id}`}
+                        type="date"
+                        defaultValue={testOffer?.endDate}
+                        required
+                    />
                 </div>
 
                 {/* Branch Selection */}
@@ -392,6 +430,7 @@ function OfferConfigurationSection() {
                 {/* Offer Type Selection */}
                 <ChoiceInput
                     id="offerType"
+                    name="offerType"
                     label="Offer Type"
                     className="w-fit!"
                     checked={toggleOverallDiscount}
@@ -411,15 +450,15 @@ function OfferConfigurationSection() {
 
                 {/* Set status of offer */}
                 <SelectInput
-                    key={`status-${id}`}
                     name="status"
-                    defaultValue={testOffer?.offerStatus ?? "draft"}
+                    defaultValue="enabled"
                     label="Status"
-                >
-                    <SelectInput.Option value="enabled">Enabled</SelectInput.Option>
-                    <SelectInput.Option value="disabled">Disabled</SelectInput.Option>
-                    <SelectInput.Option value="draft">Draft</SelectInput.Option>
-                </SelectInput>
+                    options={{
+                        Enabled: "enabled",
+                        Disabled: "disabled",
+                        Draft: "draft",
+                    }}
+                />
             </Card.Body>
         </Card>
     );

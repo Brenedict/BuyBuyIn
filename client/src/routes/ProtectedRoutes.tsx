@@ -32,6 +32,7 @@ import HQ_ManageUsers from "../pages/hq-admin/HQ.ManageUsers";
 import HQ_Subscriptions from "../pages/hq-admin/HQ.Subscriptions";
 
 import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
+import {BranchFormPopup, DeleteBranchPopup, BranchManagerFormPopup,} from "../components/popups/hq-admin/HQAdminAccountsPopups";
 import { DeleteSubscriptionPopup, SubscriptionFormPopup } from "../components/popups/super-admin/SubscriptionsPopups";
 
 // Super Admin Pages
@@ -121,7 +122,19 @@ export const protectedRoutes: RouteObject[] = [
                     // HQ Admin Routes: /hq-admin
                     { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard />, children: [...globalPopups] },
                     { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory />, children: [...globalPopups] },
-                    { path: ROUTES.HQ_ADMIN.manageUsers, element: <HQ_ManageUsers />, children: [...globalPopups] },
+                    {
+                        path: ROUTES.HQ_ADMIN.manageUsers,
+                        element: <HQ_ManageUsers />,
+                        children: [
+                            ...globalPopups,
+                            { path: "branch/add", element: <BranchFormPopup mode="add" /> },
+                            { path: "branch/edit/:id", element: <BranchFormPopup mode="edit" /> },
+                            { path: "branch/delete/:id", element: <DeleteBranchPopup /> },
+                            { path: "manager/add", element: <BranchManagerFormPopup mode="add" /> },
+                            { path: "manager/edit/:id", element: <BranchManagerFormPopup mode="edit" /> },
+                            { path: "manager/view/:id", element: <BranchManagerFormPopup mode="view" /> },
+                        ],
+                    },
                     { path: ROUTES.HQ_ADMIN.subscriptions, element: <HQ_Subscriptions />, children: [...globalPopups] },
                     {
                         path: ROUTES.HQ_ADMIN.branchOffers,

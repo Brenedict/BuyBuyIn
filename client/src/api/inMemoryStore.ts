@@ -27,6 +27,7 @@ class InMemoryStore {
 
     public setUserContext = (user: UserGlobalContextSchemaType | null) => {
         this.userContext = user;
+        this.notify();
     };
 
     public getUserContext = () => {

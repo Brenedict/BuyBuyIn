@@ -6,6 +6,8 @@ import StaticLayout from "../pages/shared/StaticLayout";
 
 // Static Access Checker before entering any page
 import { AccessValidator } from "../pages/shared/AccessValidator";
+import { RoleBoundary } from "../pages/shared/RoleBoundary";
+import Forbidden from "../pages/shared/Forbidden";
 import { primaryAuthLoader, homeRedirectLoader } from "../api/authService";
 
 // Global Pages and Popups
@@ -42,7 +44,6 @@ import SuperAdmin_SubscriberAccounts from "../pages/super-admin/SuperAdmin.Subsc
 
 // Predefined Routes
 import { ROLE_HOME, ROUTES } from "./Routes";
-
 import { RoleType } from "@buybuyin/shared/prisma/enums";
 import { PlansAddEditPopup, PlansDeletePopup } from "../components/popups/super-admin/PlansPopups";
 
@@ -63,118 +64,165 @@ export const protectedRoutes: RouteObject[] = [
                         loader: homeRedirectLoader,
                     },
 
-                    // Adds redirect when users go to ":role/" (no specific page). Ensures users go to their respective home pages.
+                    // Shown when RoleBoundary rejects the user's role.
                     {
-                        path: ROUTES.BRANCH_MANAGER.root,
-                        element: <Navigate to={ROLE_HOME[RoleType.BRANCHMANAGER]} replace />,
-                    },
-                    {
-                        path: ROUTES.CASHIER.root,
-                        element: <Navigate to={ROLE_HOME[RoleType.CASHIER]} replace />,
-                    },
-                    {
-                        path: ROUTES.HQ_ADMIN.root,
-                        element: <Navigate to={ROLE_HOME[RoleType.HQADMIN]} replace />,
-                    },
-                    {
-                        path: ROUTES.SUPER_ADMIN.root,
-                        element: <Navigate to={ROLE_HOME[RoleType.SUPERADMIN]} replace />,
+                        path: ROUTES.FORBIDDEN,
+                        element: <Forbidden />,
+                        children: [...globalPopups],
                     },
 
                     // Branch Manager Routes: /branch-manager
                     {
-                        path: ROUTES.BRANCH_MANAGER.dashboard,
-                        element: <BranchManager_Dashboard />,
-                        children: [...globalPopups],
-                    },
-                    {
-                        path: ROUTES.BRANCH_MANAGER.inventory,
-                        element: <BranchManager_Inventory />,
-                        children: [...globalPopups],
-                    },
-                    {
-                        path: ROUTES.BRANCH_MANAGER.manageUsers,
-                        element: <BranchManager_ManageUsers />,
-                        children: [...globalPopups],
-                    },
-                    {
-                        path: ROUTES.BRANCH_MANAGER.branchOffers,
-                        element: <BranchManager_BranchWideOffers />,
-                        children: [...globalPopups],
-                    },
-                    {
-                        path: ROUTES.BRANCH_MANAGER.transactions,
-                        element: <BranchManager_Transactions />,
-                        children: [...globalPopups],
+                        element: <RoleBoundary />,
+                        handle: { accessLevel: RoleType.BRANCHMANAGER },
+                        children: [
+                            // Adds redirect when users go to ":role/" (no specific page).
+                            {
+                                path: ROUTES.BRANCH_MANAGER.root,
+                                element: <Navigate to={ROLE_HOME[RoleType.BRANCHMANAGER]} replace />,
+                            },
+                            {
+                                path: ROUTES.BRANCH_MANAGER.dashboard,
+                                element: <BranchManager_Dashboard />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.BRANCH_MANAGER.inventory,
+                                element: <BranchManager_Inventory />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.BRANCH_MANAGER.manageUsers,
+                                element: <BranchManager_ManageUsers />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.BRANCH_MANAGER.branchOffers,
+                                element: <BranchManager_BranchWideOffers />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.BRANCH_MANAGER.transactions,
+                                element: <BranchManager_Transactions />,
+                                children: [...globalPopups],
+                            },
+                        ],
                     },
 
                     // Cashier Routes: /cashier
-                    { path: ROUTES.CASHIER.dashboard, element: <Cashier_Dashboard />, children: [...globalPopups] },
                     {
-                        path: ROUTES.CASHIER.transactions,
-                        element: <Cashier_Transactions />,
-                        children: [...globalPopups],
+                        element: <RoleBoundary />,
+                        handle: { accessLevel: RoleType.CASHIER },
+                        children: [
+                            {
+                                path: ROUTES.CASHIER.root,
+                                element: <Navigate to={ROLE_HOME[RoleType.CASHIER]} replace />,
+                            },
+                            {
+                                path: ROUTES.CASHIER.dashboard,
+                                element: <Cashier_Dashboard />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.CASHIER.transactions,
+                                element: <Cashier_Transactions />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.CASHIER.pointOfSale,
+                                element: <Cashier_PointOfSale />,
+                                children: [...globalPopups],
+                            },
+                            { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead />, children: [...globalPopups] },
+                        ],
                     },
-                    { path: ROUTES.CASHIER.pointOfSale, element: <Cashier_PointOfSale />, children: [...globalPopups] },
-                    { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead />, children: [...globalPopups] },
 
                     // HQ Admin Routes: /hq-admin
-                    { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard />, children: [...globalPopups] },
-                    { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory />, children: [...globalPopups] },
-                    { path: ROUTES.HQ_ADMIN.manageUsers, element: <HQ_ManageUsers />, children: [...globalPopups] },
-                    { path: ROUTES.HQ_ADMIN.subscriptions, element: <HQ_Subscriptions />, children: [...globalPopups] },
                     {
-                        path: ROUTES.HQ_ADMIN.branchOffers,
-                        element: <HQ_BranchWideOffers />,
+                        element: <RoleBoundary />,
+                        handle: { accessLevel: RoleType.HQADMIN },
                         children: [
                             {
-                                path: "save",
-                                element: <SaveConfirmationPopup />,
+                                path: ROUTES.HQ_ADMIN.root,
+                                element: <Navigate to={ROLE_HOME[RoleType.HQADMIN]} replace />,
                             },
-                            ...globalPopups,
-                        ],
-                    },
-                    {
-                        path: ROUTES.HQ_ADMIN.branchOffers + "/:id/edit",
-                        element: <HQ_BranchWideOffers />,
-                        children: [
+                            { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard />, children: [...globalPopups] },
+                            { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory />, children: [...globalPopups] },
                             {
-                                path: "save",
-                                element: <SaveConfirmationPopup />,
+                                path: ROUTES.HQ_ADMIN.manageUsers,
+                                element: <HQ_ManageUsers />,
+                                children: [...globalPopups],
                             },
-                            ...globalPopups,
+                            {
+                                path: ROUTES.HQ_ADMIN.subscriptions,
+                                element: <HQ_Subscriptions />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.HQ_ADMIN.branchOffers,
+                                element: <HQ_BranchWideOffers />,
+                                children: [
+                                    {
+                                        path: "save",
+                                        element: <SaveConfirmationPopup />,
+                                    },
+                                    ...globalPopups,
+                                ],
+                            },
+                            {
+                                path: ROUTES.HQ_ADMIN.branchOffers + "/:id/edit",
+                                element: <HQ_BranchWideOffers />,
+                                children: [
+                                    {
+                                        path: "save",
+                                        element: <SaveConfirmationPopup />,
+                                    },
+                                    ...globalPopups,
+                                ],
+                            },
                         ],
                     },
+
                     // Super Admin Routes: /super-admin
                     {
-                        path: ROUTES.SUPER_ADMIN.plans,
-                        element: <SuperAdmin_Plans />,
+                        element: <RoleBoundary />,
+                        handle: { accessLevel: RoleType.SUPERADMIN },
                         children: [
-                            { path: "add", element: <PlansAddEditPopup mode="add" /> },
-                            { path: ":id/edit", element: <PlansAddEditPopup mode="edit" /> },
-                            { path: ":id/delete", element: <PlansDeletePopup /> },
-                            ...globalPopups,
+                            {
+                                path: ROUTES.SUPER_ADMIN.root,
+                                element: <Navigate to={ROLE_HOME[RoleType.SUPERADMIN]} replace />,
+                            },
+                            {
+                                path: ROUTES.SUPER_ADMIN.plans,
+                                element: <SuperAdmin_Plans />,
+                                children: [
+                                    { path: "add", element: <PlansAddEditPopup mode="add" /> },
+                                    { path: ":id/edit", element: <PlansAddEditPopup mode="edit" /> },
+                                    { path: ":id/delete", element: <PlansDeletePopup /> },
+                                    ...globalPopups,
+                                ],
+                            },
+                            {
+                                path: ROUTES.SUPER_ADMIN.businesses,
+                                element: <SuperAdmin_Businesses />,
+                                children: [...globalPopups],
+                            },
+                            {
+                                path: ROUTES.SUPER_ADMIN.subscriptions,
+                                element: <SuperAdmin_Subscriptions />,
+                                children: [
+                                    { path: "add", element: <SubscriptionFormPopup mode="add" /> },
+                                    { path: ":id/edit", element: <SubscriptionFormPopup mode="edit" /> },
+                                    { path: ":id/delete", element: <DeleteSubscriptionPopup /> },
+                                    ...globalPopups,
+                                ],
+                            },
+                            {
+                                path: ROUTES.SUPER_ADMIN.subscriberAccounts,
+                                element: <SuperAdmin_SubscriberAccounts />,
+                                children: [...globalPopups],
+                            },
                         ],
-                    },
-                    {
-                        path: ROUTES.SUPER_ADMIN.businesses,
-                        element: <SuperAdmin_Businesses />,
-                        children: [...globalPopups],
-                    },
-                    {
-                        path: ROUTES.SUPER_ADMIN.subscriptions,
-                        element: <SuperAdmin_Subscriptions />,
-                        children: [
-                            { path: "add", element: <SubscriptionFormPopup mode="add" /> },
-                            { path: ":id/edit", element: <SubscriptionFormPopup mode="edit" /> },
-                            { path: ":id/delete", element: <DeleteSubscriptionPopup /> },
-                            ...globalPopups,
-                        ],
-                    },
-                    {
-                        path: ROUTES.SUPER_ADMIN.subscriberAccounts,
-                        element: <SuperAdmin_SubscriberAccounts />,
-                        children: [...globalPopups],
                     },
                 ],
             },

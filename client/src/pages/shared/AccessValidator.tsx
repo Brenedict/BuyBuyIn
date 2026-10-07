@@ -1,13 +1,13 @@
 // General Imports
 import { useSyncExternalStore } from "react";
-import { Link, Outlet, useRouteLoaderData } from "react-router";
+import { Navigate, Outlet, useRouteLoaderData } from "react-router";
 
 // API Services
 import { type primaryAuthLoader } from "../../api/authService";
 import InMemoryStore from "../../api/inMemoryStore";
 import { ROUTES } from "../../routes/Routes";
 
-export async function AccessValidator() {
+export function AccessValidator() {
     const data = useRouteLoaderData<typeof primaryAuthLoader>("protected");
     const accessToken = useSyncExternalStore(InMemoryStore.subscribe, InMemoryStore.getAccessToken);
 
@@ -15,7 +15,7 @@ export async function AccessValidator() {
     if (!data?.isAuthenticated || !accessToken) {
         InMemoryStore.setAccessToken(null);
         InMemoryStore.setUserContext(null);
-        return <Link to={ROUTES.AUTH} />;
+        return <Navigate to={ROUTES.AUTH} replace />;
     }
 
     return <Outlet />;

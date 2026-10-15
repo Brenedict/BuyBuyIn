@@ -3,6 +3,7 @@ import type { RoleType } from "@buybuyin/shared/prisma/enums";
 
 export const ROUTES = {
     AUTH: "/auth",
+    FORBIDDEN: "/forbidden",
 
     // ALL CASHIER ROUTES: Define all actions here for popup URL's
     CASHIER: (() => {
@@ -73,3 +74,8 @@ export const ROLE_HOME: Record<RoleType, string> = {
     HQADMIN: ROUTES.HQ_ADMIN.dashboard,
     SUPERADMIN: ROUTES.SUPER_ADMIN.plans,
 };
+
+// Where a user gets sent when they open a page their role cannot access.
+// The blocked path is carried along so the forbidden page can name it.
+export const forbiddenPath = (from?: string): string =>
+    from ? `${ROUTES.FORBIDDEN}?from=${encodeURIComponent(from)}` : ROUTES.FORBIDDEN;

@@ -1,7 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import  SelectInput  from "../../components/inputs/SelectInput";
+import type { ComponentProps } from "react";
+import SelectInput from "../../components/inputs/SelectInput";
 import { Card } from "../../components/Card";
 import "../../index.css";
+
+const DEFAULT_OPTIONS: Record<string, string> = {
+    option1: "option1",
+    option2: "option2",
+    option3: "option3",
+    option4: "option4",
+    option5: "option5",
+};
 
 const selectInputMeta = {
     title: "All-Components/Input-Components/Select",
@@ -14,6 +23,8 @@ const selectInputMeta = {
         id: "roles",
         name: "roles",
         label: "",
+        defaultValue: "option2",
+        options: DEFAULT_OPTIONS,
         disabled: false,
         hidden: false,
     },
@@ -22,35 +33,20 @@ const selectInputMeta = {
 export default selectInputMeta;
 type Story = StoryObj<typeof selectInputMeta>;
 
-// Reusable render function for the compound components
-const renderSelect = (args: any) => (
-    <SelectInput {...args}>
-        <SelectInput.Option value="option1">option1</SelectInput.Option>
-        <SelectInput.Option value="option2">option2</SelectInput.Option>
-        <SelectInput.Option value="option3">option3</SelectInput.Option>
-        <SelectInput.Option value="option4">option4</SelectInput.Option>
-        <SelectInput.Option value="option5">option5</SelectInput.Option>
-    </SelectInput>
-);
+const renderSelect = (args: ComponentProps<typeof SelectInput>) => <SelectInput {...args} />;
 
 export const DefaultVariant: Story = {
-    // @ts-ignore
-    args: {
-        defaultValue: "option2",
-    },
     render: renderSelect,
     parameters: {
         docs: {
             source: {
                 // This explicitly sets the code block in the Storybook Docs tab
                 code: `
-<SelectInput name="roles" defaultValue="option2">
-    <SelectInput.Option value="option1">option1</SelectInput.Option>
-    <SelectInput.Option value="option2">option2</SelectInput.Option>
-    <SelectInput.Option value="option3">option3</SelectInput.Option>
-    <SelectInput.Option value="option4">option4</SelectInput.Option>
-    <SelectInput.Option value="option5">option5</SelectInput.Option>
-</SelectInput>
+<SelectInput
+    name="roles"
+    defaultValue="option2"
+    options={{ option1: "option1", option2: "option2", option3: "option3", option4: "option4", option5: "option5" }}
+/>
                 `.trim(),
             },
         },
@@ -58,10 +54,8 @@ export const DefaultVariant: Story = {
 };
 
 export const ButtonVariant: Story = {
-    // @ts-ignore
     args: {
         variant: "button",
-        defaultValue: "option2",
     },
     render: renderSelect,
     parameters: {
@@ -69,13 +63,12 @@ export const ButtonVariant: Story = {
             source: {
                 // Explicitly sets the syntax box for the button variant
                 code: `
-<SelectInput variant="button" name="roles" defaultValue="option2">
-    <SelectInput.Option value="option1">option1</SelectInput.Option>
-    <SelectInput.Option value="option2">option2</SelectInput.Option>
-    <SelectInput.Option value="option3">option3</SelectInput.Option>
-    <SelectInput.Option value="option4">option4</SelectInput.Option>
-    <SelectInput.Option value="option5">option5</SelectInput.Option>
-</SelectInput>
+<SelectInput
+    variant="button"
+    name="roles"
+    defaultValue="option2"
+    options={{ option1: "option1", option2: "option2", option3: "option3", option4: "option4", option5: "option5" }}
+/>
                 `.trim(),
             },
         },
@@ -83,25 +76,22 @@ export const ButtonVariant: Story = {
 };
 
 export const Comparison: Story = {
-    // @ts-ignore
-    args: {
-        defaultValue: "option2",
-    },
     render: (args) => (
         <div className="min-w-[500px]">
             <Card isGlass={false}>
                 <Card.Body className="flex flex-col gap-4">
                     {/* Standard Variant */}
-                    <SelectInput {...args}>
-                        <SelectInput.Option value="option1">Standard 1</SelectInput.Option>
-                        <SelectInput.Option value="option2">Standard 2</SelectInput.Option>
-                    </SelectInput>
+                    <SelectInput
+                        {...args}
+                        options={{ "Standard 1": "option1", "Standard 2": "option2" }}
+                    />
 
                     {/* Button Variant */}
-                    <SelectInput {...args} variant="button">
-                        <SelectInput.Option value="option1">Button 1</SelectInput.Option>
-                        <SelectInput.Option value="option2">Button 2</SelectInput.Option>
-                    </SelectInput>
+                    <SelectInput
+                        {...args}
+                        variant="button"
+                        options={{ "Button 1": "option1", "Button 2": "option2" }}
+                    />
                 </Card.Body>
             </Card>
         </div>

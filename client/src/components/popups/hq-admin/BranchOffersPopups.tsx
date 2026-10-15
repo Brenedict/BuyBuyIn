@@ -1,26 +1,21 @@
-import useNavigatePage from "../../../hooks/useNavigatePage";
-import { ROUTES } from "../../../routes/Routes";
+// Components
 import { PopUp } from "../../PopUp";
 import { Button } from "../../Button";
 import GeneralInput from "../../inputs/GeneralInput";
 import TextAreaInput from "../../inputs/TextAreaInput";
-import { useParams } from "react-router";
 
-export function SaveConfirmationPopup({ isFromEditPage = false }: { isFromEditPage?: boolean }) {
-    // Extracts the Branch Wide Offer Id from the URL Param
-    const { id } = useParams();
+// Hooks
+import useNavigatePage from "../../../hooks/useNavigatePage";
 
+export function SaveConfirmationPopup() {
     // Used for redirecting
     const useNavigate = useNavigatePage();
 
-    // Two instances of the pages use the popup (add and edit). They have different root pages.
-    const popupRootPage = isFromEditPage && id ? ROUTES.HQ_ADMIN.branchOffersEdit(id) : ROUTES.HQ_ADMIN.branchOffers;
-
     // When triggered, returns the page to the root (exiting the popup)
-    const handleClose = () => useNavigate(popupRootPage, true);
+    const handleClose = () => useNavigate();
 
     return (
-        <PopUp title="Save New Offer" onClose={handleClose}>
+        <PopUp title="Save New Offer">
             <section className="flex flex-col gap-4">
                 <GeneralInput
                     name="offerTitle"

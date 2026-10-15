@@ -2,9 +2,12 @@
     "compilerOptions": {
         "composite": true,
         "declaration": true,
-        "declarationMap": true
+        "declarationMap": true,
+        "outDir": "./dist",
+        "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+        "allowImportingTsExtensions": true,
+        "emitDeclarationOnly": true
     },
-    "include": [
-        "**/*.ts"
-    ]
+    "include": ["**/*.ts"],
+    "exclude": ["dist", "node_modules"]
 }

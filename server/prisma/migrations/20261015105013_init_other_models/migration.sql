@@ -9,9 +9,6 @@
 CREATE TYPE "PackageType" AS ENUM ('BASIC', 'PRO', 'ENTERPRISE');
 
 -- CreateEnum
-CREATE TYPE "RoleType" AS ENUM ('SUPERADMIN', 'HQADMIN', 'BRANCHMANAGER', 'CASHIER');
-
--- CreateEnum
 CREATE TYPE "PaymentMethodType" AS ENUM ('CASH', 'ECASH', 'CARD');
 
 -- CreateEnum
@@ -30,7 +27,6 @@ CREATE TYPE "DiscountType" AS ENUM ('PERCENTAGE', 'FIXEDVALUE');
 ALTER TABLE "User" DROP COLUMN "updatedAt",
 ADD COLUMN     "resetToken" TEXT,
 ADD COLUMN     "resetTokenExpiresAt" TIMESTAMP(3),
-ADD COLUMN     "role" "RoleType" NOT NULL DEFAULT 'CASHIER',
 ADD COLUMN     "upDateTimedAt" TIMESTAMPTZ(0) NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 -- CreateTable

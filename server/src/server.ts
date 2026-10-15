@@ -7,6 +7,7 @@ import env from "./config/env.config";
 
 // Routes
 import authRoutes from "./routes/auth.route";
+import userRoutes from "./routes/user.routes";
 
 // Middlewares
 import handleShutdown from "./middlewares/shutdown.middleware";
@@ -59,6 +60,7 @@ app.use(cookieParser());
 // --------------------- SERVER ROUTES --------------------------------
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/user", userRoutes);
 
 app.use(errorMiddleware.notFoundError);
 app.use(errorMiddleware.internalError);

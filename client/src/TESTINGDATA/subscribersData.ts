@@ -1,0 +1,23 @@
+export const SAMPLE_SUBSCRIBERS_DATA = [
+    {
+        id: 1,
+        lastName: "Santos",
+        firstName: "Maria",
+        username: "mariasantos03",
+        businessName: "Santos Fashion Boutique",
+    },
+    { id: 2, lastName: "Reyes", firstName: "John", username: "johnreyes_", businessName: "Reyes Hardware Supply" },
+    { id: 3, lastName: "Cruz", firstName: "Angela", username: "angelacruz42", businessName: "GlowUp Beauty Studio" },
+    { id: 4, lastName: "Navarro", firstName: "Bianca", username: "biancanav", businessName: "Luxe Beauty Essentials" },
+    { id: 5, lastName: "Villanueva", firstName: "Carlo", username: "carlovill4", businessName: "CV Office Supplies" },
+    { id: 6, lastName: "Mendoza", firstName: "Daniel", username: "danmendoza", businessName: "HomeCraft Furniture" },
+    { id: 7, lastName: "Lim", firstName: "Adrian", username: "adrianlim_08", businessName: "Urban Living Home Décor" },
+    { id: 8, lastName: "Navarro", firstName: "Bianca", username: "biancanav", businessName: "Luxe Beauty Essentials" },
+    { id: 9, lastName: "Villanueva", firstName: "Carlo", username: "carlovill4", businessName: "CV Office Supplies" },
+    { id: 10, lastName: "Mendoza", firstName: "Daniel", username: "danmendoza", businessName: "HomeCraft Furniture" },
+    { id: 11, lastName: "Lim", firstName: "Adrian", username: "adrianlim_08", businessName: "Urban Living Home Décor" },
+    { id: 12, lastName: "Navarro", firstName: "Bianca", username: "biancanav", businessName: "Luxe Beauty Essentials" },
+    { id: 13, lastName: "Villanueva", firstName: "Carlo", username: "carlovill4", businessName: "CV Office Supplies" },
+    { id: 14, lastName: "Mendoza", firstName: "Daniel", username: "danmendoza", businessName: "HomeCraft Furniture" },
+    { id: 15, lastName: "Lim", firstName: "Adrian", username: "adrianlim_08", businessName: "Urban Living Home Décor" },
+];

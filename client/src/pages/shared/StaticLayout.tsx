@@ -1,13 +1,25 @@
 // General Imports
-import { Outlet, Link } from "react-router";
+import { Outlet } from "react-router";
 import "../../index.css";
 
+// Temporary
 import testBg from "../../assets/testbg.png";
-import { NavBar } from "../../components/NavBar";
 
 // Components
+import { NavBar } from "../../components/NavBar";
+
+// Context
+import { useGlobalContext } from "./AccessValidator";
 
 function StaticLayout() {
+    const { user } = useGlobalContext();
+    const role = user?.role;
+
+    // The auth layer already redirects anonymous visitors, so this is just a
+    // safety net. Rendering nothing beats defaulting the role and handing an
+    // unknown value to NavBar, which indexes NavItems by it.
+    if (!role) return null;
+
     return (
         /**
          * NOTE FROM BINAS:
@@ -18,11 +30,11 @@ function StaticLayout() {
          * */
 
         <main
-            className="w-screen h-screen overflow-hidden flex antialiased bg-cover bg-center"
+            className="w-screen h-screen overflow-hidden flex antialiased bg-cover bg-center flex flex-col min-w-[1024px]"
             style={{ backgroundImage: `url(${testBg})` }}
         >
             {/* Insert Nav */}
-            <NavBar role="hqadmin"></NavBar>
+            <NavBar role={role}></NavBar>
 
             <section className="p-8 grow overflow-y-auto overscroll-y-auto">
                 <Outlet />

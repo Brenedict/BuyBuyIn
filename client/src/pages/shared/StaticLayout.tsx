@@ -8,20 +8,17 @@ import testBg from "../../assets/testbg.png";
 // Components
 import { NavBar } from "../../components/NavBar";
 
-// BuyBuyIn Shared Imports
-import type { RoleType } from "@buybuyin/shared/prisma/enums";
-
 // Context
 import { useGlobalContext } from "./AccessValidator";
 
-// Hooks
-import useNavigatePage from "../../hooks/useNavigatePage";
-
 function StaticLayout() {
-    // Temporary: Currently not using InMemoryStore
     const { user } = useGlobalContext();
+    const role = user?.role;
 
-    let role: RoleType = user?.role ?? "CASHIER";
+    // The auth layer already redirects anonymous visitors, so this is just a
+    // safety net. Rendering nothing beats defaulting the role and handing an
+    // unknown value to NavBar, which indexes NavItems by it.
+    if (!role) return null;
 
     return (
         /**

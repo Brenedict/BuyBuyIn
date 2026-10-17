@@ -20,6 +20,12 @@ import BranchManager_Inventory from "../pages/branch-manager/BranchManager.Inven
 import BranchManager_ManageUsers from "../pages/branch-manager/BranchManager.ManageUsers";
 import BranchManager_Transactions from "../pages/branch-manager/BranchManager.Transactions";
 
+import {
+    InventoryItemViewPopup,
+    InventoryItemRestockPopup,
+    InventoryItemDeletePopup,
+} from "../components/popups/branch-manager/InventoryPopups";
+
 // Cashier Pages
 import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
 import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
@@ -95,7 +101,21 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.BRANCH_MANAGER.inventory,
                                 element: <BranchManager_Inventory />,
-                                children: [...globalPopups],
+                                children: [
+                                    {
+                                        path: "item/:id/view",
+                                        element: <InventoryItemViewPopup />,
+                                    },
+                                    {
+                                        path: "item/:id/restock",
+                                        element: <InventoryItemRestockPopup />,
+                                    },
+                                    {
+                                        path: "item/:id/delete",
+                                        element: <InventoryItemDeletePopup />,
+                                    },
+                                    ...globalPopups,
+                                ],
                             },
                             {
                                 path: ROUTES.BRANCH_MANAGER.manageUsers,

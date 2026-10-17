@@ -6,7 +6,7 @@ import { Outlet } from "react-router";
 import { PageHeader } from "../../components/PageHeader";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
-import { SearchInput, SelectInput } from "../../components/Input"; 
+import { SearchInput, SelectInput } from "../../components/Input";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
@@ -20,6 +20,7 @@ import PointOfSaleOutlinedIcon from "@mui/icons-material/PointOfSaleOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 // Utility formatting
 export function NumberFormat(value: number, symbol?: string) {
@@ -234,6 +235,7 @@ function TransactionListSection({ transactions }: TransactionListProps) {
                                         size="small"
                                         className="rounded-3xl! px-4!"
                                         onClick={() => handleView(txn.id)}
+                                        leftIcon={VisibilityOutlinedIcon}
                                     >
                                         View
                                     </Button>

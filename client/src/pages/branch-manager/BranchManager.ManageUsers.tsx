@@ -1,5 +1,6 @@
 // General Imports
 import { useState } from "react";
+import { Outlet } from "react-router";
 
 // Components
 import { PageHeader } from "../../components/PageHeader";
@@ -8,6 +9,7 @@ import { Text } from "../../components/Text";
 import { SearchInput, SelectInput } from "../../components/Input";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
+import Icon from "../../components/Icon";
 
 // Mock Data
 import { SAMPLE_USERS } from "../../TESTINGDATA/manageUsersData";
@@ -18,8 +20,9 @@ import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 import PauseCircleOutlinedIcon from "@mui/icons-material/PauseCircleOutlined";
 import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Icon from "../../components/Icon";
-import { Outlet } from "react-router";
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 
 // SUB COMPONENTS
 interface StatCardsProps {
@@ -203,13 +206,28 @@ function EmployeeListSection({ users }: EmployeeListProps) {
                             <Table.Data text={user.status} />
                             <Table.Data>
                                 <div className="flex justify-center gap-2">
-                                    <Button variant="secondary" size="small" className="rounded-3xl! px-4!">
+                                    <Button
+                                        variant="secondary"
+                                        size="small"
+                                        leftIcon={VisibilityOutlinedIcon}
+                                        className="rounded-3xl! px-4!"
+                                    >
                                         View
                                     </Button>
-                                    <Button variant="secondary" size="small" className="rounded-3xl! px-4!">
+                                    <Button
+                                        variant="secondary"
+                                        size="small"
+                                        leftIcon={DriveFileRenameOutlineOutlinedIcon}
+                                        className="rounded-3xl! px-4!"
+                                    >
                                         Edit
                                     </Button>
-                                    <Button variant="main" size="small" className="rounded-3xl! px-4!">
+                                    <Button
+                                        variant="main"
+                                        size="small"
+                                        leftIcon={DeleteForeverOutlinedIcon}
+                                        className="rounded-3xl! px-4!"
+                                    >
                                         Delete
                                     </Button>
                                 </div>

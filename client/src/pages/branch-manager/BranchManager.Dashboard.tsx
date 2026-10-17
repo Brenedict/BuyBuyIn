@@ -19,7 +19,7 @@ import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import { formatShortDate } from "../../utils/dateUtils";
 
 // Material UI Icons
-import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { Outlet } from "react-router";
 
 export function NumberFormat(value: number, symbol?: string) {
@@ -127,9 +127,9 @@ export function BranchManager_Dashboard() {
                                             id={index}
                                             actions={[
                                                 {
-                                                    text: "Edit",
+                                                    text: "View",
                                                     variant: "secondary",
-                                                    leftIcon: DriveFileRenameOutlineOutlinedIcon,
+                                                    leftIcon: VisibilityOutlinedIcon,
                                                     handleClick: handleView,
                                                 },
                                             ]}

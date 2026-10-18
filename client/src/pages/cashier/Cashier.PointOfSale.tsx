@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
-import { Calculator } from "../../components/Calculator";
+import { Calculator, type CalculatorDiscount } from "../../components/Calculator";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
@@ -18,6 +18,14 @@ import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/i
 export function Cashier_PointOfSale() {
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+    const [confirmedDiscount, setConfirmedDiscount] = useState<CalculatorDiscount | null>(null);
+    type Transaction = { id: string; name: string; quantity: number; price: number };
+    const [transactionData, setTransactionData] = useState<Transaction[]>([
+        { id: "TOM-001", name: "Tomato", quantity: 2, price: 10.0 },
+        { id: "KAM-001", name: "Kamatis", quantity: 3, price: 10.0 },
+        { id: "KAL-001", name: "Kalamansi", quantity: 2, price: 5.0 },
+        { id: "KMT-001", name: "Kalamatis", quantity: 6, price: 15.0 },
+    ]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -36,17 +44,27 @@ export function Cashier_PointOfSale() {
     const amount: number = 90.0;
     const transNum: number = 939391;
 
-    const discAmt: number = 125.0;
+    const discountAmount = confirmedDiscount ? (amount * confirmedDiscount.percentage) / 100 : 0;
+    const amountDue = amount - discountAmount;
     const afterVatAmt: number = 145.09;
     const itemCnt: number = 8;
 
-    type transaction = [number, string, number];
-    const transactionData: transaction[] = [
-        [2, "Tomato", 10.0],
-        [3, "Kamatis", 10.0],
-        [2, "Kalamansi", 5.0],
-        [6, "Kalamatis", 15.0],
-    ];
+    const updateItemQuantity = (itemIdentifier: string, quantity: number) => {
+        const matchingItem = transactionData.find(
+            (item) =>
+                item.id.toLowerCase() === itemIdentifier.toLowerCase() ||
+                item.name.toLowerCase() === itemIdentifier.toLowerCase()
+        );
+
+        if (!matchingItem) {
+            return false;
+        }
+
+        setTransactionData((items) =>
+            items.map((item) => (item.id === matchingItem.id ? { ...item, quantity } : item))
+        );
+        return true;
+    };
 
     const buttonSize = "min-w-[125px] flex-1";
     const spacing = "p-2 gap-3 m-2";
@@ -101,14 +119,14 @@ export function Cashier_PointOfSale() {
                                         TOTAL AMOUNT DUE
                                     </Text>
                                     <Text variant="crimson" weight="extraBold" size="large">
-                                        P{amount}
+                                        P{amountDue.toFixed(2)}
                                     </Text>
                                     <div className="flex flex-row items-center justify-between">
                                         <Text variant="crimson" weight="medium" size="normal">
                                             Transaction #: {transNum}
                                         </Text>
                                         <Text variant="crimson" weight="medium" size="small">
-                                            Discount : {discAmt}
+                                            Discount : P{discountAmount.toFixed(2)}
                                         </Text>
                                         <Text variant="crimson" weight="medium" size="small">
                                             {" "}
@@ -118,6 +136,12 @@ export function Cashier_PointOfSale() {
                                             Items: {itemCnt}
                                         </Text>
                                     </div>
+                                    {confirmedDiscount && (
+                                        <Text variant="crimson" weight="medium" size="small">
+                                            Discount entry: {confirmedDiscount.type} (20%) - {confirmedDiscount.name},
+                                            ID {confirmedDiscount.idNumber}
+                                        </Text>
+                                    )}
                                 </Card.Body>
                             </Card>
 
@@ -131,17 +155,19 @@ export function Cashier_PointOfSale() {
                                         <Table.Header textVariant="cream" text="Amount" />
                                     </Table.Row>
                                     {transactionData.map((transaction) => (
-                                        <Table.Row key={transaction[1]}>
+                                        <Table.Row key={transaction.id}>
                                             <Table.Data>
                                                 <div className="flex flex-row justify-center gap-[10%] items-center">
                                                     <Button size="smallest" leftIcon={Add}></Button>
-                                                    {transaction[0]}
+                                                    {transaction.quantity}
                                                     <Button size="smallest" variant="grey" leftIcon={Remove}></Button>
                                                 </div>
                                             </Table.Data>
-                                            <Table.Data text={String(transaction[1])}></Table.Data>
-                                            <Table.Data text={String(transaction[2])}></Table.Data>
-                                            <Table.Data text={String(transaction[0] * transaction[2])}></Table.Data>
+                                            <Table.Data text={transaction.name}></Table.Data>
+                                            <Table.Data text={String(transaction.price)}></Table.Data>
+                                            <Table.Data
+                                                text={String(transaction.quantity * transaction.price)}
+                                            ></Table.Data>
                                         </Table.Row>
                                     ))}
                                 </Table>
@@ -202,11 +228,15 @@ export function Cashier_PointOfSale() {
                         </div>
                         {/* Calculator toggle */}
                         {isCalculatorToggled ? (
-                            <Calculator handleToggle={setIsCalculatorToggled} />
+                            <Calculator
+                                handleToggle={setIsCalculatorToggled}
+                                onConfirmDiscount={setConfirmedDiscount}
+                                onConfirmQuantity={updateItemQuantity}
+                            />
                         ) : (
                             <Button
-                                className="absolute group -right-14.5 bottom-1/2"
-                                variant="grey"
+                                className="absolute group -right-14.5 bottom-1/2 z-50"
+                                variant="secondary"
                                 size="medium"
                                 leftIcon={ArrowLeftRounded}
                                 onClick={() => setIsCalculatorToggled((e) => !e)}

@@ -1,12 +1,13 @@
 // General Imports
 import { Outlet } from "react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 
 // Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import { Calculator } from "../../components/Calculator";
+import GeneralInput from "../../components/inputs/GeneralInput";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
@@ -18,6 +19,19 @@ import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/i
 export function Cashier_PointOfSale() {
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"Cash" | "E-Cash" | "Card">("Cash");
+    const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+    const [newItemName, setNewItemName] = useState("");
+    const [newItemQuantity, setNewItemQuantity] = useState("1");
+    const [newItemPrice, setNewItemPrice] = useState("");
+    const [addItemError, setAddItemError] = useState("");
+    type Transaction = { id: string; quantity: number; name: string; price: number };
+    const [transactionData, setTransactionData] = useState<Transaction[]>([
+        { id: "tomato", quantity: 2, name: "Tomato", price: 10.0 },
+        { id: "kamatis", quantity: 3, name: "Kamatis", price: 10.0 },
+        { id: "kalamansi", quantity: 2, name: "Kalamansi", price: 5.0 },
+        { id: "kalamatis", quantity: 6, name: "Kalamatis", price: 15.0 },
+    ]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -33,20 +47,44 @@ export function Cashier_PointOfSale() {
 
     const terminalNumber: number = 1;
     const cashierNum: number = 1;
-    const amount: number = 90.0;
+    const amount = transactionData.reduce((total, item) => total + item.quantity * item.price, 0);
     const transNum: number = 939391;
 
     const discAmt: number = 125.0;
     const afterVatAmt: number = 145.09;
-    const itemCnt: number = 8;
+    const itemCnt = transactionData.reduce((total, item) => total + item.quantity, 0);
 
-    type transaction = [number, string, number];
-    const transactionData: transaction[] = [
-        [2, "Tomato", 10.0],
-        [3, "Kamatis", 10.0],
-        [2, "Kalamansi", 5.0],
-        [6, "Kalamatis", 15.0],
-    ];
+    const addItemToTransaction = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const quantity = Number(newItemQuantity);
+        const price = Number(newItemPrice);
+
+        if (
+            !newItemName.trim() ||
+            !Number.isInteger(quantity) ||
+            quantity < 1 ||
+            !Number.isFinite(price) ||
+            price < 0
+        ) {
+            setAddItemError("Enter an item name, whole-number quantity, and valid unit price.");
+            return;
+        }
+
+        setTransactionData((items) => [
+            ...items,
+            {
+                id: `${newItemName.trim().toLowerCase()}-${Date.now()}`,
+                name: newItemName.trim(),
+                quantity,
+                price,
+            },
+        ]);
+        setNewItemName("");
+        setNewItemQuantity("1");
+        setNewItemPrice("");
+        setAddItemError("");
+        setIsAddItemOpen(false);
+    };
 
     const buttonSize = "min-w-[125px] flex-1";
     const spacing = "p-2 gap-3 m-2";
@@ -101,7 +139,7 @@ export function Cashier_PointOfSale() {
                                         TOTAL AMOUNT DUE
                                     </Text>
                                     <Text variant="crimson" weight="extraBold" size="large">
-                                        P{amount}
+                                        P{amount.toFixed(2)}
                                     </Text>
                                     <div className="flex flex-row items-center justify-between">
                                         <Text variant="crimson" weight="medium" size="normal">
@@ -131,20 +169,87 @@ export function Cashier_PointOfSale() {
                                         <Table.Header textVariant="cream" text="Amount" />
                                     </Table.Row>
                                     {transactionData.map((transaction) => (
-                                        <Table.Row key={transaction[1]}>
+                                        <Table.Row key={transaction.id}>
                                             <Table.Data>
                                                 <div className="flex flex-row justify-center gap-[10%] items-center">
                                                     <Button size="smallest" leftIcon={Add}></Button>
-                                                    {transaction[0]}
+                                                    {transaction.quantity}
                                                     <Button size="smallest" variant="grey" leftIcon={Remove}></Button>
                                                 </div>
                                             </Table.Data>
-                                            <Table.Data text={String(transaction[1])}></Table.Data>
-                                            <Table.Data text={String(transaction[2])}></Table.Data>
-                                            <Table.Data text={String(transaction[0] * transaction[2])}></Table.Data>
+                                            <Table.Data text={transaction.name}></Table.Data>
+                                            <Table.Data text={transaction.price.toFixed(2)}></Table.Data>
+                                            <Table.Data
+                                                text={(transaction.quantity * transaction.price).toFixed(2)}
+                                            ></Table.Data>
                                         </Table.Row>
                                     ))}
                                 </Table>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    className="self-start"
+                                    variant="transparent"
+                                    size="small"
+                                    leftIcon={Add}
+                                    aria-expanded={isAddItemOpen}
+                                    onClick={() => {
+                                        setIsAddItemOpen((open) => !open);
+                                        setAddItemError("");
+                                    }}
+                                >
+                                    Add item
+                                </Button>
+                                {isAddItemOpen && (
+                                    <form
+                                        className="flex flex-wrap items-end gap-2 rounded-md border border-crimson/30 bg-off-white p-3"
+                                        onSubmit={addItemToTransaction}
+                                    >
+                                        <div className="min-w-40 flex-1">
+                                            <GeneralInput
+                                                id="pos-new-item-name"
+                                                name="itemName"
+                                                type="text"
+                                                label="Item name"
+                                                placeholder="Enter item name"
+                                                value={newItemName}
+                                                onChange={(event) => setNewItemName(event.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="w-24">
+                                            <GeneralInput
+                                                id="pos-new-item-quantity"
+                                                name="itemQuantity"
+                                                type="number"
+                                                label="Quantity"
+                                                min="1"
+                                                step="1"
+                                                value={newItemQuantity}
+                                                onChange={(event) => setNewItemQuantity(event.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="w-32">
+                                            <GeneralInput
+                                                id="pos-new-item-price"
+                                                name="itemPrice"
+                                                type="number"
+                                                label="Unit price"
+                                                min="0"
+                                                step="0.01"
+                                                value={newItemPrice}
+                                                onChange={(event) => setNewItemPrice(event.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <Button type="submit" size="normal" leftIcon={Add}>
+                                            Add to transaction
+                                        </Button>
+                                        {addItemError && <p className="w-full text-sm text-crimson">{addItemError}</p>}
+                                    </form>
+                                )}
                             </div>
 
                             {/* Actions panel */}
@@ -159,16 +264,26 @@ export function Cashier_PointOfSale() {
                                             <div className="bg-brown h-[2px] w-full flex-1"></div>
                                         </div>
 
-                                        <div className="flex flex-row gap-3 items-center  w-full">
-                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
-                                                Cash
-                                            </Button>
-                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
-                                                E-Cash
-                                            </Button>
-                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
-                                                Card
-                                            </Button>
+                                        <div
+                                            className="flex flex-row gap-3 items-center w-full"
+                                            role="group"
+                                            aria-label="Payment method"
+                                        >
+                                            {(["Cash", "E-Cash", "Card"] as const).map((method) => {
+                                                const isSelected = selectedPaymentMethod === method;
+                                                return (
+                                                    <Button
+                                                        key={method}
+                                                        className={`${buttonSize} ${isSelected ? "bg-crimson! text-cream! ring-2 ring-crimson ring-offset-2" : ""}`}
+                                                        variant={isSelected ? "main" : "transparent"}
+                                                        size="medium"
+                                                        aria-pressed={isSelected}
+                                                        onClick={() => setSelectedPaymentMethod(method)}
+                                                    >
+                                                        {method}
+                                                    </Button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center justify-center w-[45%] gap-2 ">

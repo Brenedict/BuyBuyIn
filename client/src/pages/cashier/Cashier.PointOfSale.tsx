@@ -59,7 +59,7 @@ export function Cashier_PointOfSale() {
                     <SearchInput className="flex-1" />
                     <div className="flex flex-row">
                         <Icon icon={AccountCircleIcon} size="large" variant="cream" />
-                        <Text size="bigger" variant="cream" weight="extraBold">
+                        <Text size="big" variant="cream" weight="extraBold">
                             Cashier {cashierNum}
                         </Text>
                     </div>
@@ -94,9 +94,9 @@ export function Cashier_PointOfSale() {
                     </div>
                     {/* Amount Due Display */}
                     <div className={`flex flex-row w-full h-full px-0! ${spacing}`}>
-                        <div className={`flex flex-col flex-1 gap-2 h-full`}>
-                            <Card isGlass={false} dropShadow className="flex-1 h-fit! bg-off-white">
-                                <Card.Body>
+                        <div className={`flex flex-col gap-2 h-full w-full`}>
+                            <Card isGlass={false} dropShadow className="flex flex-col flex-1 bg-off-white">
+                                <Card.Body className="flex flex-col justify-between h-full py-[1.5rem]!">
                                     <Text variant="crimson" weight="bold" size="big">
                                         TOTAL AMOUNT DUE
                                     </Text>
@@ -122,7 +122,7 @@ export function Cashier_PointOfSale() {
                             </Card>
 
                             {/* transactions table */}
-                            <div className="h-2/5 min-h-0 max-h-[44vh] justify-center items-center overflow-auto flex-2">
+                            <div className="h-2/5 min-h-0 justify-center items-center overflow-auto flex-1">
                                 <Table rounded shadow pagination={{ maxItems: 10 }}>
                                     <Table.Row borderedBottom>
                                         <Table.Header textVariant="cream" text="Quantity" />
@@ -148,7 +148,7 @@ export function Cashier_PointOfSale() {
                             </div>
 
                             {/* Actions panel */}
-                            <Card className="flex flex-col flex-1 justify-center items-center px-10">
+                            <Card className="flex flex-col flex-1 h-fit! justify-center items-center px-10">
                                 <Card.Body className="flex flex-row justify-between w-full">
                                     <div className="flex flex-col items-center justify-center w-[45%] gap-2">
                                         <div className="flex flex-row w-full items-center justify-center gap-2">

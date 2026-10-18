@@ -85,7 +85,7 @@ model User {
     role RoleType @default(CASHIER)
 
     createdAt DateTime @default(now()) @db.Timestamptz(0)
-    upDateTimedAt DateTime @default(now()) @db.Timestamptz(0)
+    updatedAt DateTime @default(now()) @db.Timestamptz(0)
     fullName  String?  @default(dbgenerated()) @db.VarChar(256)
 
     resetToken String? @unique

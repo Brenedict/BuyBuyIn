@@ -1,6 +1,8 @@
 import prisma from "../src/config/prisma.config";
 import HashUtil from "../src/utils/hash.util";
 
+const SEEDED_USERNAMES = ["SUPERADMIN", "HQADMIN", "BRANCHMANAGER", "CASHIER"];
+
 async function main() {
     // Create a new user
     const user = await prisma.user.createMany({

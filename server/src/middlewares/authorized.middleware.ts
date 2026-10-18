@@ -10,6 +10,10 @@ export function requireAccessLevel(minAccessLevel: RoleType, accessType: AccessT
     return (req: Request, res: Response, next: NextFunction) => {
         const requestor = req.user as User | undefined;
 
+        console.log(
+            `Requestor: ${requestor?.fullName}, Role: ${requestor?.role}, Required Access Level: ${minAccessLevel}, Access Type: ${accessType}`
+        );
+
         if (!requestor) {
             return res.status(404).json({ message: "User not found" });
         }

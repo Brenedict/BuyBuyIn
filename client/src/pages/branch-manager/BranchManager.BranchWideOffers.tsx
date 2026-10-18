@@ -14,6 +14,7 @@ import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlin
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 // --- Mock Data ---
 const STAT_CARDS = [
@@ -36,26 +37,30 @@ export function BranchManager_BranchWideOffers() {
     return (
         <Card>
             <Card.Body className="py-6 px-10 flex flex-col gap-8 overflow-scroll">
-                
                 {/* --- HEADER SECTION --- */}
                 <div className="flex flex-row justify-between items-center border-b-1 border-maroon pb-6">
-                    <Text weight="extraBold" size="large" variant="crimson" className="uppercase drop-shadow-sm text-4xl">
+                    <Text
+                        weight="extraBold"
+                        size="large"
+                        variant="crimson"
+                        className="uppercase drop-shadow-sm text-4xl"
+                    >
                         BRANCH-WIDE OFFERS
                     </Text>
-                    
+
                     <div className="flex flex-row gap-6 items-center">
-                        <SearchInput 
+                        <SearchInput
                             id="searchBranch"
                             name="searchBranch"
                             label=""
-                            placeholder="Search Branch" 
+                            placeholder="Search Branch"
                             disabled={false}
                             hidden={false}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-64"
                         />
-                        
+
                         <Card isGlass={false} dropShadow={true} className="px-6 py-4 rounded-2xl bg-[#FEFCED]">
                             <Text weight="bold" size="normal" variant="black">
                                 Branch Details
@@ -79,11 +84,7 @@ export function BranchManager_BranchWideOffers() {
                                     {stat.label}
                                 </Text>
                                 <div className="flex flex-row items-center gap-4 mt-2">
-                                    <Icon 
-                                        icon={stat.icon} 
-                                        size="bigger" 
-                                        variant={stat.iconColor as any} 
-                                    />
+                                    <Icon icon={stat.icon} size="bigger" variant={stat.iconColor as any} />
                                     <Text size="bigger" weight="extraBold" variant="crimson" className="text-5xl">
                                         {stat.value}
                                     </Text>
@@ -100,33 +101,41 @@ export function BranchManager_BranchWideOffers() {
                             OFFERS
                         </Text>
                     </Card.Header>
-                    
+
                     <Card.Body className="px-8 pb-4">
                         <div className="border border-gray-400 rounded-3xl p-6">
                             <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
                                 {OFFERS.map((offer, idx) => (
                                     <Card key={idx} dropShadow={true} className="bg-[#FEFCED] rounded-2xl h-full">
                                         <Card.Body className="flex flex-col justify-between h-full min-h-[160px] gap-4">
-                                            
-                                            <Text weight="extraBold" size="big" variant="crimson" className="leading-tight">
+                                            <Text
+                                                weight="extraBold"
+                                                size="big"
+                                                variant="crimson"
+                                                className="leading-tight"
+                                            >
                                                 {offer.title}
                                             </Text>
-                                            
+
                                             <div className="flex flex-row justify-between items-center mt-auto pt-2">
                                                 <Text weight="bold" size="description" variant="maroon">
                                                     {offer.date}
                                                 </Text>
-                                                
+
                                                 <div className="flex flex-row items-center gap-3">
                                                     <button className="text-gray-500 hover:text-crimson transition-colors">
                                                         <DeleteOutlineOutlinedIcon fontSize="small" />
                                                     </button>
-                                                    <Button size="small" variant="main" className="rounded-full px-6">
+                                                    <Button
+                                                        size="small"
+                                                        variant="main"
+                                                        leftIcon={VisibilityOutlinedIcon}
+                                                        className="rounded-full px-6"
+                                                    >
                                                         View
                                                     </Button>
                                                 </div>
                                             </div>
-                                            
                                         </Card.Body>
                                     </Card>
                                 ))}
@@ -135,14 +144,23 @@ export function BranchManager_BranchWideOffers() {
                     </Card.Body>
 
                     <Card.Footer bordered={false} className="flex justify-end gap-2 px-8 pb-8">
-                        <Button variant="secondary" size="small" className="rounded-full!">Previous</Button>
-                        <Button variant="main" size="small" className="rounded-full! px-4!">1</Button>
-                        <Button variant="secondary" size="small" className="rounded-full! px-4!">2</Button>
-                        <Button variant="secondary" size="small" className="rounded-full! px-4!">3</Button>
-                        <Button variant="main" size="small" className="rounded-full! px-6!">Next</Button>
+                        <Button variant="secondary" size="small" className="rounded-full!">
+                            Previous
+                        </Button>
+                        <Button variant="main" size="small" className="rounded-full! px-4!">
+                            1
+                        </Button>
+                        <Button variant="secondary" size="small" className="rounded-full! px-4!">
+                            2
+                        </Button>
+                        <Button variant="secondary" size="small" className="rounded-full! px-4!">
+                            3
+                        </Button>
+                        <Button variant="main" size="small" className="rounded-full! px-6!">
+                            Next
+                        </Button>
                     </Card.Footer>
                 </Card>
-
             </Card.Body>
 
             <Outlet />

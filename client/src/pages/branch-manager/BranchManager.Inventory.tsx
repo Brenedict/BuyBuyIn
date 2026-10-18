@@ -4,9 +4,16 @@ import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 import SearchInput from "../../components/inputs/SearchInput";
-import { ActionButtons, EditDeleteButtons, PrimarySecondaryText } from "../../components/partials/TablePartials";
+import {
+    ActionButtons,
+    EditDeleteButtons,
+    MoreActionsMenu,
+    PrimarySecondaryText,
+} from "../../components/partials/TablePartials";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
+import { ROUTES } from "../../routes/Routes";
 import type { MaterialIcon } from "../../types/common";
 import {
     INVENTORY_SUMMARY,
@@ -23,7 +30,9 @@ import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import RemoveShoppingCartOutlinedIcon from "@mui/icons-material/RemoveShoppingCartOutlined";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
-import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 function formatStockLevel(item: InventoryItem) {
     if (item.stockLevel <= item.reorderThreshold) return `${item.stockLevel} (Low Stock)`;
@@ -66,11 +75,11 @@ function InventoryStatCard({ icon, title, value, subtitle }: StatCardProps) {
 }
 
 function ItemRowActions({ id }: { id: string }) {
+    // Used for redirecting
+    const navigate = useNavigatePage();
+
     const handleEdit = (itemId: string | number) => () => {
         alert(`Edit item: ${itemId}`);
-    };
-    const handleMore = (itemId: string | number) => () => {
-        alert(`More actions: ${itemId}`);
     };
 
     return (
@@ -87,12 +96,31 @@ function ItemRowActions({ id }: { id: string }) {
                 ]}
                 size="smallest"
             />
-            <Button
-                variant="secondary"
-                size="smallest"
-                leftIcon={MoreHorizOutlinedIcon}
-                onClick={handleMore(id)}
-                className="border-0! shadow!"
+            <MoreActionsMenu
+                id={id}
+                label={`More actions for ${id}`}
+                actions={[
+                    {
+                        text: "View Details",
+                        leftIcon: VisibilityOutlinedIcon,
+                        handleClick: (itemId) => () =>
+                            navigate(ROUTES.BRANCH_MANAGER.inventoryItemView(String(itemId)), true),
+                    },
+                    {
+                        text: "Restock Item",
+                        leftIcon: AddShoppingCartOutlinedIcon,
+                        handleClick: (itemId) => () =>
+                            navigate(ROUTES.BRANCH_MANAGER.inventoryItemRestock(String(itemId)), true),
+                    },
+                    {
+                        text: "Delete Item",
+                        leftIcon: DeleteForeverOutlinedIcon,
+                        textVariant: "crimson",
+                        iconVariant: "crimson",
+                        handleClick: (itemId) => () =>
+                            navigate(ROUTES.BRANCH_MANAGER.inventoryItemDelete(String(itemId)), true),
+                    },
+                ]}
             />
         </div>
     );

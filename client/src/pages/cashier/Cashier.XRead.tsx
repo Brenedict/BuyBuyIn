@@ -33,7 +33,7 @@ function Date_Section() {
                             </Text>
                             <GeneralInput type="date"></GeneralInput>
                         </div>
-                        <Button variant="grey" size="medium" className="self-end">
+                        <Button variant="secondary" size="medium" className="self-end">
                             VIEW
                         </Button>
                     </div>
@@ -60,7 +60,7 @@ function Date_Section() {
                                 defaultValue={paymentMethods.option1}
                             ></SelectInput>
                         </div>
-                        <Button variant="secondary" size="medium" className="self-end">
+                        <Button size="medium" className="self-end">
                             Print
                         </Button>
                     </div>

@@ -20,6 +20,12 @@ import BranchManager_Inventory from "../pages/branch-manager/BranchManager.Inven
 import BranchManager_ManageUsers from "../pages/branch-manager/BranchManager.ManageUsers";
 import BranchManager_Transactions from "../pages/branch-manager/BranchManager.Transactions";
 
+import {
+    InventoryItemViewPopup,
+    InventoryItemRestockPopup,
+    InventoryItemDeletePopup,
+} from "../components/popups/branch-manager/InventoryPopups";
+
 // Cashier Pages
 import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
 import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
@@ -34,13 +40,19 @@ import HQ_ManageUsers from "../pages/hq-admin/HQ.ManageUsers";
 import HQ_Subscriptions from "../pages/hq-admin/HQ.Subscriptions";
 
 import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
-import { DeleteSubscriptionPopup, SubscriptionFormPopup } from "../components/popups/super-admin/SubscriptionsPopups";
+import {
+    BranchFormPopup,
+    DeleteBranchPopup,
+    BranchManagerFormPopup,
+} from "../components/popups/hq-admin/ManageUserPopups";
 
-// Super Admin Pages
+// Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
 import SuperAdmin_Businesses from "../pages/super-admin/SuperAdmin.Businesses";
 import SuperAdmin_Subscriptions from "../pages/super-admin/SuperAdmin.Subscriptions";
 import SuperAdmin_SubscriberAccounts from "../pages/super-admin/SuperAdmin.SubscriberAccounts";
+
+import { DeleteSubscriptionPopup, SubscriptionFormPopup } from "../components/popups/super-admin/SubscriptionsPopups";
 
 // Predefined Routes
 import { ROLE_HOME, ROUTES } from "./Routes";
@@ -89,7 +101,21 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.BRANCH_MANAGER.inventory,
                                 element: <BranchManager_Inventory />,
-                                children: [...globalPopups],
+                                children: [
+                                    {
+                                        path: "item/:id/view",
+                                        element: <InventoryItemViewPopup />,
+                                    },
+                                    {
+                                        path: "item/:id/restock",
+                                        element: <InventoryItemRestockPopup />,
+                                    },
+                                    {
+                                        path: "item/:id/delete",
+                                        element: <InventoryItemDeletePopup />,
+                                    },
+                                    ...globalPopups,
+                                ],
                             },
                             {
                                 path: ROUTES.BRANCH_MANAGER.manageUsers,
@@ -151,7 +177,15 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.manageUsers,
                                 element: <HQ_ManageUsers />,
-                                children: [...globalPopups],
+                                children: [
+                                    ...globalPopups,
+                                    { path: "branch/add", element: <BranchFormPopup mode="add" /> },
+                                    { path: "branch/edit/:id", element: <BranchFormPopup mode="edit" /> },
+                                    { path: "branch/delete/:id", element: <DeleteBranchPopup /> },
+                                    { path: "manager/add", element: <BranchManagerFormPopup mode="add" /> },
+                                    { path: "manager/edit/:id", element: <BranchManagerFormPopup mode="edit" /> },
+                                    { path: "manager/view/:id", element: <BranchManagerFormPopup mode="view" /> },
+                                ],
                             },
                             {
                                 path: ROUTES.HQ_ADMIN.subscriptions,

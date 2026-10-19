@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { randomInt } from "node:crypto";
 
 const LOWERCASE_CHARS = "abcdefghijklmnopqrstuvwxyz";
@@ -41,5 +42,14 @@ export default {
         console.log("Generated password: ", randomPassword);
 
         return await this.hashPassword(randomPassword);
+    },
+
+    generatePlainToken(): string {
+        return crypto.randomBytes(32).toString("hex");
+    },
+
+    generateRandomHashedToken(): string {
+        const plainToken = this.generatePlainToken();
+        return crypto.createHash("sha256").update(plainToken).digest("hex");
     },
 };

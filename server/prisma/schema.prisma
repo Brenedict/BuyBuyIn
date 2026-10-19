@@ -64,6 +64,13 @@ enum DiscountType {
   FIXEDVALUE 
 }
 
+enum AccountStatusType {
+  UNVERIFIED
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
 model User {
     id Int @id @default(autoincrement())
 
@@ -87,6 +94,8 @@ model User {
     createdAt DateTime @default(now()) @db.Timestamptz(0)
     updatedAt DateTime @default(now()) @db.Timestamptz(0)
     fullName  String?  @default(dbgenerated()) @db.VarChar(256)
+
+    accountStatus AccountStatusType @default(UNVERIFIED)
 
     resetToken String? @unique
     resetTokenExpiresAt DateTime?

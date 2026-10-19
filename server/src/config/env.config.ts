@@ -7,4 +7,5 @@ export default {
     JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || "access",
     JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || "15m",
+    PAYMONGO_SECRET_KEY: process.env.PAYMONGO_SECRET_KEY,
 };

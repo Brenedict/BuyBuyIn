@@ -1,7 +1,7 @@
 export type PaymentMethod = "cash" | "ecash" | "card";
 
 export interface PaymentRequest {
-    orderId: string;
+    paymentId: string;
     amountCents: number;
 }
 

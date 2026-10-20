@@ -4,22 +4,32 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-    provider               = "prisma-client"
-    output                 = "../../shared/prisma"
-    previewFeatures        = ["typedSql"]
-    generatedFileExtension = "ts"
-    importFileExtension    = "ts"
-    moduleFormat           = "esm"
+  provider               = "prisma-client"
+  output                 = "../../shared/prisma"
+  previewFeatures        = ["typedSql"]
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+  moduleFormat           = "esm"
 }
 
 generator zod {
-    provider         = "prisma-zod-generator"
-    output           = "../../shared/zod"
-    prismaClientPath = "../../shared/prisma"
+  provider         = "prisma-zod-generator"
+  output           = "../../shared/zod"
+  prismaClientPath = "../../shared/prisma"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
+}
+
+/**
+ * For Payment
+ */
+enum PaymentStatusType {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
 }
 
 enum PackageType {
@@ -47,7 +57,6 @@ enum TransactionStatusType {
   REFUNDED
 }
 
-
 enum OfferStatusType {
   ENABLED
   DISABLED
@@ -61,149 +70,150 @@ enum OfferType {
 
 enum DiscountType {
   PERCENTAGE
-  FIXEDVALUE 
+  FIXEDVALUE
 }
 
 model User {
-    id Int @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-    /// @zod.string()
-    username String @unique @db.VarChar(256)
+  /// @zod.string()
+  username String @unique @db.VarChar(256)
 
-    /// @zod.string()
-    password String @db.VarChar(256)
+  /// @zod.string()
+  password String @db.VarChar(256)
 
-    /// @zod.string.min(1, { message: "Email cannot be empty" }).max(256)
-    email String @unique @db.VarChar(256)
+  /// @zod.string.min(1, { message: "Email cannot be empty" }).max(256)
+  email String @unique @db.VarChar(256)
 
-    /// @zod.string.min(1, { message: "First Name cannot be empty" }).max(256)
-    firstName String @db.VarChar(256)
+  /// @zod.string.min(1, { message: "First Name cannot be empty" }).max(256)
+  firstName String @db.VarChar(256)
 
-    /// @zod.string.min(1, { message: "Last Name cannot be empty" }).max(256)
-    lastName String @db.VarChar(256)
+  /// @zod.string.min(1, { message: "Last Name cannot be empty" }).max(256)
+  lastName String @db.VarChar(256)
 
-    role RoleType @default(CASHIER)
+  role RoleType @default(CASHIER)
 
-    createdAt DateTime @default(now()) @db.Timestamptz(0)
-    upDateTimedAt DateTime @default(now()) @db.Timestamptz(0)
-    fullName  String?  @default(dbgenerated()) @db.VarChar(256)
+  createdAt     DateTime @default(now()) @db.Timestamptz(0)
+  upDateTimedAt DateTime @default(now()) @db.Timestamptz(0)
+  fullName      String?  @default(dbgenerated()) @db.VarChar(256)
 
-    resetToken String? @unique
-    resetTokenExpiresAt DateTime?
+  resetToken          String?   @unique
+  resetTokenExpiresAt DateTime?
 
-    @@index([fullName])
-    @@index([createdAt(sort: Desc)])
+  @@index([fullName])
+  @@index([createdAt(sort: Desc)])
 }
 
 model Subscription {
-  id Int @id @default(autoincrement())
-  packageType PackageType 
-  packageName String 
-  numberBranches Int 
-  baseCost Float 
-  baseAccountLimit Int 
-  duration Int 
+  id               Int         @id @default(autoincrement())
+  packageType      PackageType
+  packageName      String
+  numberBranches   Int
+  baseCost         Float
+  baseAccountLimit Int
+  duration         Int
 }
 
 model BusinessSubscription {
-  id Int @id @default(autoincrement())
-  subscriptionID String 
-  businessID String 
-  dateApplied DateTime 
-  additionalBranches Int 
-  totalCost Float 
-  totalAccountLimit Int 
+  id                 Int      @id @default(autoincrement())
+  subscriptionID     String
+  businessID         String
+  dateApplied        DateTime
+  additionalBranches Int
+  totalCost          Float
+  totalAccountLimit  Int
 }
 
 model Business {
-  id Int @id @default(autoincrement())
-  name String 
-  location String 
+  id       Int    @id @default(autoincrement())
+  name     String
+  location String
 }
 
 model Branch {
-  id Int @id @default(autoincrement())
-  businessID String 
-  location String 
-  accountLimit Int 
+  id           Int    @id @default(autoincrement())
+  businessID   String
+  location     String
+  accountLimit Int
 }
 
-
 model BranchInventoryItem {
-  id Int @id @default(autoincrement())
-  productID String 
-  branchID String 
-  quantity Int 
-  reorderThreshold Int 
+  id               Int    @id @default(autoincrement())
+  productID        String
+  branchID         String
+  quantity         Int
+  reorderThreshold Int
 }
 
 model Transaction {
-  id Int @id @default(autoincrement())
-  branchID String 
-  userID String 
-  totalPrice Float 
-  dateofTransaction DateTime 
-  paymentMethod PaymentMethodType 
-  status TransactionStatusType 
-  discount Float 
+  id                Int                   @id @default(autoincrement())
+  branchID          String
+  userID            String
+  totalPrice        Float
+  dateofTransaction DateTime
+  paymentMethod     PaymentMethodType
+  status            TransactionStatusType
+  discount          Float
+  paymentStatus     PaymentStatusType     @default(PENDING)
+  checkoutSessionId String?
 }
 
 model Product {
-  id Int @id @default(autoincrement())
-  supplierID String 
-  productName String 
-  basePrice Float 
-  shelfPrice Float 
+  id          Int    @id @default(autoincrement())
+  supplierID  String
+  productName String
+  basePrice   Float
+  shelfPrice  Float
 }
 
 model TransactionItem {
-  id Int @id @default(autoincrement())
-  transactionId String 
+  id                Int     @id @default(autoincrement())
+  transactionId     String
   branchWideOfferId Int?
-  productId Int?
-  quantity Int 
-  currentPrice Float 
-  isBundle Boolean 
+  productId         Int?
+  quantity          Int
+  currentPrice      Float
+  isBundle          Boolean
 }
 
 model Supplier {
-  id Int @id @default(autoincrement())
-  supplierName String 
-  contactInfo String 
+  id           Int    @id @default(autoincrement())
+  supplierName String
+  contactInfo  String
 }
 
 model ProductCategory {
-  id Int @id @default(autoincrement())
+  id        Int  @id @default(autoincrement())
   productId Int?
 }
 
 model Category {
-  id Int @id @default(autoincrement())
-  categoryName String 
+  id           Int    @id @default(autoincrement())
+  categoryName String
 }
 
 model BranchWideOfferProduct {
-  id Int @id @default(autoincrement())
-  productId String 
-  unitDiscountValue Float 
-  requiredQuantity Int 
-  discountType DiscountType
+  id                Int          @id @default(autoincrement())
+  productId         String
+  unitDiscountValue Float
+  requiredQuantity  Int
+  discountType      DiscountType
 }
 
 model BranchWideOffer {
-  id Int @id @default(autoincrement())
-  offerName String 
-  description String 
-  startDate DateTime 
-  endDate DateTime
-  isExclusive Boolean 
-  offerStatus OfferStatusType 
-  offerType OfferType 
-  discountType DiscountType 
-  overallDiscountValue Float 
+  id                   Int             @id @default(autoincrement())
+  offerName            String
+  description          String
+  startDate            DateTime
+  endDate              DateTime
+  isExclusive          Boolean
+  offerStatus          OfferStatusType
+  offerType            OfferType
+  discountType         DiscountType
+  overallDiscountValue Float
 }
 
 model BranchWideOfferBranches {
-  id Int @id @default(autoincrement())
-  branchId String 
+  id       Int    @id @default(autoincrement())
+  branchId String
 }

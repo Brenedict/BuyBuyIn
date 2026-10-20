@@ -35,7 +35,7 @@ import Cashier_XRead from "../pages/cashier/Cashier.XRead";
 // HQ Admin Pages and Popups
 import HQ_BranchWideOffers from "../pages/hq-admin/HQ.BranchWideOffers";
 import HQ_Dashboard from "../pages/hq-admin/HQ.Dashboard";
-import HQ_Inventory from "../pages/hq-admin/HQ.Inventory";
+import HQ_Catalogue from "../pages/hq-admin/HQ.Catalogue";
 import HQ_ManageUsers from "../pages/hq-admin/HQ.ManageUsers";
 import HQ_Subscriptions from "../pages/hq-admin/HQ.Subscriptions";
 
@@ -173,7 +173,11 @@ export const protectedRoutes: RouteObject[] = [
                                 element: <Navigate to={ROLE_HOME[RoleType.HQADMIN]} replace />,
                             },
                             { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard />, children: [...globalPopups] },
-                            { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory />, children: [...globalPopups] },
+                            {
+                                path: ROUTES.HQ_ADMIN.catalogue,
+                                element: <HQ_Catalogue />,
+                                children: [...globalPopups],
+                            },
                             {
                                 path: ROUTES.HQ_ADMIN.manageUsers,
                                 element: <HQ_ManageUsers />,

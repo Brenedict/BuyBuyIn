@@ -40,7 +40,11 @@ export const ROUTES = {
         return {
             root: `${base}/`,
             dashboard: `${base}/dashboard`,
-            inventory: `${base}/inventory`,
+            catalogue: `${base}/catalogue`,
+            catalogueProductAdd: `${base}/catalogue/product/add`,
+            catalogueProductEdit: (id?: string) => `${base}/catalogue/product/${id}/edit`,
+            catalogueProductView: (id?: string) => `${base}/catalogue/product/${id}/view`,
+            catalogueProductDelete: (id?: string) => `${base}/catalogue/product/${id}/delete`,
             manageUsers: `${base}/manage-users`,
             subscriptions: `${base}/subscriptions`,
             branchOffers: `${base}/branch-offers`,

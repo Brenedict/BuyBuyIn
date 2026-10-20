@@ -50,7 +50,13 @@ app.use(
 );
 
 // Automatically parses body string to a json
-app.use(express.json());
+app.use(
+    express.json({
+        verify: (req, _res, buffer) => {
+            (req as typeof req & { rawBody?: Buffer }).rawBody = Buffer.from(buffer);
+        },
+    })
+);
 
 // Middleware logger
 app.use(morgan("combined"));

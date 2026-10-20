@@ -23,45 +23,44 @@ datasource db {
 }
 
 enum PackageType {
-  BASIC
-  PRO
-  ENTERPRISE
+    BASIC
+    PRO
+    ENTERPRISE
 }
 
 enum RoleType {
-  SUPERADMIN
-  HQADMIN
-  BRANCHMANAGER
-  CASHIER
+    SUPERADMIN
+    HQADMIN
+    BRANCHMANAGER
+    CASHIER
 }
 
 enum PaymentMethodType {
-  CASH
-  ECASH
-  CARD
+    CASH
+    ECASH
+    CARD
 }
 
 enum TransactionStatusType {
-  VOID
-  COMPLETE
-  REFUNDED
+    VOID
+    COMPLETE
+    REFUNDED
 }
 
-
 enum OfferStatusType {
-  ENABLED
-  DISABLED
-  DRAFT
+    ENABLED
+    DISABLED
+    DRAFT
 }
 
 enum OfferType {
-  OVERALL
-  INDIVIDUAL
+    OVERALL
+    INDIVIDUAL
 }
 
 enum DiscountType {
-  PERCENTAGE
-  FIXEDVALUE 
+    PERCENTAGE
+    FIXEDVALUE
 }
 
 model User {
@@ -84,126 +83,213 @@ model User {
 
     role RoleType @default(CASHIER)
 
-    createdAt DateTime @default(now()) @db.Timestamptz(0)
+    createdAt     DateTime @default(now()) @db.Timestamptz(0)
     upDateTimedAt DateTime @default(now()) @db.Timestamptz(0)
-    fullName  String?  @default(dbgenerated()) @db.VarChar(256)
+    fullName      String?  @default(dbgenerated()) @db.VarChar(256)
 
-    resetToken String? @unique
+    resetToken          String?   @unique
     resetTokenExpiresAt DateTime?
+
+    //One-to-many connections
+    business   Business? @relation(fields: [businessId], references: [id])
+    businessId Int?
+    branch     Branch?   @relation(fields: [branchId], references: [id])
+    branchId   Int?
+
+    // Many-to-one connections
+    transactions Transaction[]
 
     @@index([fullName])
     @@index([createdAt(sort: Desc)])
 }
 
 model Subscription {
-  id Int @id @default(autoincrement())
-  packageType PackageType 
-  packageName String 
-  numberBranches Int 
-  baseCost Float 
-  baseAccountLimit Int 
-  duration Int 
+    id               Int         @id @default(autoincrement())
+    packageType      PackageType
+    packageName      String
+    numberBranches   Int
+    baseCost         Float
+    baseAccountLimit Int
+    duration         Int
+
+    // One-to-many connections
+    businessSubscriptions BusinessSubscription[]
 }
 
 model BusinessSubscription {
-  id Int @id @default(autoincrement())
-  subscriptionID String 
-  businessID String 
-  dateApplied DateTime 
-  additionalBranches Int 
-  totalCost Float 
-  totalAccountLimit Int 
+    id                 Int      @id @default(autoincrement())
+    dateApplied        DateTime
+    additionalBranches Int
+    totalCost          Float
+    totalAccountLimit  Int
+
+    // Many-to-one connections
+    subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+    subscriptionId Int?
+    business       Business?     @relation(fields: [businessId], references: [id])
+    businessId     Int?
 }
 
 model Business {
-  id Int @id @default(autoincrement())
-  name String 
-  location String 
+    id       Int    @id @default(autoincrement())
+    name     String @db.VarChar(256)
+    location String @db.VarChar(256)
+
+    // One-to-many connections
+    businessSubscriptions BusinessSubscription[]
+    branches              Branch[]
+    users                 User[]
 }
 
 model Branch {
-  id Int @id @default(autoincrement())
-  businessID String 
-  location String 
-  accountLimit Int 
+    id           Int    @id @default(autoincrement())
+    location     String
+    accountLimit Int
+
+    // Many-to-one connections
+    business   Business? @relation(fields: [businessId], references: [id])
+    businessId Int?
+
+    // One-to-many connections
+    branchInventoryItems    BranchInventoryItem[]
+    transactions            Transaction[]
+    users                   User[]
+    branchWideOfferBranches BranchWideOfferBranches[]
 }
 
-
 model BranchInventoryItem {
-  id Int @id @default(autoincrement())
-  productID String 
-  branchID String 
-  quantity Int 
-  reorderThreshold Int 
+    id               Int @id @default(autoincrement())
+    quantity         Int
+    reorderThreshold Int
+
+    // Many-to-one connections
+    branch    Branch?  @relation(fields: [branchId], references: [id])
+    branchId  Int?
+    product   Product? @relation(fields: [productId], references: [id])
+    productId Int?
 }
 
 model Transaction {
-  id Int @id @default(autoincrement())
-  branchID String 
-  userID String 
-  totalPrice Float 
-  dateofTransaction DateTime 
-  paymentMethod PaymentMethodType 
-  status TransactionStatusType 
-  discount Float 
+    id                Int                   @id @default(autoincrement())
+    totalPrice        Float
+    dateofTransaction DateTime
+    paymentMethod     PaymentMethodType
+    status            TransactionStatusType
+    discount          Float
+
+    // Many-to-one connections
+    branch   Branch? @relation(fields: [branchId], references: [id])
+    branchId Int?
+    user     User?   @relation(fields: [userId], references: [id])
+    userId   Int?
+
+    // One-to-many connections
+    transactionItems TransactionItem[]
 }
 
 model Product {
-  id Int @id @default(autoincrement())
-  supplierID String 
-  productName String 
-  basePrice Float 
-  shelfPrice Float 
+    id          Int    @id @default(autoincrement())
+    productName String
+    basePrice   Float
+    shelfPrice  Float
+
+    // Many-to-one connections
+    supplier   Supplier? @relation(fields: [supplierId], references: [id])
+    supplierId Int?
+
+    // One-to-many connections
+    branchInventoryItems    BranchInventoryItem[]
+    productCategories       ProductCategory[]
+    branchWideOfferProducts BranchWideOfferProduct[]
+    transactionItems        TransactionItem[]
 }
 
 model TransactionItem {
-  id Int @id @default(autoincrement())
-  transactionId String 
-  branchWideOfferId Int?
-  productId Int?
-  quantity Int 
-  currentPrice Float 
-  isBundle Boolean 
+    id           Int     @id @default(autoincrement())
+    quantity     Int
+    currentPrice Float
+    isBundle     Boolean
+
+    // Many-to-one connections
+    transaction       Transaction?    @relation(fields: [transactionId], references: [id])
+    transactionId     Int?
+    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id])
+    branchWideOfferId Int
+    product           Product         @relation(fields: [productId], references: [id])
+    productId         Int
 }
 
 model Supplier {
-  id Int @id @default(autoincrement())
-  supplierName String 
-  contactInfo String 
+    id            Int    @id @default(autoincrement())
+    supplierName  String
+    contactPerson String
+    email         String @db.VarChar(256)
+    contactNumber String @db.VarChar(11)
+    address       String
+
+    // Many-to-one connections
+    products Product[]
 }
 
 model ProductCategory {
-  id Int @id @default(autoincrement())
-  productId Int?
+    // Many-to-one connections
+    category   Category @relation(fields: [categoryId], references: [id])
+    categoryId Int
+    product    Product  @relation(fields: [productId], references: [id])
+    productId  Int
+
+    // Junction table (composite key)
+    @@id([categoryId, productId])
 }
 
 model Category {
-  id Int @id @default(autoincrement())
-  categoryName String 
+    id           Int    @id @default(autoincrement())
+    categoryName String
+
+    // One-to-many connectoins
+    productCategories ProductCategory[]
 }
 
 model BranchWideOfferProduct {
-  id Int @id @default(autoincrement())
-  productId String 
-  unitDiscountValue Float 
-  requiredQuantity Int 
-  discountType DiscountType
+    unitDiscountValue Float
+    requiredQuantity  Int
+    discountType      DiscountType
+
+    // Many-to-one connections
+    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id])
+    branchWideOfferId Int
+    product           Product         @relation(fields: [productId], references: [id])
+    productId         Int
+
+    // Junction table (composite key)
+    @@id([branchWideOfferId, productId])
 }
 
 model BranchWideOffer {
-  id Int @id @default(autoincrement())
-  offerName String 
-  description String 
-  startDate DateTime 
-  endDate DateTime
-  isExclusive Boolean 
-  offerStatus OfferStatusType 
-  offerType OfferType 
-  discountType DiscountType 
-  overallDiscountValue Float 
+    id                   Int             @id @default(autoincrement())
+    offerName            String
+    description          String
+    startDate            DateTime
+    endDate              DateTime
+    isExclusive          Boolean
+    offerStatus          OfferStatusType
+    offerType            OfferType
+    discountType         DiscountType
+    overallDiscountValue Float
+
+    // One-to-many connections
+    branchWideOfferBranches BranchWideOfferBranches[]
+    transactionItems        TransactionItem[]
+    branchWideOfferProducts BranchWideOfferProduct[]
 }
 
 model BranchWideOfferBranches {
-  id Int @id @default(autoincrement())
-  branchId String 
+    // Many-to-one connections
+    branch            Branch          @relation(fields: [branchId], references: [id])
+    branchId          Int
+    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id])
+    branchWideOfferId Int
+
+    // Junction table (composite key)
+    @@id([branchId, branchWideOfferId])
 }

@@ -16,13 +16,13 @@ const meta = {
         },
     },
     tags: ["autodocs"],
-    args: {},
+    args: { handleToggle: () => undefined },
 } satisfies Meta<typeof Calculator>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const ButtonUse: Story = {
-    args: {},
+    args: { handleToggle: () => undefined },
     render: (args) => <Calculator {...args}></Calculator>,
 };

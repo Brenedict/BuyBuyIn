@@ -1,8 +1,29 @@
-import { useState, type ReactElement, type ReactNode } from "react";
-import { Text } from "./Text";
-import { Button } from "./Button";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { VisibilityOffOutlined } from "@mui/icons-material";
+import { useState, type ReactNode } from "react";
+import { PopUp } from "./PopUp";
+import GeneralInput from "./inputs/GeneralInput";
+import SelectInput from "./inputs/SelectInput";
+
+type CalculatorDisplayMode = "discount" | "quantity";
+type KeyboardField = "display" | "discountName" | "discountId" | "itemIdentifier" | "quantity";
+
+const keyboardRows = [
+    ["`~", "1!", "2@", "3#", "4$", "5%", "6^", "7&", "8*", "9(", "0)", "-_", "=+"],
+    ["qQ", "wW", "eE", "rR", "tT", "yY", "uU", "iI", "oO", "pP", "[{", "]}", "\\|"],
+    ["aA", "sS", "dD", "fF", "gG", "hH", "jJ", "kK", "lL", ";:", "'\""],
+    ["zZ", "xX", "cC", "vV", "bB", "nN", "mM", ",<", ".>", "/?"],
+] as const;
+
+export type CalculatorDiscount = {
+    type: "Senior Citizen" | "PWD";
+    idNumber: string;
+    name: string;
+    percentage: 20;
+};
+
+const CalculatorDisplayModeLabels: Record<CalculatorDisplayMode, string> = {
+    discount: "Discount",
+    quantity: "Quantity",
+};
 
 const CalculatorBtnColorClasses = {
     cream: "border-crimson bg-cream text-brown card-glass-effect hover:bg-crimson hover:text-cream",
@@ -23,7 +44,7 @@ function CalculatorBtn({
     variant: CalculatorBtnColorClassesVariant;
 }) {
     const variantclass =
-        "cursor-pointer rounded-[5px] w-full h-full border border-1 font-bold xl:py-3 xl:px-2 3xl:text-medium-big text-normal" +
+        "cursor-pointer rounded-[5px] min-h-10 sm:min-h-11 w-full border border-1 font-bold px-1.5 sm:px-2 py-1.5 text-sm sm:text-base" +
         " " +
         className +
         " " +
@@ -36,19 +57,73 @@ function CalculatorBtn({
     );
 }
 
-//TODO: add display functionality
+export function Calculator({
+    handleToggle,
+    onConfirmDiscount,
+    onConfirmQuantity,
+}: {
+    handleToggle: React.Dispatch<React.SetStateAction<boolean>>;
+    onConfirmDiscount?: (discount: CalculatorDiscount) => void;
+    onConfirmQuantity?: (itemIdentifier: string, quantity: number) => boolean;
+}) {
+    const [displayCurrent, setDisplayCurrent] = useState<string>("0");
+    const [displayMode, setDisplayMode] = useState<CalculatorDisplayMode | null>(null);
+    const [discountType, setDiscountType] = useState<CalculatorDiscount["type"]>("Senior Citizen");
+    const [discountId, setDiscountId] = useState("");
+    const [discountName, setDiscountName] = useState("");
+    const [itemIdentifier, setItemIdentifier] = useState("");
+    const [quantity, setQuantity] = useState("1");
+    const [confirmationMessage, setConfirmationMessage] = useState("");
+    const [priceMode, setPriceMode] = useState<"Wholesale" | "Retail">("Wholesale");
+    const [keyboardField, setKeyboardField] = useState<KeyboardField>("display");
+    const [shifted, setShifted] = useState(false);
+    const [capsLock, setCapsLock] = useState(false);
 
-export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<React.SetStateAction<boolean>> }) {
-    const calcClass =
-        "flex flex-col justify-center items-center h-fit p-5 card-glass-effect min-w-[400px] max-w-[500px] bg-cream/50 rounded-[10px] border border-1 border-crimson card-drop-shadow";
+    const openMode = (mode: CalculatorDisplayMode) => {
+        setDisplayMode(mode);
+        setKeyboardField(mode === "discount" ? "discountName" : "itemIdentifier");
+        setConfirmationMessage("");
+    };
 
-    const [displayCurrent, setDisplayCurrent] = useState<string>("");
-    const [displayHistory, setDisplayHistory] = useState<string>("");
+    const handleConfirm = () => {
+        if (displayMode === "discount") {
+            if (!discountId.trim() || !discountName.trim()) {
+                setConfirmationMessage("Enter the customer's name and ID number.");
+                return;
+            }
+
+            onConfirmDiscount?.({
+                type: discountType,
+                idNumber: discountId.trim(),
+                name: discountName.trim(),
+                percentage: 20,
+            });
+            setConfirmationMessage(`${discountType} discount confirmed (20%).`);
+            return;
+        }
+
+        if (displayMode === "quantity") {
+            const parsedQuantity = Number(quantity);
+            if (!itemIdentifier.trim() || !Number.isInteger(parsedQuantity) || parsedQuantity < 1) {
+                setConfirmationMessage("Enter an item and a whole-number quantity greater than zero.");
+                return;
+            }
+
+            const itemWasFound = onConfirmQuantity?.(itemIdentifier.trim(), parsedQuantity) ?? true;
+            setConfirmationMessage(
+                itemWasFound ? `Quantity updated to ${parsedQuantity}.` : `No item matched "${itemIdentifier.trim()}".`
+            );
+        }
+    };
 
     const handleNumber = (value: string) => {
         setDisplayCurrent((current) => {
             if (current === "0") {
-                return value;
+                return value === "." ? "0." : value === "00" ? "0" : value;
+            }
+
+            if (value === "." && current.includes(".")) {
+                return current;
             }
 
             return current + value;
@@ -65,138 +140,313 @@ export function Calculator({ handleToggle }: { handleToggle: React.Dispatch<Reac
         });
     };
 
-    return (
-        <div className={calcClass}>
-            <section className="flex flex-col gap-3 w-full justify-center items-center">
-                <input
-                    className="order border-1 border-crimson rounded-[5px] min-h-[120px] cursor-text text-slate-medium bg-off-white w-full!"
-                    type="text"
-                    name="display"
-                    value={displayCurrent}
-                />
+    const appendToActiveField = (character: string) => {
+        if (keyboardField === "display") {
+            if (/^\d$/.test(character) || character === ".") {
+                handleNumber(character);
+            } else {
+                setDisplayCurrent((current) => (current === "0" ? character : current + character));
+            }
+            return;
+        }
 
-                <div className="grid grid-cols-4 gap-3 w-full">
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("7")}>
-                        7
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("8")}>
-                        8
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("9")}>
-                        9
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="red" handleClick={() => setDisplayCurrent("0")}>
-                        C
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("4")}>
-                        4
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("5")}>
-                        5
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("6")}>
-                        6
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="slate" handleClick={handleDelete}>
-                        DEL
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("1")}>
-                        1
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("2")}>
-                        2
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("3")}>
-                        3
-                    </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="slate"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        DISC
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("0")}>
-                        0
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => handleNumber("00")}>
-                        00
-                    </CalculatorBtn>
-                    <CalculatorBtn variant="cream" handleClick={() => setDisplayCurrent((prev) => prev + ".")}>
-                        .
-                    </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="slate"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        F-OVER
-                    </CalculatorBtn>
-                </div>
-                <div className="flex justify-between gap-3 w-full">
-                    <CalculatorBtn
-                        variant="red"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        QTY
-                    </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        CHK PRC
-                    </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="red"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        RETAIL
-                    </CalculatorBtn>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-3 w-full">
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        REPRINT
-                    </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="cream"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        CASHOUT
-                    </CalculatorBtn>
-                    <CalculatorBtn
-                        variant="red"
-                        handleClick={() => {
-                            return;
-                        }}
-                    >
-                        SUBTOTAL
-                    </CalculatorBtn>
-                </div>
-                <Button
-                    onClick={() => handleToggle((e) => !e)}
-                    className="mt-2 max-w-[30%]"
-                    leftIcon={VisibilityOffOutlined}
-                    variant="transparent"
-                    size="small"
+        const updateField: Record<Exclude<KeyboardField, "display">, React.Dispatch<React.SetStateAction<string>>> = {
+            discountName: setDiscountName,
+            discountId: setDiscountId,
+            itemIdentifier: setItemIdentifier,
+            quantity: setQuantity,
+        };
+        updateField[keyboardField]((current) => current + character);
+    };
+
+    const handleKeyboardKey = (key: string) => {
+        if (key === "Shift") {
+            setShifted((value) => !value);
+            return;
+        }
+        if (key === "Caps") {
+            setCapsLock((value) => !value);
+            return;
+        }
+        if (key === "Backspace") {
+            if (keyboardField === "display") {
+                handleDelete();
+            } else {
+                const updateField: Record<
+                    Exclude<KeyboardField, "display">,
+                    React.Dispatch<React.SetStateAction<string>>
+                > = {
+                    discountName: setDiscountName,
+                    discountId: setDiscountId,
+                    itemIdentifier: setItemIdentifier,
+                    quantity: setQuantity,
+                };
+                updateField[keyboardField]((current) => current.slice(0, -1));
+            }
+            return;
+        }
+        if (key === "Space") {
+            appendToActiveField(" ");
+            return;
+        }
+        if (key === "Clear") {
+            if (keyboardField === "display") {
+                setDisplayCurrent("0");
+            } else {
+                const updateField: Record<
+                    Exclude<KeyboardField, "display">,
+                    React.Dispatch<React.SetStateAction<string>>
+                > = {
+                    discountName: setDiscountName,
+                    discountId: setDiscountId,
+                    itemIdentifier: setItemIdentifier,
+                    quantity: setQuantity,
+                };
+                updateField[keyboardField]("");
+            }
+            return;
+        }
+        if (key === "Enter") {
+            if (displayMode) handleConfirm();
+            return;
+        }
+
+        const useShiftedCharacter = shifted || (capsLock && /^[a-z]$/i.test(key));
+        const character = useShiftedCharacter ? key[1] : key[0];
+        appendToActiveField(character);
+        if (shifted) setShifted(false);
+    };
+
+    return (
+        <PopUp
+            title="POS Keyboard"
+            className="w-[min(94vw,600px)]! max-h-[82dvh]! overflow-y-auto! md:w-[min(84vw,680px)]! md:max-h-[78dvh]! lg:w-[min(90vw,1040px)]! lg:max-h-[84dvh]!"
+            handleCloseProp={() => handleToggle(false)}
+        >
+            <section
+                className="grid w-full grid-cols-1 gap-2 md:grid-cols-[minmax(210px,0.65fr)_minmax(0,1.8fr)] lg:gap-3"
+                data-no-drag
+            >
+                <div
+                    className="flex min-w-0 flex-col gap-1.5 rounded-[5px] border border-crimson bg-off-white p-2 text-slate-medium"
+                    role="status"
+                    aria-live="polite"
                 >
-                    hide
-                </Button>
+                    <div className="flex items-center justify-between">
+                        <span className="font-bold">{displayMode ? CalculatorDisplayModeLabels[displayMode] : ""}</span>
+                        {displayMode ? (
+                            <button
+                                className="cursor-pointer text-sm font-bold underline"
+                                type="button"
+                                onClick={() => {
+                                    setDisplayMode(null);
+                                    setConfirmationMessage("");
+                                }}
+                            >
+                                BACK
+                            </button>
+                        ) : (
+                            <span className="text-sm">{priceMode}</span>
+                        )}
+                    </div>
+                    {displayMode === "discount" && (
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-end gap-2">
+                                <SelectInput
+                                    id="calculator-discount-type"
+                                    name="discountType"
+                                    label="Discount type"
+                                    defaultValue={discountType}
+                                    options={{ "Senior Citizen": "Senior Citizen", PWD: "PWD" }}
+                                    onChange={(event) =>
+                                        setDiscountType(event.target.value as CalculatorDiscount["type"])
+                                    }
+                                    className="min-w-0 rounded-md! px-2! py-1!"
+                                />
+                                <span className="pb-2 font-bold">20%</span>
+                            </div>
+                            <GeneralInput
+                                id="calculator-discount-name"
+                                name="discountName"
+                                type="text"
+                                label="Name"
+                                placeholder="Customer name"
+                                value={discountName}
+                                onChange={(event) => setDiscountName(event.target.value)}
+                                onFocus={() => setKeyboardField("discountName")}
+                                autoComplete="name"
+                                className="rounded-md! px-2! py-1!"
+                            />
+                            <GeneralInput
+                                id="calculator-discount-id"
+                                name="discountId"
+                                type="text"
+                                label="ID number"
+                                placeholder="Senior/PWD ID number"
+                                value={discountId}
+                                onChange={(event) => setDiscountId(event.target.value)}
+                                onFocus={() => setKeyboardField("discountId")}
+                                autoComplete="off"
+                                className="rounded-md! px-2! py-1!"
+                            />
+                        </div>
+                    )}
+                    {displayMode === "quantity" && (
+                        <div className="flex flex-col gap-2">
+                            <GeneralInput
+                                id="calculator-item-identifier"
+                                name="itemIdentifier"
+                                type="text"
+                                label="Item ID or name"
+                                placeholder="Enter item ID or name"
+                                value={itemIdentifier}
+                                onChange={(event) => setItemIdentifier(event.target.value)}
+                                onFocus={() => setKeyboardField("itemIdentifier")}
+                                className="rounded-md! px-2! py-1!"
+                            />
+                            <GeneralInput
+                                id="calculator-quantity"
+                                name="quantity"
+                                type="number"
+                                label="Quantity"
+                                min="1"
+                                step="1"
+                                value={quantity}
+                                onChange={(event) => setQuantity(event.target.value)}
+                                onFocus={() => setKeyboardField("quantity")}
+                                className="rounded-md! px-2! py-1!"
+                            />
+                        </div>
+                    )}
+                    {!displayMode && (
+                        <output
+                            className="block w-full flex-1 self-end truncate text-right text-3xl font-bold"
+                            aria-label="Calculator value"
+                        >
+                            {displayCurrent}
+                        </output>
+                    )}
+                    {confirmationMessage && <span className="text-xs">{confirmationMessage}</span>}
+                    {displayMode && (
+                        <button
+                            className="mt-auto cursor-pointer rounded-[5px] bg-crimson px-3 py-2 text-sm font-bold text-cream hover:bg-cream hover:text-crimson"
+                            type="button"
+                            onClick={handleConfirm}
+                        >
+                            Confirm
+                        </button>
+                    )}
+                </div>
+
+                <div className="flex min-w-0 flex-col justify-between gap-1.5">
+                    <div className="min-w-0 overflow-x-auto pb-1">
+                        <div className="flex min-w-140 flex-col gap-1 lg:min-w-0">
+                            {keyboardRows.map((row, rowIndex) => (
+                                <div className="flex w-full gap-1" key={rowIndex}>
+                                    {rowIndex === 3 && (
+                                        <CalculatorBtn
+                                            className={`w-20! shrink-0 text-xs ${shifted ? "bg-crimson text-cream" : ""}`}
+                                            variant="slate"
+                                            handleClick={() => handleKeyboardKey("Shift")}
+                                        >
+                                            Shift
+                                        </CalculatorBtn>
+                                    )}
+                                    {row.map((key) => (
+                                        <CalculatorBtn
+                                            className="min-w-0 flex-1 text-base"
+                                            variant="cream"
+                                            key={key}
+                                            handleClick={() => handleKeyboardKey(key)}
+                                        >
+                                            {shifted || (capsLock && /^[a-z]$/i.test(key)) ? key[1] : key[0]}
+                                        </CalculatorBtn>
+                                    ))}
+                                    {rowIndex === 0 && (
+                                        <CalculatorBtn
+                                            className="w-24! shrink-0 text-xs"
+                                            variant="slate"
+                                            handleClick={() => handleKeyboardKey("Backspace")}
+                                        >
+                                            Backspace
+                                        </CalculatorBtn>
+                                    )}
+                                    {rowIndex === 2 && (
+                                        <CalculatorBtn
+                                            className={`w-20! shrink-0 text-xs ${capsLock ? "bg-crimson text-cream" : ""}`}
+                                            variant="slate"
+                                            handleClick={() => handleKeyboardKey("Caps")}
+                                        >
+                                            Caps
+                                        </CalculatorBtn>
+                                    )}
+                                    {rowIndex === 3 && (
+                                        <CalculatorBtn
+                                            className="w-24! shrink-0 text-xs"
+                                            variant="slate"
+                                            handleClick={() => handleKeyboardKey("Enter")}
+                                        >
+                                            Enter
+                                        </CalculatorBtn>
+                                    )}
+                                </div>
+                            ))}
+                            <div className="flex w-full gap-1">
+                                <CalculatorBtn
+                                    className="w-24! shrink-0 text-xs"
+                                    variant="slate"
+                                    handleClick={() => handleKeyboardKey("Clear")}
+                                >
+                                    Clear
+                                </CalculatorBtn>
+                                <CalculatorBtn
+                                    className="min-w-40 flex-1 text-xs"
+                                    variant="slate"
+                                    handleClick={() => handleKeyboardKey("Space")}
+                                >
+                                    Space
+                                </CalculatorBtn>
+                                <CalculatorBtn
+                                    className="w-24! shrink-0 text-xs"
+                                    variant="slate"
+                                    handleClick={() => handleKeyboardKey("Enter")}
+                                >
+                                    Enter
+                                </CalculatorBtn>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-1">
+                        <CalculatorBtn variant="red" handleClick={() => openMode("discount")}>
+                            DISC
+                        </CalculatorBtn>
+                        <CalculatorBtn variant="red" handleClick={() => openMode("quantity")}>
+                            QTY
+                        </CalculatorBtn>
+                        <CalculatorBtn variant="slate" handleClick={() => undefined}>
+                            F-OVER
+                        </CalculatorBtn>
+                        <CalculatorBtn variant="cream" handleClick={() => undefined}>
+                            CHK PRC
+                        </CalculatorBtn>
+                        <CalculatorBtn
+                            variant="cream"
+                            handleClick={() => setPriceMode((mode) => (mode === "Wholesale" ? "Retail" : "Wholesale"))}
+                        >
+                            {priceMode.toUpperCase()}
+                        </CalculatorBtn>
+                        <CalculatorBtn variant="cream" handleClick={() => undefined}>
+                            REPRINT
+                        </CalculatorBtn>
+                        <CalculatorBtn variant="cream" handleClick={() => undefined}>
+                            CASHOUT
+                        </CalculatorBtn>
+                        <CalculatorBtn variant="red" handleClick={() => undefined}>
+                            SUBTOTAL
+                        </CalculatorBtn>
+                    </div>
+                </div>
             </section>
-        </div>
+        </PopUp>
     );
 }

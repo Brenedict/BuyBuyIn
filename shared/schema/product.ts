@@ -1,20 +1,9 @@
 // General Imports
 import { z } from "zod";
 import { zfd } from "zod-form-data";
+import { queryNumber, queryNumberWithFallback } from "./preprocess";
 
 // ----------------------------- QUERY SCHEMAS ---------------------------------------------
-
-const queryNumber = (schema: z.ZodNumber) =>
-    z.preprocess(
-        (value) => (value === "" || value === null || value === undefined ? undefined : value),
-        z.coerce.number().pipe(schema).optional()
-    );
-
-const queryNumberWithFallback = (schema: z.ZodNumber, fallback: number) =>
-    z.preprocess(
-        (value) => (value === "" || value === null || value === undefined ? fallback : value),
-        z.coerce.number().pipe(schema)
-    );
 
 export const ProductQuerySchema = z.object({
     search: z.preprocess((value) => (value === "" || value === null ? undefined : value), z.string().trim().optional()),

@@ -36,6 +36,14 @@ export default {
         return prisma.product.findFirst({ where: { id, businessId }, select: PRODUCT_SELECT });
     },
 
+    async getProductsNotStockedInBranch(businessId: number, branchId: number) {
+        return prisma.product.findMany({
+            where: { businessId, branchInventoryItems: { none: { branchId } } },
+            orderBy: { productName: "asc" },
+            select: PRODUCT_SELECT,
+        });
+    },
+
     async count(args?: ProductCountArgs) {
         return prisma.product.count(args);
     },

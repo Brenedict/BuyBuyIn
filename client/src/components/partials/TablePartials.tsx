@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { ColorVariant, MaterialIcon } from "../../types/common";
 import { Button, type ButtonColorVariant } from "../Button";
@@ -283,4 +283,32 @@ export function DateText({ date, type }: { date: Date; type: "shortdate" | "full
         default:
             return null;
     }
+}
+
+export function TableToolbar({
+    children,
+    className = "",
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
+    return (
+        <div className={`flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 border-b border-brown bg-transparent w-full ${className}`}>
+            {children}
+        </div>
+    );
+}
+
+export function TableFilterWrapper({
+    children,
+    className = "",
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
+    return (
+        <div className={`flex flex-col gap-6 p-6 rounded-2xl border border-slate-dark bg-transparent w-full ${className}`}>
+            {children}
+        </div>
+    );
 }

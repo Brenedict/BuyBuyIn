@@ -135,6 +135,7 @@ model Business {
     // One-to-many connections
     businessSubscriptions BusinessSubscription[]
     branches              Branch[]
+    products              Product[]
     users                 User[]
 }
 
@@ -191,6 +192,8 @@ model Product {
     shelfPrice  Float
 
     // Many-to-one connections
+    business   Business? @relation(fields: [businessId], references: [id])
+    businessId Int?
     supplier   Supplier? @relation(fields: [supplierId], references: [id])
     supplierId Int?
 
@@ -199,6 +202,8 @@ model Product {
     productCategories       ProductCategory[]
     branchWideOfferProducts BranchWideOfferProduct[]
     transactionItems        TransactionItem[]
+
+    @@index([businessId])
 }
 
 model TransactionItem {

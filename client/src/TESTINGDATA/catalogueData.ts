@@ -9,7 +9,7 @@ export interface CatalogueProduct {
     supplier: string;
 }
 
-// TODO: For temporary dummy data lang
+// NOTE:: For temporary dummy data lang
 export const INVENTORY_SOURCE = [...TABLE_CURRENT_STOCK_ITEMS, ...TABLE_OUT_OF_STOCK_ITEMS];
 
 export const CATALOGUE_PRODUCTS: CatalogueProduct[] = INVENTORY_SOURCE.filter(
@@ -23,8 +23,10 @@ export const CATALOGUE_PRODUCTS: CatalogueProduct[] = INVENTORY_SOURCE.filter(
     supplier: item.supplier,
 }));
 
-const CATALOGUE_CATEGORIES: string[] = Array.from(new Set(CATALOGUE_PRODUCTS.map((product) => product.category)));
-const CATALOGUE_SUPPLIERS: string[] = Array.from(new Set(CATALOGUE_PRODUCTS.map((product) => product.supplier)));
+export const CATALOGUE_CATEGORIES: string[] = Array.from(
+    new Set(CATALOGUE_PRODUCTS.map((product) => product.category))
+);
+export const CATALOGUE_SUPPLIERS: string[] = Array.from(new Set(CATALOGUE_PRODUCTS.map((product) => product.supplier)));
 
 export const CATALOGUE_SUMMARY = {
     totalProducts: CATALOGUE_PRODUCTS.length,

@@ -1,5 +1,5 @@
 // General Imports
-import { Navigate, type RouteObject } from "react-router";
+import { Navigate, redirect, type RouteObject } from "react-router";
 
 // Static Layout Page
 import StaticLayout from "../pages/shared/StaticLayout";
@@ -24,6 +24,7 @@ import {
     InventoryItemViewPopup,
     InventoryItemRestockPopup,
     InventoryItemDeletePopup,
+    InventoryItemAddPopup,
 } from "../components/popups/branch-manager/InventoryPopups";
 
 // Cashier Pages
@@ -45,6 +46,7 @@ import {
     DeleteBranchPopup,
     BranchManagerFormPopup,
 } from "../components/popups/hq-admin/ManageUserPopups";
+import { ProductFormPopup, ProductViewPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
 
 // Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -103,16 +105,23 @@ export const protectedRoutes: RouteObject[] = [
                                 element: <BranchManager_Inventory />,
                                 children: [
                                     {
+                                        path: "item/add",
+                                        element: <InventoryItemAddPopup />,
+                                        action: () => redirect(ROUTES.BRANCH_MANAGER.inventory),
+                                    },
+                                    {
                                         path: "item/:id/view",
                                         element: <InventoryItemViewPopup />,
                                     },
                                     {
                                         path: "item/:id/restock",
                                         element: <InventoryItemRestockPopup />,
+                                        action: () => redirect(ROUTES.BRANCH_MANAGER.inventory),
                                     },
                                     {
                                         path: "item/:id/delete",
                                         element: <InventoryItemDeletePopup />,
+                                        action: () => redirect(ROUTES.BRANCH_MANAGER.inventory),
                                     },
                                     ...globalPopups,
                                 ],
@@ -176,7 +185,28 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.catalogue,
                                 element: <HQ_Catalogue />,
-                                children: [...globalPopups],
+                                children: [
+                                    {
+                                        path: "product/add",
+                                        element: <ProductFormPopup mode="add" />,
+                                        action: () => redirect(ROUTES.HQ_ADMIN.catalogue),
+                                    },
+                                    {
+                                        path: "product/:id/edit",
+                                        element: <ProductFormPopup mode="edit" />,
+                                        action: () => redirect(ROUTES.HQ_ADMIN.catalogue),
+                                    },
+                                    {
+                                        path: "product/:id/view",
+                                        element: <ProductViewPopup />,
+                                    },
+                                    {
+                                        path: "product/:id/delete",
+                                        element: <ProductDeletePopup />,
+                                        action: () => redirect(ROUTES.HQ_ADMIN.catalogue),
+                                    },
+                                    ...globalPopups,
+                                ],
                             },
                             {
                                 path: ROUTES.HQ_ADMIN.manageUsers,

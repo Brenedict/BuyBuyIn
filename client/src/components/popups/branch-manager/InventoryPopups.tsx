@@ -1,5 +1,5 @@
 // General Imports
-import { useMemo, type SubmitEvent } from "react";
+import { useMemo } from "react";
 
 // Components
 import { PopUp } from "../../PopUp";
@@ -11,7 +11,7 @@ import TextAreaInput from "../../inputs/TextAreaInput";
 
 // Hooks
 import useNavigatePage from "../../../hooks/useNavigatePage";
-import { useParams } from "react-router";
+import { Form, useParams } from "react-router";
 
 // TEST DATA
 import { ROUTES } from "../../../routes/Routes";
@@ -22,6 +22,7 @@ import {
     TABLE_SUPPLIERS,
     type InventoryItem,
 } from "../../../TESTINGDATA/inventoryData";
+import { CATALOGUE_PRODUCTS } from "../../../TESTINGDATA/catalogueData";
 
 // Material UI Icons
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
@@ -31,9 +32,6 @@ import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined
 
 import type { MaterialIcon } from "../../../types/common";
 
-/* ---------- Helpers ---------- */
-
-// The two tables hold disjoint slices of the same item list
 const ALL_INVENTORY_ITEMS: InventoryItem[] = [...TABLE_OUT_OF_STOCK_ITEMS, ...TABLE_CURRENT_STOCK_ITEMS];
 
 function useInventoryItem() {
@@ -60,16 +58,10 @@ function ItemDetailRow({ icon, label, value }: { icon: MaterialIcon; label: stri
     );
 }
 
-/* ---------- Popups ---------- */
-
 export function InventoryItemViewPopup() {
-    // Used for redirecting
     const navigate = useNavigatePage();
 
-    // Extracts the inventory item id from the URL param
     const item = useInventoryItem();
-
-    // When triggered, returns to the inventory page (exiting the popup) and keeps the filters
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
 
     if (!item) {
@@ -118,7 +110,11 @@ export function InventoryItemViewPopup() {
                     <Button onClick={handleClose} className="flex-1" variant="secondary" size="normal">
                         Close
                     </Button>
-                    <Button className="flex-1" size="normal">
+                    <Button
+                        onClick={() => navigate(ROUTES.BRANCH_MANAGER.inventoryItemRestock(item.itemId), true)}
+                        className="flex-1"
+                        size="normal"
+                    >
                         Restock Item
                     </Button>
                 </div>
@@ -128,13 +124,10 @@ export function InventoryItemViewPopup() {
 }
 
 export function InventoryItemRestockPopup() {
-    // Used for redirecting
     const navigate = useNavigatePage();
 
-    // Extracts the inventory item id from the URL param
     const item = useInventoryItem();
 
-    // Supplier options are derived from the supplier table, keyed by visible label
     const supplierOptions = useMemo(
         () =>
             TABLE_SUPPLIERS.reduce<Record<string, string>>((acc, supplier) => {
@@ -147,12 +140,6 @@ export function InventoryItemRestockPopup() {
     // When triggered, returns to the inventory page (exiting the popup) and keeps the filters
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
 
-    const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
-        // TODO: Wire to the restock API once it exists
-        event.preventDefault();
-        handleClose();
-    };
-
     if (!item) {
         return (
             <PopUp title="Item Not Found" handleCloseProp={handleClose}>
@@ -163,7 +150,7 @@ export function InventoryItemRestockPopup() {
 
     return (
         <PopUp title={`Restock ${item.itemName}`} handleCloseProp={handleClose}>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <Form method="post" className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1 rounded-2xl bg-cream px-4 py-3">
                     <Text size="description" weight="medium" variant="brown">
                         Current stock
@@ -219,46 +206,94 @@ export function InventoryItemRestockPopup() {
                         Restock
                     </Button>
                 </div>
-            </form>
+            </Form>
         </PopUp>
     );
 }
 
 export function InventoryItemDeletePopup() {
-    // Used for redirecting
     const navigate = useNavigatePage();
-
-    // Extracts the inventory item id from the URL param
     const item = useInventoryItem();
-
-    // When triggered, returns to the inventory page (exiting the popup) and keeps the filters
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
-
-    const handleDelete = () => {
-        // TODO: Wire to the delete API once it exists
-        handleClose();
-    };
 
     return (
         <PopUp title="Delete Item" handleCloseProp={handleClose}>
             <section className="flex flex-col gap-4">
                 <Text>
                     Are you sure you want to delete{" "}
-                    <span className="font-bold">
-                        {item ? `${item.itemName} (${item.sku})` : "this item"}
-                    </span>{" "}
-                    from this branch's inventory? This action cannot be undone.
+                    <span className="font-bold">{item ? `${item.itemName} (${item.sku})` : "this item"}</span> from this
+                    branch's inventory? This action cannot be undone.
                 </Text>
 
-                <div className="flex gap-2">
-                    <Button onClick={handleClose} className="flex-1" variant="secondary" size="normal">
+                <Form method="post" className="flex gap-2">
+                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
                         Cancel
                     </Button>
-                    <Button onClick={handleDelete} className="flex-1" size="normal">
+                    <Button type="submit" variant="main" className="flex-1" size="normal">
                         Delete
                     </Button>
-                </div>
+                </Form>
             </section>
+        </PopUp>
+    );
+}
+
+export function InventoryItemAddPopup() {
+    const navigate = useNavigatePage();
+
+    const catalogueOptions = useMemo(
+        () =>
+            CATALOGUE_PRODUCTS.reduce<Record<string, string>>((acc, product) => {
+                acc[product.productName] = product.productId;
+                return acc;
+            }, {}),
+        []
+    );
+
+    const defaultProductId = CATALOGUE_PRODUCTS[0]?.productId ?? "";
+
+    const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
+
+    return (
+        <PopUp title="Add Item to Inventory" handleCloseProp={handleClose}>
+            <Form method="post" className="flex flex-col gap-4">
+                <Text>Only products from the business catalogue can be added to your inventory.</Text>
+
+                <SelectInput
+                    id="product"
+                    name="productId"
+                    label="Product"
+                    options={catalogueOptions}
+                    defaultValue={defaultProductId}
+                />
+
+                <GeneralInput
+                    name="quantity"
+                    type="number"
+                    min={1}
+                    label="Quantity to Add"
+                    labelVariant="small"
+                    required
+                />
+
+                <GeneralInput
+                    name="reorderThreshold"
+                    type="number"
+                    min={0}
+                    label="Reorder Threshold"
+                    labelVariant="small"
+                    required
+                />
+
+                <div className="flex gap-2">
+                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
+                        Cancel
+                    </Button>
+                    <Button type="submit" className="flex-1" size="normal">
+                        Add Item
+                    </Button>
+                </div>
+            </Form>
         </PopUp>
     );
 }

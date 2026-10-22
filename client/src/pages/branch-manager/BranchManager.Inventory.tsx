@@ -147,6 +147,9 @@ function renderOutOfStockRow(item: InventoryItem) {
 export function BranchManager_Inventory() {
     const { values, submit } = useFormSearchParams({ search: "" });
 
+    // Used for redirecting
+    const navigate = useNavigatePage();
+
     const handleEditSupplier = (id: string | number) => () => {
         alert(`Edit supplier: ${id}`);
     };
@@ -154,7 +157,7 @@ export function BranchManager_Inventory() {
         alert(`Delete supplier: ${id}`);
     };
     const handleAddItem = () => {
-        alert("Add Item");
+        navigate(ROUTES.BRANCH_MANAGER.inventoryItemAdd, true);
     };
     const handleAddSupplier = () => {
         alert("Add Supplier");

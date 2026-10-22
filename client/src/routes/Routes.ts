@@ -25,6 +25,7 @@ export const ROUTES = {
             root: `${base}/`,
             dashboard: `${base}/dashboard`,
             inventory: `${base}/inventory`,
+            inventoryItemAdd: `${base}/inventory/item/add`,
             inventoryItemView: (id?: string) => `${base}/inventory/item/${id}/view`,
             inventoryItemRestock: (id?: string) => `${base}/inventory/item/${id}/restock`,
             inventoryItemDelete: (id?: string) => `${base}/inventory/item/${id}/delete`,

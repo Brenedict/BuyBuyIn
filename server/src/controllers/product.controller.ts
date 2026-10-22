@@ -48,7 +48,11 @@ export default {
         jwtAccessAuth,
         requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
         async (req: Request, res: Response) => {
-            const product = await ProductService.getCatalogueProduct(req.user as User, Number(req.params.productId));
+            const { productId } = req.params;
+
+            if (isNaN(Number(productId))) return res.status(404).json({ error: "Product not found" });
+
+            const product = await ProductService.getCatalogueProduct(req.user as User, Number(productId));
 
             return res.json(product);
         },

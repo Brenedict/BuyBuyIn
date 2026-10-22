@@ -8,6 +8,7 @@ import env from "./config/env.config";
 // Routes
 import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.routes";
+import productRoutes from "./routes/product.route";
 
 // Middlewares
 import handleShutdown from "./middlewares/shutdown.middleware";
@@ -61,6 +62,7 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/product", productRoutes);
 
 app.use(errorMiddleware.notFoundError);
 app.use(errorMiddleware.internalError);

@@ -1,5 +1,5 @@
 // General Imports
-import { Form, Outlet } from "react-router";
+import { Form, Outlet, useLoaderData } from "react-router";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
@@ -11,6 +11,9 @@ import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
 import { ROUTES } from "../../routes/Routes";
 
+// BuyBuyIn Shared Imports
+import type { CatalogueListResponse, CatalogueProduct } from "@buybuyin/shared/schema/product";
+
 // Material UI Icons
 import type { MaterialIcon } from "../../types/common";
 import AddIcon from "@mui/icons-material/Add";
@@ -21,7 +24,6 @@ import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { CATALOGUE_PRODUCTS, CATALOGUE_SUMMARY, type CatalogueProduct } from "../../TESTINGDATA/catalogueData";
 
 interface StatCardProps {
     icon: MaterialIcon;
@@ -101,15 +103,15 @@ function ProductRowActions({ id }: { id: string }) {
 
 function renderCatalogueRow(product: CatalogueProduct) {
     return (
-        <Table.Row key={product.productId}>
+        <Table.Row key={product.id}>
             <Table.Data wrapWords>
-                <PrimarySecondaryText primary={product.productName} secondary={product.category} />
+                <PrimarySecondaryText primary={product.productName} secondary={product.category?.categoryName ?? "—"} />
             </Table.Data>
             <Table.Data text={NumberFormat(product.basePrice, "₱")} />
             <Table.Data text={NumberFormat(product.shelfPrice, "₱")} />
-            <Table.Data text={product.supplier} wrapWords />
+            <Table.Data text={product.supplier?.supplierName ?? "—"} wrapWords />
             <Table.Data>
-                <ProductRowActions id={product.productId} />
+                <ProductRowActions id={String(product.id)} />
             </Table.Data>
         </Table.Row>
     );
@@ -117,22 +119,12 @@ function renderCatalogueRow(product: CatalogueProduct) {
 
 // Main page
 export function HQ_Catalogue() {
+    const { products, summary } = useLoaderData<CatalogueListResponse>();
     const { values, submit } = useFormSearchParams({ search: "" });
     const navigate = useNavigatePage();
 
-    const searchTerm = values.search.trim().toLowerCase();
-
-    const filteredProducts = searchTerm
-        ? CATALOGUE_PRODUCTS.filter(
-              (product) =>
-                  product.productName.toLowerCase().includes(searchTerm) ||
-                  product.category.toLowerCase().includes(searchTerm) ||
-                  product.supplier.toLowerCase().includes(searchTerm)
-          )
-        : CATALOGUE_PRODUCTS;
-
     const handleAddProduct = () => {
-        navigate(ROUTES.HQ_ADMIN.catalogueProductAdd);
+        navigate(ROUTES.HQ_ADMIN.catalogueProductAdd, true);
     };
 
     return (
@@ -167,25 +159,25 @@ export function HQ_Catalogue() {
                     <CatalogueStatCard
                         icon={Inventory2OutlinedIcon}
                         title="Total Products"
-                        value={CATALOGUE_SUMMARY.totalProducts.toLocaleString()}
-                        subtitle={`Across ${CATALOGUE_SUMMARY.totalCategories} categories`}
+                        value={summary.totalProducts.toLocaleString()}
+                        subtitle={`Across ${summary.totalCategories} categories`}
                     />
                     <CatalogueStatCard
                         icon={CategoryOutlinedIcon}
                         title="Categories"
-                        value={CATALOGUE_SUMMARY.totalCategories.toLocaleString()}
+                        value={summary.totalCategories.toLocaleString()}
                         subtitle="Product groupings"
                     />
                     <CatalogueStatCard
                         icon={LocalShippingOutlinedIcon}
                         title="Suppliers"
-                        value={CATALOGUE_SUMMARY.totalSuppliers.toLocaleString()}
+                        value={summary.totalSuppliers.toLocaleString()}
                         subtitle="Partnered suppliers"
                     />
                     <CatalogueStatCard
                         icon={PaymentsOutlinedIcon}
                         title="Average Shelf Price"
-                        value={NumberFormat(CATALOGUE_SUMMARY.averageShelfPrice, "₱")}
+                        value={NumberFormat(summary.averageShelfPrice, "₱")}
                         subtitle="Average across catalogue"
                     />
                 </div>
@@ -220,7 +212,7 @@ export function HQ_Catalogue() {
                                 <Table.Header text="Supplier" size="big" />
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
-                            {filteredProducts.map(renderCatalogueRow)}
+                            {products.map(renderCatalogueRow)}
                         </Table>
                     </Card.Body>
                 </Card>

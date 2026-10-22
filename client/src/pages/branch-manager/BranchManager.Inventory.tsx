@@ -1,4 +1,4 @@
-import { Form } from "react-router";
+import { Form, Outlet, useLoaderData } from "react-router";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
@@ -15,14 +15,10 @@ import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
 import { ROUTES } from "../../routes/Routes";
 import type { MaterialIcon } from "../../types/common";
-import {
-    INVENTORY_SUMMARY,
-    TABLE_OUT_OF_STOCK_ITEMS,
-    TABLE_CURRENT_STOCK_ITEMS,
-    TABLE_SUPPLIERS,
-    type InventoryItem,
-} from "../../TESTINGDATA/inventoryData";
-import { Outlet } from "react-router";
+import { TABLE_SUPPLIERS } from "../../TESTINGDATA/inventoryData";
+
+// BuyBuyIn Shared Imports
+import type { BranchInventoryEntry, BranchInventoryListResponse } from "@buybuyin/shared/schema/branchInventory";
 
 import AddIcon from "@mui/icons-material/Add";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
@@ -33,11 +29,6 @@ import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRen
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-
-function formatStockLevel(item: InventoryItem) {
-    if (item.stockLevel <= item.reorderThreshold) return `${item.stockLevel} (Low Stock)`;
-    return `${item.stockLevel}`;
-}
 
 function formatThreshold(reorderThreshold: number) {
     return `≤ ${reorderThreshold} units`;
@@ -126,18 +117,18 @@ function ItemRowActions({ id }: { id: string }) {
     );
 }
 
-function renderOutOfStockRow(item: InventoryItem) {
+function renderOutOfStockRow(item: BranchInventoryEntry) {
     return (
-        <Table.Row key={item.itemId}>
+        <Table.Row key={item.id}>
             <Table.Data wrapWords>
-                <PrimarySecondaryText primary={item.itemName} secondary={item.sku} />
+                <PrimarySecondaryText primary={item.product.productName} secondary={item.product.sku} />
             </Table.Data>
-            <Table.Data text={item.category} />
+            <Table.Data text={item.product.category?.categoryName ?? "—"} />
             <Table.Data text={formatThreshold(item.reorderThreshold)} />
             <Table.Data text={NumberFormat(item.unitPrice, "₱")} />
-            <Table.Data text={item.supplier} wrapWords />
+            <Table.Data text={item.product.supplier?.supplierName ?? "—"} wrapWords />
             <Table.Data>
-                <ItemRowActions id={item.itemId} />
+                <ItemRowActions id={String(item.id)} />
             </Table.Data>
         </Table.Row>
     );
@@ -145,7 +136,11 @@ function renderOutOfStockRow(item: InventoryItem) {
 
 // Main page
 export function BranchManager_Inventory() {
+    const { items, summary } = useLoaderData<BranchInventoryListResponse>();
     const { values, submit } = useFormSearchParams({ search: "" });
+
+    const outOfStock = items.filter((item) => item.status === "OUT_OF_STOCK");
+    const currentStock = items.filter((item) => item.status !== "OUT_OF_STOCK");
 
     // Used for redirecting
     const navigate = useNavigatePage();
@@ -161,6 +156,11 @@ export function BranchManager_Inventory() {
     };
     const handleAddSupplier = () => {
         alert("Add Supplier");
+    };
+
+    const formatStockLevel = (item: BranchInventoryEntry) => {
+        if (item.status === "LOW_STOCK") return `${item.quantity} (Low Stock)`;
+        return `${item.quantity}`;
     };
 
     return (
@@ -184,7 +184,7 @@ export function BranchManager_Inventory() {
                             defaultValue={values.search}
                             className="w-72"
                         />
-                        <Button leftIcon={AddIcon} onClick={handleAddItem}>
+                        <Button type="button" leftIcon={AddIcon} onClick={handleAddItem}>
                             Add Item
                         </Button>
                     </Form>
@@ -195,25 +195,25 @@ export function BranchManager_Inventory() {
                     <InventoryStatCard
                         icon={Inventory2OutlinedIcon}
                         title="Total Items"
-                        value={INVENTORY_SUMMARY.totalItems.toLocaleString()}
-                        subtitle={`Across ${INVENTORY_SUMMARY.totalCategories} categories`}
+                        value={summary.totalItems.toLocaleString()}
+                        subtitle={`Across ${summary.totalCategories} categories`}
                     />
                     <InventoryStatCard
                         icon={PaymentsOutlinedIcon}
                         title="Total Stock Value"
-                        value={NumberFormat(INVENTORY_SUMMARY.totalStockValue, "₱")}
+                        value={NumberFormat(summary.totalStockValue, "₱")}
                         subtitle="Last update today"
                     />
                     <InventoryStatCard
                         icon={WarningAmberOutlinedIcon}
                         title="Low Stock Items"
-                        value={INVENTORY_SUMMARY.lowStockCount.toLocaleString()}
+                        value={summary.lowStockCount.toLocaleString()}
                         subtitle="Near reorder threshold"
                     />
                     <InventoryStatCard
                         icon={RemoveShoppingCartOutlinedIcon}
                         title="Out of Stock"
-                        value={INVENTORY_SUMMARY.outOfStockCount.toLocaleString()}
+                        value={summary.outOfStockCount.toLocaleString()}
                         subtitle="Requires immediate action"
                     />
                 </div>
@@ -257,7 +257,7 @@ export function BranchManager_Inventory() {
                                 <Table.Header text="Supplier" size="big" />
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
-                            {TABLE_OUT_OF_STOCK_ITEMS.map(renderOutOfStockRow)}
+                            {outOfStock.map(renderOutOfStockRow)}
                         </Table>
                     </Card.Body>
                 </Card>
@@ -294,18 +294,21 @@ export function BranchManager_Inventory() {
                                 <Table.Header text="Supplier" size="big" />
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
-                            {TABLE_CURRENT_STOCK_ITEMS.map((item) => (
-                                <Table.Row key={item.itemId}>
+                            {currentStock.map((item) => (
+                                <Table.Row key={item.id}>
                                     <Table.Data wrapWords>
-                                        <PrimarySecondaryText primary={item.itemName} secondary={item.sku} />
+                                        <PrimarySecondaryText
+                                            primary={item.product.productName}
+                                            secondary={item.product.sku}
+                                        />
                                     </Table.Data>
-                                    <Table.Data text={item.category} />
+                                    <Table.Data text={item.product.category?.categoryName ?? "—"} />
                                     <Table.Data text={formatStockLevel(item)} />
                                     <Table.Data text={formatThreshold(item.reorderThreshold)} />
                                     <Table.Data text={NumberFormat(item.unitPrice, "₱")} />
-                                    <Table.Data text={item.supplier} wrapWords />
+                                    <Table.Data text={item.product.supplier?.supplierName ?? "—"} wrapWords />
                                     <Table.Data>
-                                        <ItemRowActions id={item.itemId} />
+                                        <ItemRowActions id={String(item.id)} />
                                     </Table.Data>
                                 </Table.Row>
                             ))}

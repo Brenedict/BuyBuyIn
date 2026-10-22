@@ -1,6 +1,5 @@
 // General Imports
-import { useMemo } from "react";
-import { Form, useParams } from "react-router";
+import { Form, useLoaderData } from "react-router";
 
 // Components
 import { PopUp } from "../../PopUp";
@@ -12,17 +11,15 @@ import SelectInput from "../../inputs/SelectInput";
 // Hooks
 import useNavigatePage from "../../../hooks/useNavigatePage";
 
+// API Services
+import type { ProductFormLoaderData } from "../../../api/productService";
+
+// BuyBuyIn Shared Imports
+import type { CatalogueProduct } from "@buybuyin/shared/schema/product";
+
 // Routes & Utils
 import { ROUTES } from "../../../routes/Routes";
 import { NumberFormat } from "../../../utils/chartConfigs";
-
-// TEST DATA
-import {
-    CATALOGUE_PRODUCTS,
-    CATALOGUE_CATEGORIES,
-    CATALOGUE_SUPPLIERS,
-    type CatalogueProduct,
-} from "../../../TESTINGDATA/catalogueData";
 
 // Material UI Icons
 import TagOutlinedIcon from "@mui/icons-material/TagOutlined";
@@ -31,21 +28,6 @@ import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 
 import type { MaterialIcon } from "../../../types/common";
-
-// Extracts the catalogue product from the URL param
-function useCatalogueProduct(): CatalogueProduct | undefined {
-    const { id } = useParams();
-
-    return useMemo(() => CATALOGUE_PRODUCTS.find((product) => product.productId === id), [id]);
-}
-
-// Select options are keyed by the visible label, mapping each value to itself
-function toSelectOptions(values: string[]): Record<string, string> {
-    return values.reduce<Record<string, string>>((acc, value) => {
-        acc[value] = value;
-        return acc;
-    }, {});
-}
 
 function ProductDetailRow({ icon, label, value }: { icon: MaterialIcon; label: string; value: string }) {
     return (
@@ -65,15 +47,13 @@ function ProductDetailRow({ icon, label, value }: { icon: MaterialIcon; label: s
     );
 }
 
-/* ---------- Popups ---------- */
-
 export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
     const navigate = useNavigatePage();
 
-    const product = useCatalogueProduct();
+    const { product, options } = useLoaderData<ProductFormLoaderData>();
 
-    const supplierOptions = useMemo(() => toSelectOptions(CATALOGUE_SUPPLIERS), []);
-    const categoryOptions = useMemo(() => toSelectOptions(CATALOGUE_CATEGORIES), []);
+    const supplierOptions = Object.fromEntries(options.suppliers.map((s) => [s.supplierName, String(s.id)]));
+    const categoryOptions = Object.fromEntries(options.categories.map((c) => [c.categoryName, String(c.id)]));
 
     const handleClose = () => navigate(ROUTES.HQ_ADMIN.catalogue, true);
 
@@ -85,9 +65,8 @@ export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
         );
     }
 
-    // On edit, the current values are kept. On add, the first option is the default.
-    const defaultSupplier = product?.supplier ?? CATALOGUE_SUPPLIERS[0] ?? "";
-    const defaultCategory = product?.category ?? CATALOGUE_CATEGORIES[0] ?? "";
+    const defaultSupplier = String(product?.supplier?.id ?? options.suppliers[0]?.id ?? "");
+    const defaultCategory = String(product?.category?.id ?? options.categories[0]?.id ?? "");
 
     return (
         <PopUp title={mode === "add" ? "Add Product" : "Edit Product"} handleCloseProp={handleClose}>
@@ -125,16 +104,16 @@ export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
                 </div>
 
                 <SelectInput
-                    id="supplier"
-                    name="supplier"
+                    id="supplierId"
+                    name="supplierId"
                     label="Supplier"
                     options={supplierOptions}
                     defaultValue={defaultSupplier}
                 />
 
                 <SelectInput
-                    id="category"
-                    name="category"
+                    id="categoryId"
+                    name="categoryId"
                     label="Category"
                     options={categoryOptions}
                     defaultValue={defaultCategory}
@@ -156,7 +135,7 @@ export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
 export function ProductViewPopup() {
     const navigate = useNavigatePage();
 
-    const product = useCatalogueProduct();
+    const product = useLoaderData<CatalogueProduct | null>();
 
     const handleClose = () => navigate(ROUTES.HQ_ADMIN.catalogue, true);
 
@@ -178,11 +157,15 @@ export function ProductViewPopup() {
                         variant="brown"
                         svg={{ icon: TagOutlinedIcon, size: "normal", position: "left", gap: "small" }}
                     >
-                        {product.productId}
+                        #{String(product.id).padStart(4, "0")}
                     </Text>
                 </div>
 
-                <ProductDetailRow icon={CategoryOutlinedIcon} label="Category" value={product.category} />
+                <ProductDetailRow
+                    icon={CategoryOutlinedIcon}
+                    label="Category"
+                    value={product.category?.categoryName ?? "—"}
+                />
                 <ProductDetailRow
                     icon={PaymentsOutlinedIcon}
                     label="Base Price"
@@ -193,14 +176,18 @@ export function ProductViewPopup() {
                     label="Shelf Price"
                     value={NumberFormat(product.shelfPrice, "₱")}
                 />
-                <ProductDetailRow icon={LocalShippingOutlinedIcon} label="Supplier" value={product.supplier} />
+                <ProductDetailRow
+                    icon={LocalShippingOutlinedIcon}
+                    label="Supplier"
+                    value={product.supplier?.supplierName ?? "—"}
+                />
 
                 <div className="flex gap-2">
                     <Button onClick={handleClose} className="flex-1" variant="secondary" size="normal">
                         Close
                     </Button>
                     <Button
-                        onClick={() => navigate(ROUTES.HQ_ADMIN.catalogueProductEdit(product.productId), true)}
+                        onClick={() => navigate(ROUTES.HQ_ADMIN.catalogueProductEdit(String(product.id)), true)}
                         className="flex-1"
                         size="normal"
                     >
@@ -215,7 +202,7 @@ export function ProductViewPopup() {
 export function ProductDeletePopup() {
     const navigate = useNavigatePage();
 
-    const product = useCatalogueProduct();
+    const product = useLoaderData<CatalogueProduct | null>();
 
     const handleClose = () => navigate(ROUTES.HQ_ADMIN.catalogue, true);
 

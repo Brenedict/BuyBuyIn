@@ -1,5 +1,5 @@
 // General Imports
-import { Navigate, redirect, type RouteObject } from "react-router";
+import { Navigate, type RouteObject } from "react-router";
 
 // Static Layout Page
 import StaticLayout from "../pages/shared/StaticLayout";
@@ -9,6 +9,25 @@ import { AccessValidator } from "../pages/shared/AccessValidator";
 import { RoleBoundary } from "../pages/shared/RoleBoundary";
 import Forbidden from "../pages/shared/Forbidden";
 import { primaryAuthLoader, homeRedirectLoader } from "../api/authService";
+
+// API Services
+import {
+    createProduct,
+    deleteProduct,
+    getCatalogue,
+    getCatalogueProduct,
+    getProduct,
+    getProductForm,
+    updateProduct,
+} from "../api/productService";
+import {
+    createBranchInventoryItem,
+    deleteBranchInventoryItem,
+    getBranchInventory,
+    getBranchInventoryItem,
+    getBranchInventoryOptions,
+    restockBranchInventoryItem,
+} from "../api/branchInventoryService";
 
 // Global Pages and Popups
 import { globalPopups } from "./GlobalPopupRoutes";
@@ -103,25 +122,30 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.BRANCH_MANAGER.inventory,
                                 element: <BranchManager_Inventory />,
+                                loader: getBranchInventory,
                                 children: [
                                     {
                                         path: "item/add",
                                         element: <InventoryItemAddPopup />,
-                                        action: () => redirect(ROUTES.BRANCH_MANAGER.inventory),
+                                        loader: getBranchInventoryOptions,
+                                        action: createBranchInventoryItem,
                                     },
                                     {
                                         path: "item/:id/view",
                                         element: <InventoryItemViewPopup />,
+                                        loader: getBranchInventoryItem,
                                     },
                                     {
                                         path: "item/:id/restock",
                                         element: <InventoryItemRestockPopup />,
-                                        action: () => redirect(ROUTES.BRANCH_MANAGER.inventory),
+                                        loader: getBranchInventoryItem,
+                                        action: restockBranchInventoryItem,
                                     },
                                     {
                                         path: "item/:id/delete",
                                         element: <InventoryItemDeletePopup />,
-                                        action: () => redirect(ROUTES.BRANCH_MANAGER.inventory),
+                                        loader: getBranchInventoryItem,
+                                        action: deleteBranchInventoryItem,
                                     },
                                     ...globalPopups,
                                 ],
@@ -185,25 +209,30 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.catalogue,
                                 element: <HQ_Catalogue />,
+                                loader: getCatalogue,
                                 children: [
                                     {
                                         path: "product/add",
                                         element: <ProductFormPopup mode="add" />,
-                                        action: () => redirect(ROUTES.HQ_ADMIN.catalogue),
+                                        loader: getProductForm,
+                                        action: createProduct,
                                     },
                                     {
                                         path: "product/:id/edit",
                                         element: <ProductFormPopup mode="edit" />,
-                                        action: () => redirect(ROUTES.HQ_ADMIN.catalogue),
+                                        loader: getCatalogueProduct,
+                                        action: updateProduct,
                                     },
                                     {
                                         path: "product/:id/view",
                                         element: <ProductViewPopup />,
+                                        loader: getProduct,
                                     },
                                     {
                                         path: "product/:id/delete",
                                         element: <ProductDeletePopup />,
-                                        action: () => redirect(ROUTES.HQ_ADMIN.catalogue),
+                                        loader: getProduct,
+                                        action: deleteProduct,
                                     },
                                     ...globalPopups,
                                 ],

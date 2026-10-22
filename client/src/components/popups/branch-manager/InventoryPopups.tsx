@@ -1,5 +1,5 @@
 // General Imports
-import { useMemo } from "react";
+import { Form, useLoaderData } from "react-router";
 
 // Components
 import { PopUp } from "../../PopUp";
@@ -7,22 +7,16 @@ import { Button } from "../../Button";
 import { Text } from "../../Text";
 import GeneralInput from "../../inputs/GeneralInput";
 import SelectInput from "../../inputs/SelectInput";
-import TextAreaInput from "../../inputs/TextAreaInput";
 
 // Hooks
 import useNavigatePage from "../../../hooks/useNavigatePage";
-import { Form, useParams } from "react-router";
 
-// TEST DATA
+// BuyBuyIn Shared Imports
+import type { BranchInventoryEntry, BranchInventoryOptionsResponse } from "@buybuyin/shared/schema/branchInventory";
+
+// Routes & Utils
 import { ROUTES } from "../../../routes/Routes";
 import { NumberFormat } from "../../../utils/chartConfigs";
-import {
-    TABLE_OUT_OF_STOCK_ITEMS,
-    TABLE_CURRENT_STOCK_ITEMS,
-    TABLE_SUPPLIERS,
-    type InventoryItem,
-} from "../../../TESTINGDATA/inventoryData";
-import { CATALOGUE_PRODUCTS } from "../../../TESTINGDATA/catalogueData";
 
 // Material UI Icons
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
@@ -31,14 +25,6 @@ import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 
 import type { MaterialIcon } from "../../../types/common";
-
-const ALL_INVENTORY_ITEMS: InventoryItem[] = [...TABLE_OUT_OF_STOCK_ITEMS, ...TABLE_CURRENT_STOCK_ITEMS];
-
-function useInventoryItem() {
-    const { id } = useParams();
-
-    return useMemo(() => ALL_INVENTORY_ITEMS.find((item) => item.itemId === id), [id]);
-}
 
 function ItemDetailRow({ icon, label, value }: { icon: MaterialIcon; label: string; value: string }) {
     return (
@@ -61,7 +47,7 @@ function ItemDetailRow({ icon, label, value }: { icon: MaterialIcon; label: stri
 export function InventoryItemViewPopup() {
     const navigate = useNavigatePage();
 
-    const item = useInventoryItem();
+    const item = useLoaderData<BranchInventoryEntry | null>();
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
 
     if (!item) {
@@ -72,10 +58,8 @@ export function InventoryItemViewPopup() {
         );
     }
 
-    const isLowStock = item.stockLevel <= item.reorderThreshold;
-
     return (
-        <PopUp title={item.itemName} handleCloseProp={handleClose}>
+        <PopUp title={item.product.productName} handleCloseProp={handleClose}>
             <section className="flex flex-col gap-4">
                 <div className="flex items-center justify-center gap-2 rounded-2xl bg-cream px-4 py-3">
                     <Text
@@ -84,15 +68,19 @@ export function InventoryItemViewPopup() {
                         variant="brown"
                         svg={{ icon: Inventory2OutlinedIcon, size: "normal", position: "left", gap: "small" }}
                     >
-                        {item.sku}
+                        {item.product.sku}
                     </Text>
                 </div>
 
-                <ItemDetailRow icon={Inventory2OutlinedIcon} label="Category" value={item.category} />
+                <ItemDetailRow
+                    icon={Inventory2OutlinedIcon}
+                    label="Category"
+                    value={item.product.category?.categoryName ?? "—"}
+                />
                 <ItemDetailRow
                     icon={WarningAmberOutlinedIcon}
                     label="Stock Level"
-                    value={`${item.stockLevel} units${isLowStock ? " (Low Stock)" : ""}`}
+                    value={`${item.quantity} units${item.status === "LOW_STOCK" ? " (Low Stock)" : ""}`}
                 />
                 <ItemDetailRow
                     icon={WarningAmberOutlinedIcon}
@@ -104,14 +92,18 @@ export function InventoryItemViewPopup() {
                     label="Unit Price"
                     value={NumberFormat(item.unitPrice, "₱")}
                 />
-                <ItemDetailRow icon={LocalShippingOutlinedIcon} label="Supplier" value={item.supplier} />
+                <ItemDetailRow
+                    icon={LocalShippingOutlinedIcon}
+                    label="Supplier"
+                    value={item.product.supplier?.supplierName ?? "—"}
+                />
 
                 <div className="flex gap-2">
                     <Button onClick={handleClose} className="flex-1" variant="secondary" size="normal">
                         Close
                     </Button>
                     <Button
-                        onClick={() => navigate(ROUTES.BRANCH_MANAGER.inventoryItemRestock(item.itemId), true)}
+                        onClick={() => navigate(ROUTES.BRANCH_MANAGER.inventoryItemRestock(String(item.id)), true)}
                         className="flex-1"
                         size="normal"
                     >
@@ -126,16 +118,7 @@ export function InventoryItemViewPopup() {
 export function InventoryItemRestockPopup() {
     const navigate = useNavigatePage();
 
-    const item = useInventoryItem();
-
-    const supplierOptions = useMemo(
-        () =>
-            TABLE_SUPPLIERS.reduce<Record<string, string>>((acc, supplier) => {
-                acc[supplier.supplierName] = supplier.supplierId;
-                return acc;
-            }, {}),
-        []
-    );
+    const item = useLoaderData<BranchInventoryEntry | null>();
 
     // When triggered, returns to the inventory page (exiting the popup) and keeps the filters
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
@@ -149,53 +132,28 @@ export function InventoryItemRestockPopup() {
     }
 
     return (
-        <PopUp title={`Restock ${item.itemName}`} handleCloseProp={handleClose}>
+        <PopUp title={`Restock ${item.product.productName}`} handleCloseProp={handleClose}>
             <Form method="post" className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1 rounded-2xl bg-cream px-4 py-3">
-                    <Text size="description" weight="medium" variant="brown">
-                        Current stock
-                    </Text>
-                    <Text size="normal" weight="bold" variant="crimson">
-                        {item.stockLevel} units
-                    </Text>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                    <GeneralInput
-                        name="quantity"
-                        label="Quantity to Add"
-                        labelVariant="small"
-                        type="number"
-                        min={1}
-                        placeholder="0"
-                        required
-                    />
-                    <GeneralInput
-                        name="unitCost"
-                        label="Unit Cost"
-                        labelVariant="small"
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        placeholder={`₱${item.unitPrice.toFixed(2)}`}
-                        defaultValue={item.unitPrice}
-                        required
-                    />
-                </div>
-
-                <SelectInput
-                    id="restockSupplier"
-                    name="restockSupplier"
+                <ItemDetailRow icon={WarningAmberOutlinedIcon} label="Current Stock" value={`${item.quantity} units`} />
+                <ItemDetailRow
+                    icon={PaymentsOutlinedIcon}
+                    label="Unit Price"
+                    value={NumberFormat(item.unitPrice, "₱")}
+                />
+                <ItemDetailRow
+                    icon={LocalShippingOutlinedIcon}
                     label="Supplier"
-                    options={supplierOptions}
-                    defaultValue={item.supplier}
+                    value={item.product.supplier?.supplierName ?? "—"}
                 />
 
-                <TextAreaInput
-                    name="notes"
-                    label="Notes"
+                <GeneralInput
+                    name="quantity"
+                    label="Quantity to Add"
                     labelVariant="small"
-                    placeholder="Optional remarks about this restock"
+                    type="number"
+                    min={1}
+                    placeholder="0"
+                    required
                 />
 
                 <div className="flex gap-2">
@@ -213,7 +171,7 @@ export function InventoryItemRestockPopup() {
 
 export function InventoryItemDeletePopup() {
     const navigate = useNavigatePage();
-    const item = useInventoryItem();
+    const item = useLoaderData<BranchInventoryEntry | null>();
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
 
     return (
@@ -221,8 +179,10 @@ export function InventoryItemDeletePopup() {
             <section className="flex flex-col gap-4">
                 <Text>
                     Are you sure you want to delete{" "}
-                    <span className="font-bold">{item ? `${item.itemName} (${item.sku})` : "this item"}</span> from this
-                    branch's inventory? This action cannot be undone.
+                    <span className="font-bold">
+                        {item ? `${item.product.productName} (${item.product.sku})` : "this item"}
+                    </span>{" "}
+                    from this branch's inventory? This action cannot be undone.
                 </Text>
 
                 <Form method="post" className="flex gap-2">
@@ -241,18 +201,29 @@ export function InventoryItemDeletePopup() {
 export function InventoryItemAddPopup() {
     const navigate = useNavigatePage();
 
-    const catalogueOptions = useMemo(
-        () =>
-            CATALOGUE_PRODUCTS.reduce<Record<string, string>>((acc, product) => {
-                acc[product.productName] = product.productId;
-                return acc;
-            }, {}),
-        []
-    );
+    const { products } = useLoaderData<BranchInventoryOptionsResponse>();
 
-    const defaultProductId = CATALOGUE_PRODUCTS[0]?.productId ?? "";
+    const productOptions = Object.fromEntries(products.map((product) => [product.productName, String(product.id)]));
+    const defaultProductId = String(products[0]?.id ?? "");
 
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
+
+    if (products.length === 0) {
+        return (
+            <PopUp title="Add Item to Inventory" handleCloseProp={handleClose}>
+                <section className="flex flex-col gap-4">
+                    <Text>
+                        Every product in the business catalogue is already stocked in this branch. Ask HQ Admin to add a
+                        product to the catalogue first.
+                    </Text>
+
+                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
+                        Close
+                    </Button>
+                </section>
+            </PopUp>
+        );
+    }
 
     return (
         <PopUp title="Add Item to Inventory" handleCloseProp={handleClose}>
@@ -263,7 +234,7 @@ export function InventoryItemAddPopup() {
                     id="product"
                     name="productId"
                     label="Product"
-                    options={catalogueOptions}
+                    options={productOptions}
                     defaultValue={defaultProductId}
                 />
 

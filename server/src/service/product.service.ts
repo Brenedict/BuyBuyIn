@@ -62,7 +62,10 @@ export default {
             ...(categoryId && { productCategories: { some: { categoryId } } }),
         };
 
-        const [products, total, aggregate, totalSuppliers, totalCategories] = await Promise.all([
+        // The catalogue stat cards describe the whole catalogue, not the current search.
+        const summaryWhere: ProductWhereInput = { businessId };
+
+        const [products, total, summaryTotal, aggregate, totalSuppliers, totalCategories] = await Promise.all([
             ProductModel.getProducts({
                 where,
                 skip: (page - 1) * limit,
@@ -71,7 +74,8 @@ export default {
                 select: PRODUCT_SELECT,
             }),
             ProductModel.count({ where }),
-            ProductModel.aggregate({ where, _avg: { shelfPrice: true } }),
+            ProductModel.count({ where: summaryWhere }),
+            ProductModel.aggregate({ where: summaryWhere, _avg: { shelfPrice: true } }),
             SupplierModel.countForBusiness(businessId),
             CategoryModel.countForBusiness(businessId),
         ]);
@@ -79,7 +83,7 @@ export default {
         return {
             products: products.map(mapProduct),
             summary: {
-                totalProducts: total,
+                totalProducts: summaryTotal,
                 totalCategories,
                 totalSuppliers,
                 averageShelfPrice: Math.round((aggregate._avg?.shelfPrice ?? 0) * 100) / 100,

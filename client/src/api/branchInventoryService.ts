@@ -35,7 +35,9 @@ const parseItemId = (id?: string) => {
 export const getBranchInventory = async ({ request }: LoaderFunctionArgs): Promise<BranchInventoryListResponse> => {
     try {
         const { query } = extractQueryToObject(request);
-        const queryString = buildQueryString(query);
+
+        // The Table paginates client-side, so request the API maximum up front.
+        const queryString = buildQueryString({ ...query, limit: "100" });
 
         // Main Fetch Request
         const res = await apiJson(`/branch-inventory${queryString ? `?${queryString}` : ""}`, { method: "GET" });
@@ -52,7 +54,7 @@ export const getBranchInventory = async ({ request }: LoaderFunctionArgs): Promi
 export const getBranchInventoryItem = async ({
     params,
     request,
-}: LoaderFunctionArgs): Promise<BranchInventoryEntry> => {
+}: LoaderFunctionArgs): Promise<BranchInventoryEntry | null> => {
     try {
         const itemId = parseItemId(params.id);
 
@@ -62,6 +64,11 @@ export const getBranchInventoryItem = async ({
 
         // Main Fetch Request
         const res = await apiJson(`/branch-inventory/${itemId}`, { method: "GET" });
+
+        // Let the popup render its own not-found state.
+        if (res.status === 404) {
+            return null;
+        }
 
         await ensureOk(res, "Failed to retrieve inventory item");
 

@@ -8,6 +8,16 @@ import { apiFetch } from "./httpClient";
 // Routes & Utils
 import { ROUTES } from "../routes/Routes";
 
+export class ApiError extends Error {
+    readonly status: number;
+
+    constructor(message: string, status: number) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+    }
+}
+
 export const JSON_HEADERS = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -66,6 +76,8 @@ export const handleErrRedirect = (err: unknown, request: Request, path: string, 
     // 2nd Line of Defense on Unauthorized URL Access
     if (err instanceof Response) throw err;
 
+    if (err instanceof ApiError && err.status === 403) return redirect(ROUTES.FORBIDDEN);
+
     console.error(err);
 
     if (withQuery) {
@@ -114,7 +126,7 @@ export const ensureOk = async (res: Response, message: string) => {
         throw res;
     }
 
-    throw new Error(errorMessage);
+    throw new ApiError(errorMessage, res.status);
 };
 
 export const ensureOkOrRedirect = async (res: Response, message: string, request: Request, path: string) => {
@@ -142,7 +154,7 @@ export const ensureOkOrRedirect = async (res: Response, message: string, request
         throw redirectWithQuery(request, path, `ERROR=${encodeURIComponent(detail)}`);
     }
 
-    throw new Error(`${message} (${res.status})`);
+    throw new ApiError(`${message} (${res.status})`, res.status);
 };
 
 export function validateForm<T extends z.ZodType>(

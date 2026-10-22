@@ -25,6 +25,11 @@ import {
 // Routes & Utils
 import { ROUTES } from "../routes/Routes";
 
+export type ProductFormLoaderData = {
+    product: CatalogueProduct | null;
+    options: CatalogueOptionsResponse;
+};
+
 const parseProductId = (id?: string) => {
     const productId = Number(id);
 
@@ -35,7 +40,9 @@ const parseProductId = (id?: string) => {
 export const getCatalogue = async ({ request }: LoaderFunctionArgs): Promise<CatalogueListResponse> => {
     try {
         const { query } = extractQueryToObject(request);
-        const queryString = buildQueryString(query);
+
+        // The Table paginates client-side, so request the API maximum up front.
+        const queryString = buildQueryString({ ...query, limit: "100" });
 
         // Main Fetch Request
         const res = await apiJson(`/product${queryString ? `?${queryString}` : ""}`, { method: "GET" });
@@ -48,11 +55,48 @@ export const getCatalogue = async ({ request }: LoaderFunctionArgs): Promise<Cat
     }
 };
 
+// GET: Fetches a single catalogue product
+export const getProduct = async ({ params, request }: LoaderFunctionArgs): Promise<CatalogueProduct | null> => {
+    try {
+        const productId = parseProductId(params.id);
+
+        if (productId === null) {
+            throw redirect(ROUTES.HQ_ADMIN.catalogue);
+        }
+
+        // Main Fetch Request
+        const res = await apiJson(`/product/${productId}`, { method: "GET" });
+
+        if (res.status === 404) {
+            return null;
+        }
+
+        await ensureOk(res, "Failed to retrieve product");
+
+        return res.json();
+    } catch (err) {
+        throw handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
+    }
+};
+
+// GET: Fetches the option lists for the add form (no product to load)
+export const getProductForm = async ({ request }: LoaderFunctionArgs): Promise<ProductFormLoaderData> => {
+    try {
+        // Main Fetch Request
+        const res = await apiJson("/product/options", { method: "GET" });
+
+        await ensureOk(res, "Failed to retrieve product options");
+
+        const options: CatalogueOptionsResponse = await res.json();
+
+        return { product: null, options };
+    } catch (err) {
+        throw handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
+    }
+};
+
 // GET: Fetches a single catalogue product together with its option lists
-export const getCatalogueProduct = async ({
-    params,
-    request,
-}: LoaderFunctionArgs): Promise<{ product: CatalogueProduct; options: CatalogueOptionsResponse }> => {
+export const getCatalogueProduct = async ({ params, request }: LoaderFunctionArgs): Promise<ProductFormLoaderData> => {
     try {
         const productId = parseProductId(params.id);
 
@@ -66,11 +110,18 @@ export const getCatalogueProduct = async ({
             apiJson("/product/options", { method: "GET" }),
         ]);
 
-        await ensureOk(productRes, "Failed to retrieve product");
         await ensureOk(optionsRes, "Failed to retrieve product options");
 
-        const product: CatalogueProduct = await productRes.json();
         const options: CatalogueOptionsResponse = await optionsRes.json();
+
+        // Let the popup render its own not-found state.
+        if (productRes.status === 404) {
+            return { product: null, options };
+        }
+
+        await ensureOk(productRes, "Failed to retrieve product");
+
+        const product: CatalogueProduct = await productRes.json();
 
         return { product, options };
     } catch (err) {

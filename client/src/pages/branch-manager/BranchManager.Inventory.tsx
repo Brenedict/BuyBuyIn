@@ -104,7 +104,7 @@ function renderOutOfStockRow(item: BranchInventoryEntry) {
 // Main page
 export function BranchManager_Inventory() {
     const { items, summary } = useLoaderData<BranchInventoryListResponse>();
-    const { values, submit } = useFormSearchParams({ search: "" });
+    const { values, handleChange } = useFormSearchParams({ search: "" });
 
     const outOfStock = items.filter((item) => item.status === "OUT_OF_STOCK");
     const currentStock = items.filter((item) => item.status !== "OUT_OF_STOCK");
@@ -135,7 +135,7 @@ export function BranchManager_Inventory() {
                         </Text>
                     </div>
 
-                    <Form onSubmit={submit()} className="flex items-center gap-3">
+                    <Form onChange={handleChange} className="flex items-center gap-3">
                         <SearchInput
                             name="search"
                             placeholder="Search items, supplier..."

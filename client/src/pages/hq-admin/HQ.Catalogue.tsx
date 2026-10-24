@@ -87,7 +87,7 @@ function renderCatalogueRow(product: CatalogueProduct) {
 // Main page
 export function HQ_Catalogue() {
     const { products, summary, suppliers } = useLoaderData<CataloguePageData>();
-    const { values, submit } = useFormSearchParams({ search: "" });
+    const { values, handleChange } = useFormSearchParams({ search: "" });
     const navigate = useNavigatePage();
 
     const handleAddSupplier = () => navigate(ROUTES.HQ_ADMIN.supplierAdd, true);
@@ -113,7 +113,7 @@ export function HQ_Catalogue() {
                         </Text>
                     </div>
 
-                    <Form onSubmit={submit()} className="flex items-center gap-3">
+                    <Form onChange={handleChange} className="flex items-center gap-3">
                         <SearchInput
                             name="search"
                             placeholder="Search products, category..."

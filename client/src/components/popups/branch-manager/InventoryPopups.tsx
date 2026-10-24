@@ -155,7 +155,7 @@ export function InventoryItemDeletePopup() {
                 <div className="flex items-start gap-3 rounded-2xl bg-crimson-muted p-3">
                     <WarningAmberOutlinedIcon className="text-crimson" fontSize="small" />
                     <Text size="description" weight="medium" variant="crimson">
-                        This is permanent. Once deleted, this item and its data cannot be recovered.
+                        This is not permanent. Once deleted, the item will still remain in the catalogue.
                     </Text>
                 </div>
 

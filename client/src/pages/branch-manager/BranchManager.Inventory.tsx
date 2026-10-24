@@ -4,13 +4,12 @@ import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 import SearchInput from "../../components/inputs/SearchInput";
-import { EditDeleteButtons, PrimarySecondaryText } from "../../components/partials/TablePartials";
+import { PrimarySecondaryText } from "../../components/partials/TablePartials";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
 import { ROUTES } from "../../routes/Routes";
 import type { MaterialIcon } from "../../types/common";
-import { TABLE_SUPPLIERS } from "../../TESTINGDATA/inventoryData";
 
 // BuyBuyIn Shared Imports
 import type { BranchInventoryEntry, BranchInventoryListResponse } from "@buybuyin/shared/schema/branchInventory";
@@ -113,17 +112,8 @@ export function BranchManager_Inventory() {
     // Used for redirecting
     const navigate = useNavigatePage();
 
-    const handleEditSupplier = (id: string | number) => () => {
-        alert(`Edit supplier: ${id}`);
-    };
-    const handleDeleteSupplier = (id: string | number) => () => {
-        alert(`Delete supplier: ${id}`);
-    };
     const handleAddItem = () => {
         navigate(ROUTES.BRANCH_MANAGER.inventoryItemAdd, true);
-    };
-    const handleAddSupplier = () => {
-        alert("Add Supplier");
     };
 
     const formatStockLevel = (item: BranchInventoryEntry) => {
@@ -277,65 +267,6 @@ export function BranchManager_Inventory() {
                                     <Table.Data text={item.product.supplier?.supplierName ?? "—"} wrapWords />
                                     <Table.Data>
                                         <ItemRowActions id={String(item.id)} />
-                                    </Table.Data>
-                                </Table.Row>
-                            ))}
-                        </Table>
-                    </Card.Body>
-                </Card>
-
-                {/* Suppliers Table */}
-                <Card>
-                    <Card.Header
-                        toggleRightButton
-                        rightButton={<Button leftIcon={AddIcon} onClick={handleAddSupplier} size="normal" />}
-                        bordered
-                    >
-                        <Text variant="crimson" size="bigger" weight="extraBold">
-                            Suppliers
-                        </Text>
-                    </Card.Header>
-                    <Card.Body removePadding>
-                        <Table
-                            bordered={false}
-                            shadow={false}
-                            rounded={false}
-                            pagination={{
-                                bgVariant: "cream-muted",
-                                borderVariant: "brown",
-                                borderedTop: true,
-                                maxItems: 5,
-                                textSize: "description",
-                                textVariant: "crimson",
-                                textWeight: "medium",
-                            }}
-                            pageKey="suppliers_page"
-                        >
-                            <Table.Row borderedBottom>
-                                <Table.Header text="Supplier" size="big" />
-                                <Table.Header text="Contact Person" size="big" />
-                                <Table.Header text="Contact Information" size="big" />
-                                <Table.Header text="Address" size="big" />
-                                <Table.Header text="Actions" size="big" />
-                            </Table.Row>
-                            {TABLE_SUPPLIERS.map((supplier) => (
-                                <Table.Row key={supplier.supplierId}>
-                                    <Table.Data text={supplier.supplierName} wrapWords />
-                                    <Table.Data text={supplier.contactPerson} wrapWords />
-                                    <Table.Data wrapWords>
-                                        <PrimarySecondaryText
-                                            primary={supplier.contactNumber}
-                                            secondary={supplier.email}
-                                        />
-                                    </Table.Data>
-                                    <Table.Data text={supplier.address} wrapWords />
-                                    <Table.Data>
-                                        <EditDeleteButtons
-                                            id={supplier.supplierId}
-                                            handleEdit={handleEditSupplier}
-                                            handleDelete={handleDeleteSupplier}
-                                            size="smallest"
-                                        />
                                     </Table.Data>
                                 </Table.Row>
                             ))}

@@ -10,6 +10,7 @@ import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
 import { ROUTES } from "../../routes/Routes";
+import { TABLE_SUPPLIERS } from "../../TESTINGDATA/inventoryData";
 
 // BuyBuyIn Shared Imports
 import type { CatalogueListResponse, CatalogueProduct } from "@buybuyin/shared/schema/product";
@@ -86,6 +87,16 @@ export function HQ_Catalogue() {
     const { products, summary } = useLoaderData<CatalogueListResponse>();
     const { values, submit } = useFormSearchParams({ search: "" });
     const navigate = useNavigatePage();
+
+    const handleAddSupplier = () => {
+        alert("Add Supplier");
+    };
+    const handleEditSupplier = (id: string | number) => () => {
+        alert(`Edit supplier: ${id}`);
+    };
+    const handleDeleteSupplier = (id: string | number) => () => {
+        alert(`Delete supplier: ${id}`);
+    };
 
     const handleAddProduct = () => {
         navigate(ROUTES.HQ_ADMIN.catalogueProductAdd, true);
@@ -177,6 +188,65 @@ export function HQ_Catalogue() {
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
                             {products.map(renderCatalogueRow)}
+                        </Table>
+                    </Card.Body>
+                </Card>
+
+                {/* Suppliers Table */}
+                <Card>
+                    <Card.Header
+                        toggleRightButton
+                        rightButton={<Button leftIcon={AddIcon} onClick={handleAddSupplier} size="normal" />}
+                        bordered
+                    >
+                        <Text variant="crimson" size="bigger" weight="extraBold">
+                            Suppliers
+                        </Text>
+                    </Card.Header>
+                    <Card.Body removePadding>
+                        <Table
+                            bordered={false}
+                            shadow={false}
+                            rounded={false}
+                            pagination={{
+                                bgVariant: "cream-muted",
+                                borderVariant: "brown",
+                                borderedTop: true,
+                                maxItems: 5,
+                                textSize: "description",
+                                textVariant: "crimson",
+                                textWeight: "medium",
+                            }}
+                            pageKey="suppliers_page"
+                        >
+                            <Table.Row borderedBottom>
+                                <Table.Header text="Supplier" size="big" />
+                                <Table.Header text="Contact Person" size="big" />
+                                <Table.Header text="Contact Information" size="big" />
+                                <Table.Header text="Address" size="big" />
+                                <Table.Header text="Actions" size="big" />
+                            </Table.Row>
+                            {TABLE_SUPPLIERS.map((supplier) => (
+                                <Table.Row key={supplier.supplierId}>
+                                    <Table.Data text={supplier.supplierName} wrapWords />
+                                    <Table.Data text={supplier.contactPerson} wrapWords />
+                                    <Table.Data wrapWords>
+                                        <PrimarySecondaryText
+                                            primary={supplier.contactNumber}
+                                            secondary={supplier.email}
+                                        />
+                                    </Table.Data>
+                                    <Table.Data text={supplier.address} wrapWords />
+                                    <Table.Data>
+                                        <EditDeleteButtons
+                                            id={supplier.supplierId}
+                                            handleEdit={handleEditSupplier}
+                                            handleDelete={handleDeleteSupplier}
+                                            size="smallest"
+                                        />
+                                    </Table.Data>
+                                </Table.Row>
+                            ))}
                         </Table>
                     </Card.Body>
                 </Card>

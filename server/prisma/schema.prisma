@@ -229,7 +229,7 @@ model Supplier {
     contactNumber String @db.VarChar(11)
     address       String
 
-    // Many-to-one connections
+    // One-to-many connections
     products Product[]
 }
 

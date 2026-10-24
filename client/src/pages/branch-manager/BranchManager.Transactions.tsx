@@ -6,7 +6,8 @@ import { Outlet } from "react-router";
 import { PageHeader } from "../../components/PageHeader";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
-import { SearchInput, SelectInput } from "../../components/Input";
+import SearchInput from "../../components/inputs/SearchInput";
+import SelectInput from "../../components/inputs/SelectInput";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
@@ -139,13 +140,14 @@ function ControlsSection({
                             defaultValue={paymentFilter}
                             className="py-1!"
                             onChange={(e) => setPaymentFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Methods">All Methods</SelectInput.Option>
-                            <SelectInput.Option value="Cash">Cash</SelectInput.Option>
-                            <SelectInput.Option value="GCash Digital">GCash Digital</SelectInput.Option>
-                            <SelectInput.Option value="Card Payment">Card Payment</SelectInput.Option>
-                            <SelectInput.Option value="Maya QR">Maya QR</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                "All Methods": "All Methods",
+                                Cash: "Cash",
+                                "GCash Digital": "GCash Digital",
+                                "Card Payment": "Card Payment",
+                                "Maya QR": "Maya QR",
+                            }}
+                        />
                     </div>
 
                     <div className="w-48">
@@ -154,12 +156,13 @@ function ControlsSection({
                             defaultValue={quantityFilter}
                             className="py-1!"
                             onChange={(e) => setQuantityFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Quantities">All Quantities</SelectInput.Option>
-                            <SelectInput.Option value="1 - 5 items">1 - 5 items</SelectInput.Option>
-                            <SelectInput.Option value="6 - 10 items">6 - 10 items</SelectInput.Option>
-                            <SelectInput.Option value="11+ items">11+ items</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                "All Quantities": "All Quantities",
+                                "1 - 5 items": "1 - 5 items",
+                                "6 - 10 items": "6 - 10 items",
+                                "11+ items": "11+ items",
+                            }}
+                        />
                     </div>
 
                     <div className="w-32">
@@ -169,12 +172,13 @@ function ControlsSection({
                             className="py-1!"
                             variant="button"
                             onChange={(e) => setTimeframeFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="Today">Today</SelectInput.Option>
-                            <SelectInput.Option value="Last 7 Days">Last Week</SelectInput.Option>
-                            <SelectInput.Option value="Last 30 Days">Last Month</SelectInput.Option>
-                            <SelectInput.Option value="All Time">All Time</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                Today: "Today",
+                                "Last Week": "Last 7 Days",
+                                "Last Month": "Last 30 Days",
+                                "All Time": "All Time",
+                            }}
+                        />
                     </div>
                 </div>
             </Card.Body>

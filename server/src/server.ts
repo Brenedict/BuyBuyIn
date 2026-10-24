@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import env from "./config/env.config";
 
 // Routes
+import registrationRoutes from "./routes/registration.route";
 import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.routes";
 
@@ -59,6 +60,7 @@ app.use(cookieParser());
 
 // --------------------- SERVER ROUTES --------------------------------
 
+app.use("/api/v1/registration", registrationRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 

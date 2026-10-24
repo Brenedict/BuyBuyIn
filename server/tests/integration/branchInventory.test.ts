@@ -19,7 +19,7 @@ import productRouter from "../../src/routes/product.route";
 
 // Prisma.config
 import prisma from "../../src/config/prisma.config";
-import { app } from "../../jest.integration";
+import { app, setCurrentAuthUser } from "../../jest.integration";
 
 // Helpers
 import { resetDatabase } from "../helpers/database.helper";
@@ -28,7 +28,8 @@ import { resetDatabase } from "../helpers/database.helper";
 import { buildMockProduct, mockBranch, mockBusiness, mockSupplier, seedCatalogue } from "../fixtures/catalogue.fixture";
 import type { SeededCatalogue } from "../fixtures/catalogue.fixture";
 import { buildMockInventoryItem } from "../fixtures/branchInventory.fixture";
-import { PASSWORD, mockBranchManager, mockCashier, mockHqAdmin, seedUsers } from "../fixtures/user.fixture";
+import { PASSWORD, seedUsers } from "../fixtures/user.fixture";
+import type { SeededUsers } from "../fixtures/user.fixture";
 
 describe("Branch inventory routes", () => {
     app.use("/auth", authRouter);
@@ -36,6 +37,7 @@ describe("Branch inventory routes", () => {
     app.use("/branch-inventory", branchInventoryRouter);
 
     let catalogue: SeededCatalogue;
+    let users: SeededUsers;
     let secondBranch: Branch;
     let stock: {
         alpha: BranchInventoryItem;
@@ -55,7 +57,7 @@ describe("Branch inventory routes", () => {
             data: { ...mockBranch, location: "Second Branch", businessId: catalogue.business.id },
         });
 
-        await seedUsers(catalogue.business.id, catalogue.branch.id, secondBranch.id);
+        users = await seedUsers(catalogue.business.id, catalogue.branch.id, secondBranch.id);
 
         const alpha = findProduct("Alpha Shirt");
         const beta = findProduct("Beta Mug");
@@ -107,14 +109,6 @@ describe("Branch inventory routes", () => {
         };
     });
 
-    const loginAs = async (email: string): Promise<string> => {
-        const res = await request(app).post("/auth/login").send({ email, password: PASSWORD }).expect(200);
-
-        return res.body.accessToken as string;
-    };
-
-    const authHeader = async (email: string) => ({ Authorization: `Bearer ${await loginAs(email)}` });
-
     function findProduct(productName: string) {
         const product = catalogue.products.find((entry) => entry.productName === productName);
 
@@ -152,7 +146,12 @@ describe("Branch inventory routes", () => {
             data: { ...mockBusiness, name: "Foreign Business", location: "Cebu, Philippines" },
         });
         const supplier = await prisma.supplier.create({
-            data: { ...mockSupplier, supplierName: "Foreign Supplier", email: "foreign@supplier.test" },
+            data: {
+                ...mockSupplier,
+                supplierName: "Foreign Supplier",
+                email: "foreign@supplier.test",
+                businessId: business.id,
+            },
         });
         const category = await prisma.category.create({ data: { categoryName: "Foreign Category" } });
 
@@ -173,10 +172,9 @@ describe("Branch inventory routes", () => {
 
     describe("GET /branch-inventory", () => {
         it("returns the branch stock with a branch-wide summary", async () => {
-            const res = await request(app)
-                .get("/branch-inventory")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/branch-inventory").expect(200);
 
             const body = res.body as BranchInventoryListResponse;
 
@@ -229,29 +227,28 @@ describe("Branch inventory routes", () => {
         });
 
         it("filters by stock status", async () => {
-            const headers = await authHeader(mockBranchManager.email);
+            setCurrentAuthUser(users.branchManager);
 
-            const inStock = await request(app).get("/branch-inventory?status=in-stock").set(headers).expect(200);
+            const inStock = await request(app).get("/branch-inventory?status=in-stock").expect(200);
             expect((inStock.body as BranchInventoryListResponse).items.map((item) => item.product.productName)).toEqual(
                 ["Alpha Shirt", "Delta Bag"]
             );
 
-            const lowStock = await request(app).get("/branch-inventory?status=low-stock").set(headers).expect(200);
+            const lowStock = await request(app).get("/branch-inventory?status=low-stock").expect(200);
             expect(
                 (lowStock.body as BranchInventoryListResponse).items.map((item) => item.product.productName)
             ).toEqual(["Beta Mug"]);
 
-            const outOfStock = await request(app).get("/branch-inventory?status=out-of-stock").set(headers).expect(200);
+            const outOfStock = await request(app).get("/branch-inventory?status=out-of-stock").expect(200);
             expect(
                 (outOfStock.body as BranchInventoryListResponse).items.map((item) => item.product.productName)
             ).toEqual(["Gamma Pen"]);
         });
 
         it("filters by product name while keeping the summary branch-wide", async () => {
-            const res = await request(app)
-                .get("/branch-inventory?search=beta")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/branch-inventory?search=beta").expect(200);
 
             const body = res.body as BranchInventoryListResponse;
 
@@ -262,11 +259,10 @@ describe("Branch inventory routes", () => {
         });
 
         it("filters by category and by supplier", async () => {
-            const headers = await authHeader(mockBranchManager.email);
+            setCurrentAuthUser(users.branchManager);
 
             const byCategory = await request(app)
                 .get(`/branch-inventory?categoryId=${findCategory("Apparel").id}`)
-                .set(headers)
                 .expect(200);
             expect(
                 (byCategory.body as BranchInventoryListResponse).items.map((item) => item.product.productName)
@@ -274,7 +270,6 @@ describe("Branch inventory routes", () => {
 
             const bySupplier = await request(app)
                 .get(`/branch-inventory?supplierId=${findSupplier("Acme Supplies").id}`)
-                .set(headers)
                 .expect(200);
             expect(
                 (bySupplier.body as BranchInventoryListResponse).items.map((item) => item.product.productName)
@@ -282,10 +277,9 @@ describe("Branch inventory routes", () => {
         });
 
         it("paginates the branch stock", async () => {
-            const res = await request(app)
-                .get("/branch-inventory?page=2&limit=2")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/branch-inventory?page=2&limit=2").expect(200);
 
             const body = res.body as BranchInventoryListResponse;
 
@@ -294,10 +288,9 @@ describe("Branch inventory routes", () => {
         });
 
         it("never leaks items stocked by another branch", async () => {
-            const res = await request(app)
-                .get("/branch-inventory")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/branch-inventory").expect(200);
 
             const body = res.body as BranchInventoryListResponse;
 
@@ -311,10 +304,9 @@ describe("Branch inventory routes", () => {
 
     describe("GET /branch-inventory/options", () => {
         it("returns business products that are not stocked in the requestor's branch", async () => {
-            const res = await request(app)
-                .get("/branch-inventory/options")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/branch-inventory/options").expect(200);
 
             const body = res.body as BranchInventoryOptionsResponse;
 
@@ -332,10 +324,9 @@ describe("Branch inventory routes", () => {
 
             await seedForeignProduct();
 
-            const res = await request(app)
-                .get("/branch-inventory/options")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/branch-inventory/options").expect(200);
 
             const body = res.body as BranchInventoryOptionsResponse;
 
@@ -347,10 +338,9 @@ describe("Branch inventory routes", () => {
 
     describe("GET /branch-inventory/:id", () => {
         it("returns a single inventory item", async () => {
-            const res = await request(app)
-                .get(`/branch-inventory/${stock.beta.id}`)
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get(`/branch-inventory/${stock.beta.id}`).expect(200);
 
             const item = res.body as BranchInventoryEntry;
 
@@ -362,19 +352,17 @@ describe("Branch inventory routes", () => {
         });
 
         it("returns 404 for an item of another branch", async () => {
-            const res = await request(app)
-                .get(`/branch-inventory/${stock.secondBranchEpsilon.id}`)
-                .set(await authHeader(mockBranchManager.email))
-                .expect(404);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get(`/branch-inventory/${stock.secondBranchEpsilon.id}`).expect(404);
 
             expect(res.body).toEqual({ error: "Inventory item not found" });
         });
 
         it("returns 404 for a non-numeric item id", async () => {
-            const res = await request(app)
-                .get("/branch-inventory/abc")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(404);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/branch-inventory/abc").expect(404);
 
             expect(res.body).toEqual({ error: "Inventory item not found" });
         });
@@ -386,9 +374,10 @@ describe("Branch inventory routes", () => {
         it("adds an unstocked product to the requestor's branch", async () => {
             const epsilon = findProduct("Epsilon Cap");
 
+            setCurrentAuthUser(users.branchManager);
+
             const res = await request(app)
                 .post("/branch-inventory")
-                .set(await authHeader(mockBranchManager.email))
                 .send({ productId: epsilon.id, quantity: 5, reorderThreshold: 2 })
                 .expect(201);
 
@@ -405,9 +394,10 @@ describe("Branch inventory routes", () => {
         });
 
         it("returns 409 when the product is already stocked in the branch", async () => {
+            setCurrentAuthUser(users.branchManager);
+
             const res = await request(app)
                 .post("/branch-inventory")
-                .set(await authHeader(mockBranchManager.email))
                 .send({ productId: findProduct("Alpha Shirt").id, quantity: 1, reorderThreshold: 1 })
                 .expect(409);
 
@@ -417,9 +407,10 @@ describe("Branch inventory routes", () => {
         it("returns 400 for a product of another business", async () => {
             const { product } = await seedForeignProduct();
 
+            setCurrentAuthUser(users.branchManager);
+
             const res = await request(app)
                 .post("/branch-inventory")
-                .set(await authHeader(mockBranchManager.email))
                 .send({ productId: product.id, quantity: 1, reorderThreshold: 1 })
                 .expect(400);
 
@@ -431,9 +422,10 @@ describe("Branch inventory routes", () => {
                 data: buildMockProduct({ productName: "Orphan Product", businessId: null }),
             });
 
+            setCurrentAuthUser(users.branchManager);
+
             const res = await request(app)
                 .post("/branch-inventory")
-                .set(await authHeader(mockBranchManager.email))
                 .send({ productId: orphan.id, quantity: 1, reorderThreshold: 1 })
                 .expect(400);
 
@@ -441,18 +433,16 @@ describe("Branch inventory routes", () => {
         });
 
         it("returns 400 for missing and negative quantities", async () => {
-            const headers = await authHeader(mockBranchManager.email);
+            setCurrentAuthUser(users.branchManager);
             const epsilon = findProduct("Epsilon Cap");
 
             await request(app)
                 .post("/branch-inventory")
-                .set(headers)
                 .send({ productId: epsilon.id, reorderThreshold: 2 })
                 .expect(400);
 
             await request(app)
                 .post("/branch-inventory")
-                .set(headers)
                 .send({ productId: epsilon.id, quantity: -1, reorderThreshold: 2 })
                 .expect(400);
         });
@@ -462,9 +452,10 @@ describe("Branch inventory routes", () => {
 
     describe("PATCH /branch-inventory/:id/restock", () => {
         it("increments the quantity", async () => {
+            setCurrentAuthUser(users.branchManager);
+
             const res = await request(app)
                 .patch(`/branch-inventory/${stock.alpha.id}/restock`)
-                .set(await authHeader(mockBranchManager.email))
                 .send({ quantity: 5 })
                 .expect(200);
 
@@ -476,9 +467,10 @@ describe("Branch inventory routes", () => {
         });
 
         it("updates the reorder threshold when provided", async () => {
+            setCurrentAuthUser(users.branchManager);
+
             const res = await request(app)
                 .patch(`/branch-inventory/${stock.alpha.id}/restock`)
-                .set(await authHeader(mockBranchManager.email))
                 .send({ quantity: 1, reorderThreshold: 12 })
                 .expect(200);
 
@@ -489,9 +481,10 @@ describe("Branch inventory routes", () => {
         });
 
         it("returns 404 for an item of another branch", async () => {
+            setCurrentAuthUser(users.branchManager);
+
             const res = await request(app)
                 .patch(`/branch-inventory/${stock.secondBranchEpsilon.id}/restock`)
-                .set(await authHeader(mockBranchManager.email))
                 .send({ quantity: 1 })
                 .expect(404);
 
@@ -499,11 +492,9 @@ describe("Branch inventory routes", () => {
         });
 
         it("rejects a zero quantity", async () => {
-            await request(app)
-                .patch(`/branch-inventory/${stock.alpha.id}/restock`)
-                .set(await authHeader(mockBranchManager.email))
-                .send({ quantity: 0 })
-                .expect(400);
+            setCurrentAuthUser(users.branchManager);
+
+            await request(app).patch(`/branch-inventory/${stock.alpha.id}/restock`).send({ quantity: 0 }).expect(400);
         });
     });
 
@@ -513,10 +504,9 @@ describe("Branch inventory routes", () => {
         it("removes only the inventory row and keeps the product", async () => {
             const beta = findProduct("Beta Mug");
 
-            const res = await request(app)
-                .delete(`/branch-inventory/${stock.beta.id}`)
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).delete(`/branch-inventory/${stock.beta.id}`).expect(200);
 
             expect(res.body).toEqual({ message: "Item removed from inventory" });
             expect(await prisma.branchInventoryItem.findUnique({ where: { id: stock.beta.id } })).toBeNull();
@@ -524,11 +514,11 @@ describe("Branch inventory routes", () => {
         });
 
         it("returns 404 when deleting the same item twice", async () => {
-            const headers = await authHeader(mockBranchManager.email);
+            setCurrentAuthUser(users.branchManager);
 
-            await request(app).delete(`/branch-inventory/${stock.beta.id}`).set(headers).expect(200);
+            await request(app).delete(`/branch-inventory/${stock.beta.id}`).expect(200);
 
-            const res = await request(app).delete(`/branch-inventory/${stock.beta.id}`).set(headers).expect(404);
+            const res = await request(app).delete(`/branch-inventory/${stock.beta.id}`).expect(404);
 
             expect(res.body).toEqual({ error: "Inventory item not found" });
         });
@@ -538,21 +528,21 @@ describe("Branch inventory routes", () => {
 
     describe("Role gates", () => {
         it("forbids HQ admins, cashiers and anonymous requests from reading inventory", async () => {
-            await request(app)
-                .get("/branch-inventory")
-                .set(await authHeader(mockHqAdmin.email))
-                .expect(403);
+            setCurrentAuthUser(users.hqAdmin);
 
-            await request(app)
-                .get("/branch-inventory")
-                .set(await authHeader(mockCashier.email))
-                .expect(403);
+            await request(app).get("/branch-inventory").expect(403);
+
+            setCurrentAuthUser(users.cashier);
+
+            await request(app).get("/branch-inventory").expect(403);
+
+            setCurrentAuthUser(null);
 
             await request(app).get("/branch-inventory").expect(401);
         });
 
         it("forbids HQ admins from mutating inventory", async () => {
-            const headers = await authHeader(mockHqAdmin.email);
+            setCurrentAuthUser(users.hqAdmin);
             const epsilon = findProduct("Epsilon Cap");
 
             const mutations = [
@@ -565,12 +555,13 @@ describe("Branch inventory routes", () => {
             ];
 
             for (const mutate of mutations) {
-                await mutate().set(headers).expect(403);
+                setCurrentAuthUser(users.hqAdmin);
+                await mutate().expect(403);
             }
         });
 
         it("rejects a branch manager that is not attached to a branch", async () => {
-            await prisma.user.create({
+            const createdUser = await prisma.user.create({
                 data: {
                     email: "branchmanager.nobranch@test.local",
                     password: await bcrypt.hash(PASSWORD, 10),
@@ -582,10 +573,9 @@ describe("Branch inventory routes", () => {
                 },
             });
 
-            const res = await request(app)
-                .get("/branch-inventory")
-                .set(await authHeader("branchmanager.nobranch@test.local"))
-                .expect(403);
+            setCurrentAuthUser(createdUser);
+
+            const res = await request(app).get("/branch-inventory").expect(403);
 
             expect(res.body).toEqual({ error: "User is not attached to a branch" });
         });

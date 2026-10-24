@@ -54,7 +54,9 @@ export const seedCatalogue = async (): Promise<SeededCatalogue> => {
     const business = await prisma.business.create({ data: mockBusiness });
     const branch = await prisma.branch.create({ data: { ...mockBranch, businessId: business.id } });
 
-    const primarySupplier = await prisma.supplier.create({ data: mockSupplier });
+    const primarySupplier = await prisma.supplier.create({
+        data: { ...mockSupplier, businessId: business.id },
+    });
     const secondarySupplier = await prisma.supplier.create({
         data: {
             ...mockSupplier,
@@ -63,6 +65,7 @@ export const seedCatalogue = async (): Promise<SeededCatalogue> => {
             email: "sales@globaltraders.test",
             contactNumber: "09179876543",
             address: "45 Trade Avenue, Pasig",
+            businessId: business.id,
         },
     });
 

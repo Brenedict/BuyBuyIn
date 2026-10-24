@@ -23,7 +23,7 @@ import productRouter from "../../src/routes/product.route";
 
 // Prisma.config
 import prisma from "../../src/config/prisma.config";
-import { app } from "../../jest.integration";
+import { app, setCurrentAuthUser } from "../../jest.integration";
 
 // Helpers
 import { resetDatabase } from "../helpers/database.helper";
@@ -32,36 +32,23 @@ import { resetDatabase } from "../helpers/database.helper";
 import { buildMockProduct, mockBusiness, mockSupplier, seedCatalogue } from "../fixtures/catalogue.fixture";
 import type { SeededCatalogue } from "../fixtures/catalogue.fixture";
 import { buildMockInventoryItem } from "../fixtures/branchInventory.fixture";
-import {
-    PASSWORD,
-    mockBranchManager,
-    mockCashier,
-    mockHqAdmin,
-    mockHqAdminNoBusiness,
-    seedUsers,
-} from "../fixtures/user.fixture";
+import { PASSWORD, mockHqAdminNoBusiness, seedUsers } from "../fixtures/user.fixture";
+import type { SeededUsers } from "../fixtures/user.fixture";
 
 describe("Product routes", () => {
     app.use("/auth", authRouter);
     app.use("/product", productRouter);
 
     let catalogue: SeededCatalogue;
+    let users: SeededUsers;
 
     // ----------------------------- SETUP -----------------------------------------------------
 
     beforeEach(async () => {
         await resetDatabase();
         catalogue = await seedCatalogue();
-        await seedUsers(catalogue.business.id, catalogue.branch.id);
+        users = await seedUsers(catalogue.business.id, catalogue.branch.id);
     });
-
-    const loginAs = async (email: string): Promise<string> => {
-        const res = await request(app).post("/auth/login").send({ email, password: PASSWORD }).expect(200);
-
-        return res.body.accessToken as string;
-    };
-
-    const authHeader = async (email: string) => ({ Authorization: `Bearer ${await loginAs(email)}` });
 
     const findProduct = (productName: string) => {
         const product = catalogue.products.find((entry) => entry.productName === productName);
@@ -98,7 +85,12 @@ describe("Product routes", () => {
             data: { ...mockBusiness, name: "Foreign Business", location: "Cebu, Philippines" },
         });
         const supplier = await prisma.supplier.create({
-            data: { ...mockSupplier, supplierName: "Foreign Supplier", email: "foreign@supplier.test" },
+            data: {
+                ...mockSupplier,
+                supplierName: "Foreign Supplier",
+                email: "foreign@supplier.test",
+                businessId: business.id,
+            },
         });
         const category = await prisma.category.create({ data: { categoryName: "Foreign Category" } });
 
@@ -121,10 +113,9 @@ describe("Product routes", () => {
 
     describe("GET /product", () => {
         it("returns the catalogue sorted by product name with summary and pagination", async () => {
-            const res = await request(app)
-                .get("/product")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/product").expect(200);
 
             const body = res.body as CatalogueListResponse;
 
@@ -161,10 +152,9 @@ describe("Product routes", () => {
 
         it("filters by search case-insensitively while keeping the summary catalogue-wide", async () => {
             for (const search of ["alpha", "ALPHA"]) {
-                const res = await request(app)
-                    .get(`/product?search=${search}`)
-                    .set(await authHeader(mockBranchManager.email))
-                    .expect(200);
+                setCurrentAuthUser(users.branchManager);
+
+                const res = await request(app).get(`/product?search=${search}`).expect(200);
 
                 const body = res.body as CatalogueListResponse;
 
@@ -178,10 +168,9 @@ describe("Product routes", () => {
         it("filters by category and reflects the filter in pagination", async () => {
             const apparel = findCategory("Apparel");
 
-            const res = await request(app)
-                .get(`/product?categoryId=${apparel.id}`)
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get(`/product?categoryId=${apparel.id}`).expect(200);
 
             const body = res.body as CatalogueListResponse;
 
@@ -197,10 +186,9 @@ describe("Product routes", () => {
         it("filters by supplier and reflects the filter in pagination", async () => {
             const acme = findSupplier("Acme Supplies");
 
-            const res = await request(app)
-                .get(`/product?supplierId=${acme.id}`)
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get(`/product?supplierId=${acme.id}`).expect(200);
 
             const body = res.body as CatalogueListResponse;
 
@@ -213,10 +201,9 @@ describe("Product routes", () => {
         });
 
         it("paginates the catalogue", async () => {
-            const res = await request(app)
-                .get("/product?page=2&limit=2")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/product?page=2&limit=2").expect(200);
 
             const body = res.body as CatalogueListResponse;
 
@@ -225,10 +212,9 @@ describe("Product routes", () => {
         });
 
         it("rejects an invalid limit", async () => {
-            const res = await request(app)
-                .get("/product?limit=0")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(400);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/product?limit=0").expect(400);
 
             expect(res.body).toHaveProperty("error");
         });
@@ -241,10 +227,9 @@ describe("Product routes", () => {
             const alpha = findProduct("Alpha Shirt");
             const apparel = findCategory("Apparel");
 
-            const res = await request(app)
-                .get(`/product/${alpha.id}`)
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get(`/product/${alpha.id}`).expect(200);
 
             expect(res.body).toEqual({
                 id: alpha.id,
@@ -259,19 +244,17 @@ describe("Product routes", () => {
         it("returns 404 for a product of another business", async () => {
             const { product } = await seedForeignProduct();
 
-            const res = await request(app)
-                .get(`/product/${product.id}`)
-                .set(await authHeader(mockBranchManager.email))
-                .expect(404);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get(`/product/${product.id}`).expect(404);
 
             expect(res.body).toEqual({ error: "Product not found" });
         });
 
         it("returns 404 for a non-numeric product id", async () => {
-            const res = await request(app)
-                .get("/product/abc")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(404);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/product/abc").expect(404);
 
             expect(res.body).toEqual({ error: "Product not found" });
         });
@@ -281,10 +264,9 @@ describe("Product routes", () => {
 
     describe("GET /product/options", () => {
         it("returns only the suppliers and categories of the requestor's business", async () => {
-            const res = await request(app)
-                .get("/product/options")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/product/options").expect(200);
 
             const body = res.body as CatalogueOptionsResponse;
 
@@ -298,10 +280,9 @@ describe("Product routes", () => {
         it("does not leak another business' options", async () => {
             await seedForeignProduct();
 
-            const res = await request(app)
-                .get("/product/options")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).get("/product/options").expect(200);
 
             const body = res.body as CatalogueOptionsResponse;
 
@@ -327,11 +308,9 @@ describe("Product routes", () => {
         it("creates a product for the requestor's business", async () => {
             const payload = validPayload();
 
-            const res = await request(app)
-                .post("/product")
-                .set(await authHeader(mockHqAdmin.email))
-                .send(payload)
-                .expect(201);
+            setCurrentAuthUser(users.hqAdmin);
+
+            const res = await request(app).post("/product").send(payload).expect(201);
 
             expect(res.body.message).toBe("Product created");
             expect(res.body.product).toMatchObject({
@@ -355,12 +334,11 @@ describe("Product routes", () => {
         });
 
         it("rejects missing and invalid fields", async () => {
-            const headers = await authHeader(mockHqAdmin.email);
+            setCurrentAuthUser(users.hqAdmin);
             const payload = validPayload();
 
             await request(app)
                 .post("/product")
-                .set(headers)
                 .send({
                     basePrice: payload.basePrice,
                     shelfPrice: payload.shelfPrice,
@@ -371,21 +349,20 @@ describe("Product routes", () => {
 
             await request(app)
                 .post("/product")
-                .set(headers)
                 .send({ ...payload, basePrice: -1 })
                 .expect(400);
 
             await request(app)
                 .post("/product")
-                .set(headers)
                 .send({ ...payload, supplierId: 1.5 })
                 .expect(400);
         });
 
         it("rejects a nonexistent supplier", async () => {
+            setCurrentAuthUser(users.hqAdmin);
+
             const res = await request(app)
                 .post("/product")
-                .set(await authHeader(mockHqAdmin.email))
                 .send({ ...validPayload(), supplierId: 999999 })
                 .expect(400);
 
@@ -393,9 +370,10 @@ describe("Product routes", () => {
         });
 
         it("rejects a nonexistent category", async () => {
+            setCurrentAuthUser(users.hqAdmin);
+
             const res = await request(app)
                 .post("/product")
-                .set(await authHeader(mockHqAdmin.email))
                 .send({ ...validPayload(), categoryId: 999999 })
                 .expect(400);
 
@@ -409,11 +387,9 @@ describe("Product routes", () => {
         it("partially updates a product", async () => {
             const alpha = findProduct("Alpha Shirt");
 
-            const res = await request(app)
-                .patch(`/product/${alpha.id}`)
-                .set(await authHeader(mockHqAdmin.email))
-                .send({ shelfPrice: 275 })
-                .expect(200);
+            setCurrentAuthUser(users.hqAdmin);
+
+            const res = await request(app).patch(`/product/${alpha.id}`).send({ shelfPrice: 275 }).expect(200);
 
             const product = res.body.product as CatalogueProduct;
 
@@ -426,11 +402,9 @@ describe("Product routes", () => {
             const alpha = findProduct("Alpha Shirt");
             const homeware = findCategory("Homeware");
 
-            const res = await request(app)
-                .patch(`/product/${alpha.id}`)
-                .set(await authHeader(mockHqAdmin.email))
-                .send({ categoryId: homeware.id })
-                .expect(200);
+            setCurrentAuthUser(users.hqAdmin);
+
+            const res = await request(app).patch(`/product/${alpha.id}`).send({ categoryId: homeware.id }).expect(200);
 
             expect((res.body.product as CatalogueProduct).category).toEqual({
                 id: homeware.id,
@@ -446,11 +420,9 @@ describe("Product routes", () => {
         it("returns 404 for a product of another business", async () => {
             const { product } = await seedForeignProduct();
 
-            const res = await request(app)
-                .patch(`/product/${product.id}`)
-                .set(await authHeader(mockHqAdmin.email))
-                .send({ shelfPrice: 1 })
-                .expect(404);
+            setCurrentAuthUser(users.hqAdmin);
+
+            const res = await request(app).patch(`/product/${product.id}`).send({ shelfPrice: 1 }).expect(404);
 
             expect(res.body).toEqual({ error: "Product not found" });
         });
@@ -466,10 +438,9 @@ describe("Product routes", () => {
                 data: buildMockInventoryItem({ branchId: catalogue.branch.id, productId: epsilon.id }),
             });
 
-            const res = await request(app)
-                .delete(`/product/${epsilon.id}`)
-                .set(await authHeader(mockHqAdmin.email))
-                .expect(200);
+            setCurrentAuthUser(users.hqAdmin);
+
+            const res = await request(app).delete(`/product/${epsilon.id}`).expect(200);
 
             expect(res.body).toEqual({ message: "Product deleted" });
             expect(await prisma.product.findUnique({ where: { id: epsilon.id } })).toBeNull();
@@ -479,11 +450,11 @@ describe("Product routes", () => {
 
         it("returns 404 when deleting the same product twice", async () => {
             const epsilon = findProduct("Epsilon Cap");
-            const headers = await authHeader(mockHqAdmin.email);
+            setCurrentAuthUser(users.hqAdmin);
 
-            await request(app).delete(`/product/${epsilon.id}`).set(headers).expect(200);
+            await request(app).delete(`/product/${epsilon.id}`).expect(200);
 
-            const res = await request(app).delete(`/product/${epsilon.id}`).set(headers).expect(404);
+            const res = await request(app).delete(`/product/${epsilon.id}`).expect(404);
 
             expect(res.body).toEqual({ error: "Product not found" });
         });
@@ -491,10 +462,9 @@ describe("Product routes", () => {
         it("returns 404 for a product of another business", async () => {
             const { product } = await seedForeignProduct();
 
-            const res = await request(app)
-                .delete(`/product/${product.id}`)
-                .set(await authHeader(mockHqAdmin.email))
-                .expect(404);
+            setCurrentAuthUser(users.hqAdmin);
+
+            const res = await request(app).delete(`/product/${product.id}`).expect(404);
 
             expect(res.body).toEqual({ error: "Product not found" });
         });
@@ -538,10 +508,9 @@ describe("Product routes", () => {
                 },
             });
 
-            await request(app)
-                .delete(`/product/${beta.id}`)
-                .set(await authHeader(mockHqAdmin.email))
-                .expect(409);
+            setCurrentAuthUser(users.hqAdmin);
+
+            await request(app).delete(`/product/${beta.id}`).expect(409);
 
             expect(await prisma.product.findUnique({ where: { id: beta.id } })).not.toBeNull();
         });
@@ -551,27 +520,25 @@ describe("Product routes", () => {
 
     describe("Role gates", () => {
         it("allows HQ admins and branch managers to read the catalogue", async () => {
-            await request(app)
-                .get("/product")
-                .set(await authHeader(mockHqAdmin.email))
-                .expect(200);
-            await request(app)
-                .get("/product")
-                .set(await authHeader(mockBranchManager.email))
-                .expect(200);
+            setCurrentAuthUser(users.hqAdmin);
+
+            await request(app).get("/product").expect(200);
+            setCurrentAuthUser(users.branchManager);
+
+            await request(app).get("/product").expect(200);
         });
 
         it("forbids cashiers and anonymous requests from reading the catalogue", async () => {
-            await request(app)
-                .get("/product")
-                .set(await authHeader(mockCashier.email))
-                .expect(403);
+            setCurrentAuthUser(users.cashier);
+
+            await request(app).get("/product").expect(403);
+            setCurrentAuthUser(null);
+
             await request(app).get("/product").expect(401);
         });
 
         it("forbids branch managers and anonymous requests from mutating the catalogue", async () => {
             const alpha = findProduct("Alpha Shirt");
-            const headers = await authHeader(mockBranchManager.email);
 
             const mutations = [
                 () => request(app).post("/product").send({}),
@@ -580,20 +547,22 @@ describe("Product routes", () => {
             ];
 
             for (const mutate of mutations) {
-                await mutate().set(headers).expect(403);
+                setCurrentAuthUser(users.branchManager);
+                await mutate().expect(403);
+
+                setCurrentAuthUser(null);
                 await mutate().expect(401);
             }
         });
 
         it("rejects an HQ admin that is not attached to a business", async () => {
-            await prisma.user.create({
+            const createdUser = await prisma.user.create({
                 data: { ...mockHqAdminNoBusiness, password: await bcrypt.hash(PASSWORD, 10) },
             });
 
-            const res = await request(app)
-                .get("/product")
-                .set(await authHeader(mockHqAdminNoBusiness.email as string))
-                .expect(403);
+            setCurrentAuthUser(createdUser);
+
+            const res = await request(app).get("/product").expect(403);
 
             expect(res.body).toEqual({ error: "User is not attached to a business" });
         });

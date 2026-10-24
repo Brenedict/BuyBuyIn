@@ -10,10 +10,12 @@ import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
 import { ROUTES } from "../../routes/Routes";
-import { TABLE_SUPPLIERS } from "../../TESTINGDATA/inventoryData";
 
 // BuyBuyIn Shared Imports
-import type { CatalogueListResponse, CatalogueProduct } from "@buybuyin/shared/schema/product";
+import type { CatalogueProduct } from "@buybuyin/shared/schema/product";
+
+// API Services
+import type { CataloguePageData } from "../../api/supplierService";
 
 // Material UI Icons
 import type { MaterialIcon } from "../../types/common";
@@ -84,19 +86,14 @@ function renderCatalogueRow(product: CatalogueProduct) {
 
 // Main page
 export function HQ_Catalogue() {
-    const { products, summary } = useLoaderData<CatalogueListResponse>();
+    const { products, summary, suppliers } = useLoaderData<CataloguePageData>();
     const { values, submit } = useFormSearchParams({ search: "" });
     const navigate = useNavigatePage();
 
-    const handleAddSupplier = () => {
-        alert("Add Supplier");
-    };
-    const handleEditSupplier = (id: string | number) => () => {
-        alert(`Edit supplier: ${id}`);
-    };
-    const handleDeleteSupplier = (id: string | number) => () => {
-        alert(`Delete supplier: ${id}`);
-    };
+    const handleAddSupplier = () => navigate(ROUTES.HQ_ADMIN.supplierAdd, true);
+    const handleEditSupplier = (id: string | number) => () => navigate(ROUTES.HQ_ADMIN.supplierEdit(String(id)), true);
+    const handleDeleteSupplier = (id: string | number) => () =>
+        navigate(ROUTES.HQ_ADMIN.supplierDelete(String(id)), true);
 
     const handleAddProduct = () => {
         navigate(ROUTES.HQ_ADMIN.catalogueProductAdd, true);
@@ -226,8 +223,8 @@ export function HQ_Catalogue() {
                                 <Table.Header text="Address" size="big" />
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
-                            {TABLE_SUPPLIERS.map((supplier) => (
-                                <Table.Row key={supplier.supplierId}>
+                            {suppliers.map((supplier) => (
+                                <Table.Row key={supplier.id}>
                                     <Table.Data text={supplier.supplierName} wrapWords />
                                     <Table.Data text={supplier.contactPerson} wrapWords />
                                     <Table.Data wrapWords>
@@ -239,7 +236,7 @@ export function HQ_Catalogue() {
                                     <Table.Data text={supplier.address} wrapWords />
                                     <Table.Data>
                                         <EditDeleteButtons
-                                            id={supplier.supplierId}
+                                            id={supplier.id}
                                             handleEdit={handleEditSupplier}
                                             handleDelete={handleDeleteSupplier}
                                             size="smallest"

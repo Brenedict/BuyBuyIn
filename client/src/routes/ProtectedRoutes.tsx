@@ -14,12 +14,12 @@ import { primaryAuthLoader, homeRedirectLoader } from "../api/authService";
 import {
     createProduct,
     deleteProduct,
-    getCatalogue,
     getCatalogueProduct,
     getProduct,
     getProductForm,
     updateProduct,
 } from "../api/productService";
+import { createSupplier, deleteSupplier, getCataloguePage, getSupplier, updateSupplier } from "../api/supplierService";
 import {
     createBranchInventoryItem,
     deleteBranchInventoryItem,
@@ -65,6 +65,7 @@ import {
     BranchManagerFormPopup,
 } from "../components/popups/hq-admin/ManageUserPopups";
 import { ProductFormPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
+import { SupplierFormPopup, SupplierDeletePopup } from "../components/popups/hq-admin/SupplierPopups";
 
 // Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -203,7 +204,7 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.catalogue,
                                 element: <HQ_Catalogue />,
-                                loader: getCatalogue,
+                                loader: getCataloguePage,
                                 children: [
                                     {
                                         path: "product/add",
@@ -222,6 +223,23 @@ export const protectedRoutes: RouteObject[] = [
                                         element: <ProductDeletePopup />,
                                         loader: getProduct,
                                         action: deleteProduct,
+                                    },
+                                    {
+                                        path: "supplier/add",
+                                        element: <SupplierFormPopup mode="add" />,
+                                        action: createSupplier,
+                                    },
+                                    {
+                                        path: "supplier/:id/edit",
+                                        element: <SupplierFormPopup mode="edit" />,
+                                        loader: getSupplier,
+                                        action: updateSupplier,
+                                    },
+                                    {
+                                        path: "supplier/:id/delete",
+                                        element: <SupplierDeletePopup />,
+                                        loader: getSupplier,
+                                        action: deleteSupplier,
                                     },
                                     ...globalPopups,
                                 ],

@@ -234,7 +234,7 @@ async function main() {
 
     // Suppliers
     const suppliers = await prisma.supplier.createManyAndReturn({
-        data: supplierSeeds,
+        data: supplierSeeds.map((supplier) => ({ ...supplier, businessId: business.id })),
     });
     const supplierIdByName = new Map(suppliers.map((supplier) => [supplier.supplierName, supplier.id]));
 

@@ -238,3 +238,151 @@
         opacity: 1;
     }
 }
+
+@layer loginComponents {
+    .login-input,
+    .login-select {
+        background-color: rgba(254, 252, 237, 0.72) !important;
+        border: 1px solid rgba(120, 110, 100, 0.3) !important;
+        box-shadow:
+            inset 0 1px 3px rgba(68, 45, 29, 0.1),
+            0 3px 8px rgba(68, 45, 29, 0.18);
+        color: #1f2227 !important;
+        font-size: 1rem !important;
+        font-weight: 400 !important;
+        min-height: 2.85rem;
+    }
+
+    .login-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 1px #393534;
+    }
+
+    .login-input:-webkit-autofill,
+    .login-input:-webkit-autofill:hover,
+    .login-input:-webkit-autofill:focus {
+        -webkit-box-shadow:
+            0 0 0 1000px #fbf8ea inset,
+            0 3px 8px rgba(68, 45, 29, 0.18) !important;
+        -webkit-text-fill-color: #1f2227;
+    }
+
+    .login-select > :first-child,
+    .login-select > :first-child * {
+        color: #5c5854 !important;
+        font-weight: 400 !important;
+        font-size: 1rem !important;
+    }
+
+    .login-select > div > div:first-child {
+        display: none;
+    }
+
+    .login-card label {
+        font-size: 1.35rem !important;
+    }
+
+    .login-card a {
+        font-size: 0.96rem !important;
+    }
+}
+
+@layer loginComponents {
+    .login-input:-webkit-autofill,
+    .login-input:-webkit-autofill:hover,
+    .login-input:-webkit-autofill:focus {
+        -webkit-box-shadow:
+            inset 0 1px 3px rgba(68, 45, 29, 0.1),
+            0 3px 8px rgba(68, 45, 29, 0.18) !important;
+        box-shadow:
+            inset 0 1px 3px rgba(68, 45, 29, 0.1),
+            0 3px 8px rgba(68, 45, 29, 0.18) !important;
+        -webkit-text-fill-color: #1f2227;
+        transition:
+            background-color 600000s 0s,
+            color 600000s 0s;
+    }
+}
+
+/* login-glass-fields */
+@layer loginComponents {
+    .login-input,
+    .login-select {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(150, 140, 130, 0.28) !important;
+        box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.7),
+            inset 0 -1px 2px rgba(68, 45, 29, 0.06),
+            0 3px 6px rgba(68, 45, 29, 0.16);
+    }
+
+    .login-input:focus {
+        box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.7),
+            0 0 0 1px #393534;
+    }
+
+    .login-input:-webkit-autofill,
+    .login-input:-webkit-autofill:hover,
+    .login-input:-webkit-autofill:focus {
+        -webkit-box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.7),
+            0 3px 6px rgba(68, 45, 29, 0.16) !important;
+        box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.7),
+            0 3px 6px rgba(68, 45, 29, 0.16) !important;
+        transition:
+            background-color 600000s 0s,
+            color 600000s 0s;
+    }
+
+    .login-card form section.absolute {
+        background: rgba(254, 252, 237, 0.45);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .login-card form section.absolute > div > div:not(.bg-crimson) {
+        background-color: transparent !important;
+    }
+}
+
+/* login-fields-transparent */
+@layer loginComponents {
+    .login-input,
+    .login-select {
+        background-color: rgba(255, 255, 255, 0.04) !important;
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(150, 140, 130, 0.25) !important;
+        box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.55),
+            0 3px 6px rgba(68, 45, 29, 0.14);
+    }
+
+    .login-input:-webkit-autofill,
+    .login-input:-webkit-autofill:hover,
+    .login-input:-webkit-autofill:focus {
+        -webkit-box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.55),
+            0 3px 6px rgba(68, 45, 29, 0.14) !important;
+        box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.55),
+            0 3px 6px rgba(68, 45, 29, 0.14) !important;
+        -webkit-text-fill-color: #1f2227;
+        transition:
+            background-color 600000s 0s,
+            color 600000s 0s;
+    }
+}
+
+/* login-select-hover */
+@layer loginComponents {
+    .login-card form section.absolute > div > div:not(.bg-crimson):hover {
+        background-color: rgba(254, 252, 237, 0.85) !important;
+        color: #1f2227;
+    }
+}

@@ -6,6 +6,7 @@ import { Form, useSearchParams } from "react-router";
 import { BuyBuyInWordmark } from "../../components/BuyBuyInWordmark";
 import PasswordInput from "../../components/inputs/PasswordInput";
 import GeneralInput from "../../components/inputs/GeneralInput";
+import SelectInput from "../../components/inputs/SelectInput";
 import { Button } from "../../components/Button";
 import { LoginNotifPopup } from "../../components/popups/global/AccountPopups";
 
@@ -38,7 +39,7 @@ export function Login() {
             <div aria-hidden className="login-bg-left" />
             <div aria-hidden className="login-bg-right" />
 
-            <div className="relative z-10 flex w-full max-w-[68rem] flex-col items-center gap-6 overflow-hidden lg:block lg:h-[32rem] lg:rounded-[2rem]">
+            <div className="relative z-10 flex w-full max-w-[68rem] flex-col items-center gap-6 overflow-hidden lg:block lg:h-[32rem] lg:[zoom:1.25] lg:rounded-[2rem]">
                 <section className="login-panel relative z-[2] hidden h-full items-center overflow-hidden rounded-[2rem] lg:flex lg:w-[64%]">
                     <div className="relative z-20 flex h-full w-[78%] items-center justify-center px-6">
                         <BuyBuyInWordmark className="w-[min(25rem,92%)] translate-x-6 -translate-y-10" />
@@ -58,14 +59,14 @@ export function Login() {
                                 htmlFor="email"
                                 className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
                             >
-                                Email
+                                Username
                             </label>
                             <GeneralInput
                                 id="email"
                                 name="email"
                                 type="email"
-                                autoComplete="email"
-                                placeholder="Enter Email"
+                                autoComplete="username"
+                                placeholder="Enter Username"
                                 required
                                 className="login-input"
                             />
@@ -85,6 +86,27 @@ export function Login() {
                                 placeholder="Enter Password"
                                 required
                                 className="login-input"
+                            />
+                        </div>
+
+                        <div className="w-full">
+                            <label
+                                htmlFor="role"
+                                className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
+                            >
+                                Role
+                            </label>
+                            <SelectInput
+                                id="role"
+                                name="role"
+                                defaultValue=""
+                                options={{
+                                    "-- Role --": "",
+                                    "HQ Admin": "HQ_ADMIN",
+                                    "Branch Manager": "BRANCH_MANAGER",
+                                    Cashier: "CASHIER",
+                                }}
+                                className="login-select"
                             />
                         </div>
 

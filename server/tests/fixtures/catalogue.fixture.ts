@@ -50,13 +50,6 @@ export const buildMockProduct = (
 
 // ----------------------------- PUBLIC FUNCTIONS ------------------------------------------
 
-/**
- * Seeds a business, one branch, two suppliers, two categories and five products.
- *
- * Product names are chosen so alphabetical ordering, search and pagination
- * assertions stay stable. Prices are round numbers so totals can be asserted
- * exactly.
- */
 export const seedCatalogue = async (): Promise<SeededCatalogue> => {
     const business = await prisma.business.create({ data: mockBusiness });
     const branch = await prisma.branch.create({ data: { ...mockBranch, businessId: business.id } });

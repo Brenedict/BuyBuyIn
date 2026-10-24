@@ -81,13 +81,6 @@ export const mockHqAdminNoBusiness: UserCreate = {
 
 // ----------------------------- PUBLIC FUNCTIONS ------------------------------------------
 
-/**
- * Creates the catalogue users for a business/branch pair.
- *
- * `branchId` is the primary branch used by the HQ admin (none), branch manager
- * and cashier. The second branch manager joins `secondBranchId` when a suite
- * seeds a second branch, otherwise it falls back to the primary branch.
- */
 export const seedUsers = async (
     businessId: number,
     branchId: number,

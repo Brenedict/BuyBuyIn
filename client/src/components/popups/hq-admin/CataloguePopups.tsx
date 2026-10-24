@@ -19,33 +19,6 @@ import type { CatalogueProduct } from "@buybuyin/shared/schema/product";
 
 // Routes & Utils
 import { ROUTES } from "../../../routes/Routes";
-import { NumberFormat } from "../../../utils/chartConfigs";
-
-// Material UI Icons
-import TagOutlinedIcon from "@mui/icons-material/TagOutlined";
-import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-
-import type { MaterialIcon } from "../../../types/common";
-
-function ProductDetailRow({ icon, label, value }: { icon: MaterialIcon; label: string; value: string }) {
-    return (
-        <div className="flex items-center justify-between gap-4 border-b border-[#cfcabd] py-2 last:border-b-0">
-            <Text
-                size="description"
-                weight="medium"
-                variant="brown"
-                svg={{ icon, size: "smaller", position: "left", gap: "small" }}
-            >
-                {label}
-            </Text>
-            <Text size="normal" weight="bold" variant="crimson" align="right">
-                {value}
-            </Text>
-        </div>
-    );
-}
 
 export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
     const navigate = useNavigatePage();
@@ -128,73 +101,6 @@ export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
                     </Button>
                 </div>
             </Form>
-        </PopUp>
-    );
-}
-
-export function ProductViewPopup() {
-    const navigate = useNavigatePage();
-
-    const product = useLoaderData<CatalogueProduct | null>();
-
-    const handleClose = () => navigate(ROUTES.HQ_ADMIN.catalogue, true);
-
-    if (!product) {
-        return (
-            <PopUp title="Product Not Found" handleCloseProp={handleClose}>
-                <Text>The product you are looking for no longer exists in the catalogue.</Text>
-            </PopUp>
-        );
-    }
-
-    return (
-        <PopUp title={product.productName} handleCloseProp={handleClose}>
-            <section className="flex flex-col gap-4">
-                <div className="flex items-center justify-center gap-2 rounded-2xl bg-cream px-4 py-3">
-                    <Text
-                        size="normal"
-                        weight="bold"
-                        variant="brown"
-                        svg={{ icon: TagOutlinedIcon, size: "normal", position: "left", gap: "small" }}
-                    >
-                        #{String(product.id).padStart(4, "0")}
-                    </Text>
-                </div>
-
-                <ProductDetailRow
-                    icon={CategoryOutlinedIcon}
-                    label="Category"
-                    value={product.category?.categoryName ?? "—"}
-                />
-                <ProductDetailRow
-                    icon={PaymentsOutlinedIcon}
-                    label="Base Price"
-                    value={NumberFormat(product.basePrice, "₱")}
-                />
-                <ProductDetailRow
-                    icon={PaymentsOutlinedIcon}
-                    label="Shelf Price"
-                    value={NumberFormat(product.shelfPrice, "₱")}
-                />
-                <ProductDetailRow
-                    icon={LocalShippingOutlinedIcon}
-                    label="Supplier"
-                    value={product.supplier?.supplierName ?? "—"}
-                />
-
-                <div className="flex gap-2">
-                    <Button onClick={handleClose} className="flex-1" variant="secondary" size="normal">
-                        Close
-                    </Button>
-                    <Button
-                        onClick={() => navigate(ROUTES.HQ_ADMIN.catalogueProductEdit(String(product.id)), true)}
-                        className="flex-1"
-                        size="normal"
-                    >
-                        Edit Product
-                    </Button>
-                </div>
-            </section>
         </PopUp>
     );
 }

@@ -62,7 +62,6 @@ export default {
             ...(categoryId && { productCategories: { some: { categoryId } } }),
         };
 
-        // The catalogue stat cards describe the whole catalogue, not the current search.
         const summaryWhere: ProductWhereInput = { businessId };
 
         const [products, total, summaryTotal, aggregate, totalSuppliers, totalCategories] = await Promise.all([

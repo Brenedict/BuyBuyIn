@@ -40,7 +40,6 @@ import BranchManager_ManageUsers from "../pages/branch-manager/BranchManager.Man
 import BranchManager_Transactions from "../pages/branch-manager/BranchManager.Transactions";
 
 import {
-    InventoryItemViewPopup,
     InventoryItemRestockPopup,
     InventoryItemDeletePopup,
     InventoryItemAddPopup,
@@ -65,7 +64,7 @@ import {
     DeleteBranchPopup,
     BranchManagerFormPopup,
 } from "../components/popups/hq-admin/ManageUserPopups";
-import { ProductFormPopup, ProductViewPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
+import { ProductFormPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
 
 // Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -129,11 +128,6 @@ export const protectedRoutes: RouteObject[] = [
                                         element: <InventoryItemAddPopup />,
                                         loader: getBranchInventoryOptions,
                                         action: createBranchInventoryItem,
-                                    },
-                                    {
-                                        path: "item/:id/view",
-                                        element: <InventoryItemViewPopup />,
-                                        loader: getBranchInventoryItem,
                                     },
                                     {
                                         path: "item/:id/restock",
@@ -222,11 +216,6 @@ export const protectedRoutes: RouteObject[] = [
                                         element: <ProductFormPopup mode="edit" />,
                                         loader: getCatalogueProduct,
                                         action: updateProduct,
-                                    },
-                                    {
-                                        path: "product/:id/view",
-                                        element: <ProductViewPopup />,
-                                        loader: getProduct,
                                     },
                                     {
                                         path: "product/:id/delete",

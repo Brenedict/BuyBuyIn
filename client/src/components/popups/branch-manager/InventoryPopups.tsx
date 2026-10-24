@@ -19,7 +19,7 @@ import { ROUTES } from "../../../routes/Routes";
 import { NumberFormat } from "../../../utils/chartConfigs";
 
 // Material UI Icons
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
@@ -41,77 +41,6 @@ function ItemDetailRow({ icon, label, value }: { icon: MaterialIcon; label: stri
                 {value}
             </Text>
         </div>
-    );
-}
-
-export function InventoryItemViewPopup() {
-    const navigate = useNavigatePage();
-
-    const item = useLoaderData<BranchInventoryEntry | null>();
-    const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
-
-    if (!item) {
-        return (
-            <PopUp title="Item Not Found" handleCloseProp={handleClose}>
-                <Text>The item you are looking for no longer exists in this branch's inventory.</Text>
-            </PopUp>
-        );
-    }
-
-    return (
-        <PopUp title={item.product.productName} handleCloseProp={handleClose}>
-            <section className="flex flex-col gap-4">
-                <div className="flex items-center justify-center gap-2 rounded-2xl bg-cream px-4 py-3">
-                    <Text
-                        size="normal"
-                        weight="bold"
-                        variant="brown"
-                        svg={{ icon: Inventory2OutlinedIcon, size: "normal", position: "left", gap: "small" }}
-                    >
-                        {item.product.sku}
-                    </Text>
-                </div>
-
-                <ItemDetailRow
-                    icon={Inventory2OutlinedIcon}
-                    label="Category"
-                    value={item.product.category?.categoryName ?? "—"}
-                />
-                <ItemDetailRow
-                    icon={WarningAmberOutlinedIcon}
-                    label="Stock Level"
-                    value={`${item.quantity} units${item.status === "LOW_STOCK" ? " (Low Stock)" : ""}`}
-                />
-                <ItemDetailRow
-                    icon={WarningAmberOutlinedIcon}
-                    label="Reorder Threshold"
-                    value={`≤ ${item.reorderThreshold} units`}
-                />
-                <ItemDetailRow
-                    icon={PaymentsOutlinedIcon}
-                    label="Unit Price"
-                    value={NumberFormat(item.unitPrice, "₱")}
-                />
-                <ItemDetailRow
-                    icon={LocalShippingOutlinedIcon}
-                    label="Supplier"
-                    value={item.product.supplier?.supplierName ?? "—"}
-                />
-
-                <div className="flex gap-2">
-                    <Button onClick={handleClose} className="flex-1" variant="secondary" size="normal">
-                        Close
-                    </Button>
-                    <Button
-                        onClick={() => navigate(ROUTES.BRANCH_MANAGER.inventoryItemRestock(String(item.id)), true)}
-                        className="flex-1"
-                        size="normal"
-                    >
-                        Restock Item
-                    </Button>
-                </div>
-            </section>
-        </PopUp>
     );
 }
 

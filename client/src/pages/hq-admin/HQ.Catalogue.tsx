@@ -5,7 +5,7 @@ import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 import SearchInput from "../../components/inputs/SearchInput";
-import { ActionButtons, MoreActionsMenu, PrimarySecondaryText } from "../../components/partials/TablePartials";
+import { EditDeleteButtons, PrimarySecondaryText } from "../../components/partials/TablePartials";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
@@ -21,9 +21,6 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
-import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
-import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 interface StatCardProps {
     icon: MaterialIcon;
@@ -56,49 +53,16 @@ function CatalogueStatCard({ icon, title, value, subtitle }: StatCardProps) {
 }
 
 function ProductRowActions({ id }: { id: string }) {
-    // Used for redirecting
     const navigate = useNavigatePage();
 
     const handleEdit = (itemId: string | number) => () => {
         navigate(ROUTES.HQ_ADMIN.catalogueProductEdit(String(itemId)), true);
     };
+    const handleDelete = (itemId: string | number) => () => {
+        navigate(ROUTES.HQ_ADMIN.catalogueProductDelete(String(itemId)), true);
+    };
 
-    return (
-        <div className="flex items-center gap-2 justify-center">
-            <ActionButtons
-                id={id}
-                actions={[
-                    {
-                        text: "Edit",
-                        variant: "secondary",
-                        leftIcon: DriveFileRenameOutlineOutlinedIcon,
-                        handleClick: handleEdit,
-                    },
-                ]}
-                size="smallest"
-            />
-            <MoreActionsMenu
-                id={id}
-                label={`More actions for ${id}`}
-                actions={[
-                    {
-                        text: "View Details",
-                        leftIcon: VisibilityOutlinedIcon,
-                        handleClick: (itemId) => () =>
-                            navigate(ROUTES.HQ_ADMIN.catalogueProductView(String(itemId)), true),
-                    },
-                    {
-                        text: "Delete Product",
-                        leftIcon: DeleteForeverOutlinedIcon,
-                        textVariant: "crimson",
-                        iconVariant: "crimson",
-                        handleClick: (itemId) => () =>
-                            navigate(ROUTES.HQ_ADMIN.catalogueProductDelete(String(itemId)), true),
-                    },
-                ]}
-            />
-        </div>
-    );
+    return <EditDeleteButtons id={id} handleEdit={handleEdit} handleDelete={handleDelete} size="smallest" />;
 }
 
 function renderCatalogueRow(product: CatalogueProduct) {

@@ -95,7 +95,7 @@ export const createSupplier = async ({ request }: ActionFunctionArgs) => {
 
         await ensureOkOrRedirect(res, "Failed to create supplier", request, ROUTES.HQ_ADMIN.catalogue);
 
-        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Supplier created successfully");
+        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Item successfully added");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
     }
@@ -120,7 +120,7 @@ export const updateSupplier = async ({ params, request }: ActionFunctionArgs) =>
 
         await ensureOkOrRedirect(res, "Failed to update supplier", request, ROUTES.HQ_ADMIN.catalogue);
 
-        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Supplier updated successfully");
+        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Changes saved");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
     }
@@ -140,7 +140,7 @@ export const deleteSupplier = async ({ params, request }: ActionFunctionArgs) =>
 
         await ensureOkOrRedirect(res, "Failed to delete supplier", request, ROUTES.HQ_ADMIN.catalogue);
 
-        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Supplier deleted successfully");
+        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Successfully deleted");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
     }

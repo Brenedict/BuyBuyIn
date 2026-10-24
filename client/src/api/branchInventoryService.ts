@@ -107,7 +107,7 @@ export const createBranchInventoryItem = async ({ request }: ActionFunctionArgs)
 
         await ensureOkOrRedirect(res, "Failed to add inventory item", request, ROUTES.BRANCH_MANAGER.inventory);
 
-        return redirectWithQuery(request, ROUTES.BRANCH_MANAGER.inventory, "NOTIF=Item added to inventory");
+        return redirectWithQuery(request, ROUTES.BRANCH_MANAGER.inventory, "NOTIF=Item successfully added");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.BRANCH_MANAGER.inventory);
     }
@@ -135,7 +135,7 @@ export const restockBranchInventoryItem = async ({ params, request }: ActionFunc
 
         await ensureOkOrRedirect(res, "Failed to restock inventory item", request, ROUTES.BRANCH_MANAGER.inventory);
 
-        return redirectWithQuery(request, ROUTES.BRANCH_MANAGER.inventory, "NOTIF=Item restocked");
+        return redirectWithQuery(request, ROUTES.BRANCH_MANAGER.inventory, "NOTIF=Changes saved");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.BRANCH_MANAGER.inventory);
     }
@@ -155,7 +155,7 @@ export const deleteBranchInventoryItem = async ({ params, request }: ActionFunct
 
         await ensureOkOrRedirect(res, "Failed to remove inventory item", request, ROUTES.BRANCH_MANAGER.inventory);
 
-        return redirectWithQuery(request, ROUTES.BRANCH_MANAGER.inventory, "NOTIF=Item removed from inventory");
+        return redirectWithQuery(request, ROUTES.BRANCH_MANAGER.inventory, "NOTIF=Successfully deleted");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.BRANCH_MANAGER.inventory);
     }

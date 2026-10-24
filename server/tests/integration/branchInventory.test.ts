@@ -496,6 +496,30 @@ describe("Branch inventory routes", () => {
 
             await request(app).patch(`/branch-inventory/${stock.alpha.id}/restock`).send({ quantity: 0 }).expect(400);
         });
+
+        it("deducts quantity when action is deduct", async () => {
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app)
+                .patch(`/branch-inventory/${stock.alpha.id}/restock`)
+                .send({ quantity: 3, action: "deduct" })
+                .expect(200);
+
+            const item = res.body.item as BranchInventoryEntry;
+
+            expect(item.quantity).toBe(7);
+        });
+
+        it("rejects deducting more than the current stock", async () => {
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app)
+                .patch(`/branch-inventory/${stock.alpha.id}/restock`)
+                .send({ quantity: 100, action: "deduct" })
+                .expect(400);
+
+            expect(res.body).toEqual({ error: "Cannot deduct more than the current stock" });
+        });
     });
 
     // ----------------------------- DELETE /branch-inventory/:id ------------------------------

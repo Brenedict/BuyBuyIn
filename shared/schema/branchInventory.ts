@@ -31,6 +31,7 @@ export const BranchInventoryFormCreateSchema = zfd.formData(
 
 export const BranchInventoryFormRestockSchema = zfd.formData(
     z.object({
+        action: z.enum(["add", "deduct"]).default("add"),
         quantity: zfd.numeric(z.number().int().positive()),
         reorderThreshold: zfd.numeric(z.number().int().nonnegative()).optional(),
     })

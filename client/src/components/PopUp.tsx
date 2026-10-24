@@ -10,20 +10,37 @@ import { Button } from "./Button";
 // Hooks
 import useNavigatePage from "../hooks/useNavigatePage";
 
+type PopUpSize = "sm" | "md" | "lg";
+
 type PopUpProps = {
     className?: string;
     title?: string;
+    subtitle?: ReactNode;
     children?: ReactNode;
+    size?: PopUpSize;
     handleCloseProp?: () => void;
 };
 
-export function PopUp({ className, title = "Add a title", children = "Insert Body", handleCloseProp }: PopUpProps) {
+const PopUpWidthClasses: Record<PopUpSize, string> = {
+    sm: "max-w-[400px]",
+    md: "max-w-[560px]",
+    lg: "max-w-[720px]",
+};
+
+export function PopUp({
+    className,
+    title = "Add a title",
+    subtitle,
+    children = "Insert Body",
+    size = "md",
+    handleCloseProp,
+}: PopUpProps) {
     // Used for redirecting
-    const useNavigate = useNavigatePage();
+    const navigate = useNavigatePage();
 
     // Default close: go up one level, exiting the popup.
     // handleCloseProp is only really necessary when it is provided (meaning you want to navigate somewhere specific or trigger a state)
-    const handleClose = () => (handleCloseProp ? handleCloseProp() : useNavigate());
+    const handleClose = () => (handleCloseProp ? handleCloseProp() : navigate());
 
     // The escape listener is registered once, so it would otherwise close with a stale handleCloseProp
     const handleCloseRef = useRef(handleClose);
@@ -119,10 +136,10 @@ export function PopUp({ className, title = "Add a title", children = "Insert Bod
             <div
                 ref={modalRef}
                 className={`
-                    ${className} 
+                    ${className ?? ""}
                     absolute left-1/2 top-1/2
                     ${dragging ? "cursor-grabbing" : "cursor-grab"}
-                    w-[904px] max-w-full
+                    w-full ${PopUpWidthClasses[size]}
                 `}
                 style={{
                     transform: `
@@ -137,19 +154,35 @@ export function PopUp({ className, title = "Add a title", children = "Insert Bod
             >
                 <Card className="bg-off-white">
                     <Card.Header
-                        className="bg-crimson "
+                        className="bg-crimson"
                         toggleRightButton
                         rightButton={
-                            <Button type="button" aria-label="Close" size="small" onClick={handleClose}>
-                                ✕
-                            </Button>
+                            <div className="flex justify-center items-center">
+                                <Button
+                                    type="button"
+                                    aria-label="Close"
+                                    variant="popup"
+                                    size="medium"
+                                    className="aspect-square! p-0! w-10! h-10!"
+                                    onClick={handleClose}
+                                >
+                                    <span className="font-bold">✕</span>
+                                </Button>
+                            </div>
                         }
                     >
-                        <Text size="big" weight="bold" variant="off-white">
-                            {title}
-                        </Text>
+                        <div className="flex flex-col gap-1">
+                            <Text size="big" weight="bold" variant="off-white">
+                                {title}
+                            </Text>
+                            {subtitle && (
+                                <Text size="description" weight="medium" variant="off-white">
+                                    {subtitle}
+                                </Text>
+                            )}
+                        </div>
                     </Card.Header>
-                    <Card.Body>{children}</Card.Body>
+                    <Card.Body className="bg-off-white">{children}</Card.Body>
                 </Card>
             </div>
         </div>,

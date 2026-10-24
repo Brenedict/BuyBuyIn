@@ -156,7 +156,7 @@ export const createProduct = async ({ request }: ActionFunctionArgs) => {
 
         await ensureOkOrRedirect(res, "Failed to create product", request, ROUTES.HQ_ADMIN.catalogue);
 
-        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Product created successfully");
+        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Item successfully added");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
     }
@@ -181,7 +181,7 @@ export const updateProduct = async ({ params, request }: ActionFunctionArgs) => 
 
         await ensureOkOrRedirect(res, "Failed to update product", request, ROUTES.HQ_ADMIN.catalogue);
 
-        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Product updated successfully");
+        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Changes saved");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
     }
@@ -201,7 +201,7 @@ export const deleteProduct = async ({ params, request }: ActionFunctionArgs) => 
 
         await ensureOkOrRedirect(res, "Failed to delete product", request, ROUTES.HQ_ADMIN.catalogue);
 
-        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Product deleted successfully");
+        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Successfully deleted");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
     }

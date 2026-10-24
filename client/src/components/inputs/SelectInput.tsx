@@ -11,7 +11,6 @@ import { Button } from "../Button";
 // Material UI Icons
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 
-
 const DROPDOWN_MIN_WIDTH = 192;
 const DROPDOWN_HEIGHT_ESTIMATE = 164;
 const DROPDOWN_OFFSET = 0;
@@ -104,6 +103,7 @@ export default function SelectInput({
     id,
     name,
     label,
+    labelVariant,
     options,
     defaultValue,
     variant = "default",
@@ -125,7 +125,6 @@ export default function SelectInput({
     const selectedLabel = optionEntries.find(([, value]) => value === selectedValue)?.[0] ?? selectedValue;
 
     const isDefaultVariant = variant === "default";
-
 
     const close = useCallback(() => setIsOpen(false), []);
 
@@ -210,7 +209,7 @@ export default function SelectInput({
 
     return (
         <div className="w-full relative" ref={selectInputParentRef} data-no-drag>
-            <Label htmlFor={id} label={label} />
+            <Label htmlFor={id} label={label} labelVariant={labelVariant} />
             <select id={id} ref={selectInputRef} hidden name={name} value={selectedValue} onChange={onChange}>
                 {optionEntries.map(([label, value]) => (
                     <option key={label} value={value}>

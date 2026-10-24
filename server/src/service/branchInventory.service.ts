@@ -234,8 +234,16 @@ export default {
             throw new HttpError(404, "Inventory item not found");
         }
 
+        const action = input.action ?? "add";
+        const delta = action === "deduct" ? -input.quantity : input.quantity;
+        const newQuantity = existing.quantity + delta;
+
+        if (newQuantity < 0) {
+            throw new HttpError(400, "Cannot deduct more than the current stock");
+        }
+
         const item = await BranchInventoryModel.updateItemById(itemId, {
-            quantity: existing.quantity + input.quantity,
+            quantity: newQuantity,
             ...(input.reorderThreshold !== undefined && { reorderThreshold: input.reorderThreshold }),
         });
 

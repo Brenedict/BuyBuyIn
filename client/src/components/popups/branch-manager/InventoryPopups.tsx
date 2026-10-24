@@ -1,4 +1,5 @@
 // General Imports
+import { useState } from "react";
 import { Form, useLoaderData } from "react-router";
 
 // Components
@@ -16,84 +17,101 @@ import type { BranchInventoryEntry, BranchInventoryOptionsResponse } from "@buyb
 
 // Routes & Utils
 import { ROUTES } from "../../../routes/Routes";
-import { NumberFormat } from "../../../utils/chartConfigs";
 
 // Material UI Icons
-
-import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-
-import type { MaterialIcon } from "../../../types/common";
-
-function ItemDetailRow({ icon, label, value }: { icon: MaterialIcon; label: string; value: string }) {
-    return (
-        <div className="flex items-center justify-between gap-4 border-b border-[#cfcabd] py-2 last:border-b-0">
-            <Text
-                size="description"
-                weight="medium"
-                variant="brown"
-                svg={{ icon, size: "smaller", position: "left", gap: "small" }}
-            >
-                {label}
-            </Text>
-            <Text size="normal" weight="bold" variant="crimson" align="right">
-                {value}
-            </Text>
-        </div>
-    );
-}
 
 export function InventoryItemRestockPopup() {
     const navigate = useNavigatePage();
 
     const item = useLoaderData<BranchInventoryEntry | null>();
 
+    const [action, setAction] = useState<"add" | "deduct">("add");
+
     // When triggered, returns to the inventory page (exiting the popup) and keeps the filters
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
 
     if (!item) {
         return (
-            <PopUp title="Item Not Found" handleCloseProp={handleClose}>
+            <PopUp title="Item Not Found" size="md" handleCloseProp={handleClose}>
                 <Text>The item you are looking for no longer exists in this branch's inventory.</Text>
+                <div className="flex w-full gap-2">
+                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
+                        Close
+                    </Button>
+                </div>
             </PopUp>
         );
     }
 
+    const formId = "inventoryRestockForm";
+
     return (
-        <PopUp title={`Restock ${item.product.productName}`} handleCloseProp={handleClose}>
-            <Form method="post" className="flex flex-col gap-4">
-                <ItemDetailRow icon={WarningAmberOutlinedIcon} label="Current Stock" value={`${item.quantity} units`} />
-                <ItemDetailRow
-                    icon={PaymentsOutlinedIcon}
-                    label="Unit Price"
-                    value={NumberFormat(item.unitPrice, "₱")}
-                />
-                <ItemDetailRow
-                    icon={LocalShippingOutlinedIcon}
-                    label="Supplier"
-                    value={item.product.supplier?.supplierName ?? "—"}
-                />
+        <PopUp title="Stock Adjustment" subtitle={item.product.productName} size="sm" handleCloseProp={handleClose}>
+            <Form id={formId} method="post" className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1 rounded-2xl bg-cream p-4">
+                    <Text size="normal" weight="bold" variant="brown">
+                        Current stock
+                    </Text>
+                    <Text size="description" weight="medium" variant="brown">
+                        Before adjustment
+                    </Text>
+                    <Text size="big" weight="bold" variant="crimson">
+                        {item.quantity}
+                    </Text>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <Text size="description" weight="bold" variant="brown">
+                        What do you want to do? <span className="text-crimson">*</span>
+                    </Text>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setAction("add")}
+                            className={`rounded-2xl border px-4 py-3 font-bold transition-colors ${
+                                action === "add"
+                                    ? "border-crimson text-crimson bg-white"
+                                    : "border-[#d8d2c4] text-brown bg-off-white"
+                            }`}
+                        >
+                            Add Stock
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setAction("deduct")}
+                            className={`rounded-2xl border px-4 py-3 font-bold transition-colors ${
+                                action === "deduct"
+                                    ? "border-crimson text-crimson bg-white"
+                                    : "border-[#d8d2c4] text-brown bg-off-white"
+                            }`}
+                        >
+                            Deduct Stock
+                        </button>
+                    </div>
+                </div>
+
+                <input type="hidden" name="action" value={action} />
 
                 <GeneralInput
                     name="quantity"
-                    label="Quantity to Add"
-                    labelVariant="small"
                     type="number"
                     min={1}
-                    placeholder="0"
+                    max={action === "deduct" ? item.quantity : undefined}
+                    label="How many unit/s"
+                    labelVariant="small"
                     required
                 />
-
-                <div className="flex gap-2">
-                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
-                        Cancel
-                    </Button>
-                    <Button type="submit" className="flex-1" size="normal">
-                        Restock
-                    </Button>
-                </div>
             </Form>
+
+            <div className="flex w-full gap-2 pt-12">
+                <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
+                    Cancel
+                </Button>
+                <Button type="submit" variant="main" size="normal" className="flex-1" form={formId}>
+                    Apply
+                </Button>
+            </div>
         </PopUp>
     );
 }
@@ -103,25 +121,53 @@ export function InventoryItemDeletePopup() {
     const item = useLoaderData<BranchInventoryEntry | null>();
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.inventory, true);
 
+    if (!item) {
+        return (
+            <PopUp title="Item Not Found" size="md" handleCloseProp={handleClose}>
+                <Text>The item you are looking for no longer exists in this branch's inventory.</Text>
+                <div className="flex w-full gap-2">
+                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
+                        Close
+                    </Button>
+                </div>
+            </PopUp>
+        );
+    }
+
+    const formId = "inventoryDeleteForm";
+
     return (
-        <PopUp title="Delete Item" handleCloseProp={handleClose}>
+        <PopUp title="Delete item" subtitle="This action cannot be undone" size="md" handleCloseProp={handleClose}>
             <section className="flex flex-col gap-4">
+                <div className="flex justify-center">
+                    <div className="w-fit rounded-full bg-cream px-4 py-1.5">
+                        <Text size="normal" weight="bold" variant="brown">
+                            {item.product.productName} ({item.product.sku})
+                        </Text>
+                    </div>
+                </div>
+
                 <Text>
-                    Are you sure you want to delete{" "}
-                    <span className="font-bold">
-                        {item ? `${item.product.productName} (${item.product.sku})` : "this item"}
-                    </span>{" "}
-                    from this branch's inventory? This action cannot be undone.
+                    Are you sure you want to delete <span className="font-bold">{item.product.productName}</span> from
+                    this branch's inventory? This action cannot be undone.
                 </Text>
 
-                <Form method="post" className="flex gap-2">
-                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
+                <div className="flex items-start gap-3 rounded-2xl bg-crimson-muted p-3">
+                    <WarningAmberOutlinedIcon className="text-crimson" fontSize="small" />
+                    <Text size="description" weight="medium" variant="crimson">
+                        This is permanent. Once deleted, this item and its data cannot be recovered.
+                    </Text>
+                </div>
+
+                <Form id={formId} method="post" />
+                <div className="flex w-full gap-2 pt-4">
+                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" variant="main" className="flex-1" size="normal">
-                        Delete
+                    <Button type="submit" variant="main" size="normal" className="flex-1" form={formId}>
+                        Yes, delete
                     </Button>
-                </Form>
+                </div>
             </section>
         </PopUp>
     );
@@ -139,24 +185,35 @@ export function InventoryItemAddPopup() {
 
     if (products.length === 0) {
         return (
-            <PopUp title="Add Item to Inventory" handleCloseProp={handleClose}>
-                <section className="flex flex-col gap-4">
-                    <Text>
-                        Every product in the business catalogue is already stocked in this branch. Ask HQ Admin to add a
-                        product to the catalogue first.
-                    </Text>
-
-                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
+            <PopUp
+                title="Add new item"
+                subtitle="Fill in the details to add to inventory"
+                size="md"
+                handleCloseProp={handleClose}
+            >
+                <Text>
+                    Every product in the business catalogue is already stocked in this branch. Ask HQ Admin to add a
+                    product to the catalogue first.
+                </Text>
+                <div className="flex w-full gap-2 pt-4">
+                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
                         Close
                     </Button>
-                </section>
+                </div>
             </PopUp>
         );
     }
 
+    const formId = "inventoryAddForm";
+
     return (
-        <PopUp title="Add Item to Inventory" handleCloseProp={handleClose}>
-            <Form method="post" className="flex flex-col gap-4">
+        <PopUp
+            title="Add new item"
+            subtitle="Fill in the details to add to inventory"
+            size="md"
+            handleCloseProp={handleClose}
+        >
+            <Form id={formId} method="post" className="flex flex-col gap-4">
                 <Text>Only products from the business catalogue can be added to your inventory.</Text>
 
                 <SelectInput
@@ -167,30 +224,35 @@ export function InventoryItemAddPopup() {
                     defaultValue={defaultProductId}
                 />
 
-                <GeneralInput
-                    name="quantity"
-                    type="number"
-                    min={1}
-                    label="Quantity to Add"
-                    labelVariant="small"
-                    required
-                />
+                <div className="grid grid-cols-2 gap-3">
+                    <GeneralInput
+                        name="quantity"
+                        type="number"
+                        min={1}
+                        label="Quantity to Add"
+                        labelVariant="small"
+                        required
+                    />
 
-                <GeneralInput
-                    name="reorderThreshold"
-                    type="number"
-                    min={0}
-                    label="Reorder Threshold"
-                    labelVariant="small"
-                    required
-                />
+                    <GeneralInput
+                        name="reorderThreshold"
+                        type="number"
+                        min={0}
+                        label="Reorder Threshold"
+                        labelVariant="small"
+                        required
+                    />
+                </div>
 
-                <div className="flex gap-2">
-                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
+                <Text size="description" variant="brown">
+                    A restocking alert will appear when stock drops to this number.
+                </Text>
+                <div className="flex w-full gap-2 pt-4">
+                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" className="flex-1" size="normal">
-                        Add Item
+                    <Button type="submit" variant="main" size="normal" className="flex-1" form={formId}>
+                        Save item
                     </Button>
                 </div>
             </Form>

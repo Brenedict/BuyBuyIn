@@ -20,6 +20,9 @@ import type { CatalogueProduct } from "@buybuyin/shared/schema/product";
 // Routes & Utils
 import { ROUTES } from "../../../routes/Routes";
 
+// Material UI Icons
+import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
+
 export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
     const navigate = useNavigatePage();
 
@@ -32,8 +35,13 @@ export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
 
     if (mode === "edit" && !product) {
         return (
-            <PopUp title="Product Not Found" handleCloseProp={handleClose}>
+            <PopUp title="Product Not Found" size="md" handleCloseProp={handleClose}>
                 <Text>The product you are looking for no longer exists in the catalogue.</Text>
+                <div className="flex w-full gap-2 pt-4">
+                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
+                        Close
+                    </Button>
+                </div>
             </PopUp>
         );
     }
@@ -41,9 +49,18 @@ export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
     const defaultSupplier = String(product?.supplier?.id ?? options.suppliers[0]?.id ?? "");
     const defaultCategory = String(product?.category?.id ?? options.categories[0]?.id ?? "");
 
+    const formId = "productForm";
+
     return (
-        <PopUp title={mode === "add" ? "Add Product" : "Edit Product"} handleCloseProp={handleClose}>
-            <Form method="post" className="flex flex-col gap-4">
+        <PopUp
+            title={mode === "add" ? "Add product" : "Edit product"}
+            subtitle={
+                mode === "add" ? "Fill in the details to add to the catalogue" : "Update the product's details below"
+            }
+            size="md"
+            handleCloseProp={handleClose}
+        >
+            <Form id={formId} method="post" className="flex flex-col gap-4">
                 <GeneralInput
                     name="productName"
                     type="text"
@@ -76,31 +93,34 @@ export function ProductFormPopup({ mode }: { mode: "add" | "edit" }) {
                     />
                 </div>
 
-                <SelectInput
-                    id="supplierId"
-                    name="supplierId"
-                    label="Supplier"
-                    options={supplierOptions}
-                    defaultValue={defaultSupplier}
-                />
-
-                <SelectInput
-                    id="categoryId"
-                    name="categoryId"
-                    label="Category"
-                    options={categoryOptions}
-                    defaultValue={defaultCategory}
-                />
-
-                <div className="flex gap-2">
-                    <Button type="button" onClick={handleClose} className="flex-1" variant="secondary" size="normal">
-                        Cancel
-                    </Button>
-                    <Button type="submit" className="flex-1" size="normal">
-                        {mode === "add" ? "Add Product" : "Save Changes"}
-                    </Button>
+                <div className="grid grid-cols-2 gap-3">
+                    <SelectInput
+                        id="supplierId"
+                        name="supplierId"
+                        label="Supplier"
+                        labelVariant="small"
+                        options={supplierOptions}
+                        defaultValue={defaultSupplier}
+                    />
+                    <SelectInput
+                        id="categoryId"
+                        name="categoryId"
+                        label="Category"
+                        labelVariant="small"
+                        options={categoryOptions}
+                        defaultValue={defaultCategory}
+                    />
                 </div>
             </Form>
+
+            <div className="flex w-full gap-2 pt-12">
+                <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
+                    Cancel
+                </Button>
+                <Button type="submit" variant="main" size="normal" className="flex-1" form={formId}>
+                    {mode === "add" ? "Save item" : "Save changes"}
+                </Button>
+            </div>
         </PopUp>
     );
 }
@@ -112,23 +132,53 @@ export function ProductDeletePopup() {
 
     const handleClose = () => navigate(ROUTES.HQ_ADMIN.catalogue, true);
 
+    if (!product) {
+        return (
+            <PopUp title="Product Not Found" size="md" handleCloseProp={handleClose}>
+                <Text>The product you are looking for no longer exists in the catalogue.</Text>
+                <div className="flex w-full gap-2 pt-4">
+                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
+                        Close
+                    </Button>
+                </div>
+            </PopUp>
+        );
+    }
+
+    const formId = "productDeleteForm";
+
     return (
-        <PopUp title="Delete Product" handleCloseProp={handleClose}>
+        <PopUp title="Delete product" subtitle="This action cannot be undone" size="md" handleCloseProp={handleClose}>
             <section className="flex flex-col gap-4">
+                <div className="flex justify-center">
+                    <div className="w-fit rounded-full bg-cream px-4 py-1.5">
+                        <Text size="normal" weight="bold" variant="brown">
+                            {product.productName}
+                        </Text>
+                    </div>
+                </div>
+
                 <Text>
-                    Are you sure you want to delete{" "}
-                    <span className="font-bold">{product ? product.productName : "this product"}</span> from the
+                    Are you sure you want to delete <span className="font-bold">{product.productName}</span> from the
                     catalogue? This action cannot be undone.
                 </Text>
 
-                <Form method="post" className="flex gap-2 pt-4">
+                <div className="flex items-start gap-3 rounded-2xl bg-crimson-muted p-3">
+                    <WarningAmberOutlinedIcon className="text-crimson" fontSize="small" />
+                    <Text size="description" weight="medium" variant="crimson">
+                        This is permanent. Once deleted, this product and its data cannot be recovered.
+                    </Text>
+                </div>
+
+                <Form id={formId} method="post" />
+                <div className="flex w-full gap-2 pt-4">
                     <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" variant="main" size="normal" className="flex-1">
-                        Delete
+                    <Button type="submit" variant="main" size="normal" className="flex-1" form={formId}>
+                        Yes, delete
                     </Button>
-                </Form>
+                </div>
             </section>
         </PopUp>
     );

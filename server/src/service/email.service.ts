@@ -1,3 +1,13 @@
+// ==============================================================
+/** Author: John Benedict Binas
+ * Co-Authors: [Name]
+ *
+ * Description: Sends account related emails.
+ * (1) Sends the account registration / activation confirmation email.
+ * (2) Sends the account successfully registered success email.
+ */
+// ==============================================================
+
 // General Imports
 import nodemailer from "nodemailer";
 
@@ -54,6 +64,43 @@ export default {
             // Sends email
             const transporter = nodemailer.createTransport({
                 service: "gmail", // Or smtp.gmail.com / smtp-relay.brevo.com
+                auth: {
+                    user: smtpSourceEmail,
+                    pass: smtpSourcePassword,
+                },
+            });
+
+            await transporter.sendMail(mailOptions);
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    },
+
+    async sendAccountRegisteredSuccessEmail(fullName: string, email: string) {
+        try {
+            // .env prerequisites
+            const smtpSourceEmail = process.env.GMAIL_SMTP_EMAIL;
+            const smtpSourcePassword = process.env.GMAIL_SMTP_16_CHAR_PASS;
+            const baseUrl = process.env.FRONTEND_URL;
+
+            if (!baseUrl || !smtpSourceEmail || !smtpSourcePassword) {
+                throw Error;
+            }
+
+            const populatedEmailHtml = TemplateUtil.formatAccountRegisteredSuccessTemplate(fullName, email);
+
+            const mailOptions = {
+                from: `"BuyBuyIn - No Reply" <${smtpSourceEmail}>`,
+                to: email,
+                subject: "Account Registered Successfully",
+                html: populatedEmailHtml,
+            };
+
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
                 auth: {
                     user: smtpSourceEmail,
                     pass: smtpSourcePassword,

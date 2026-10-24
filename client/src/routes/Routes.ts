@@ -4,6 +4,7 @@ import type { RoleType } from "@buybuyin/shared/prisma/enums";
 export const ROUTES = {
     AUTH: "/auth",
     FORBIDDEN: "/forbidden",
+    VERIFY_ACCOUNT: "/verify-account",
 
     // ALL CASHIER ROUTES: Define all actions here for popup URL's
     CASHIER: (() => {

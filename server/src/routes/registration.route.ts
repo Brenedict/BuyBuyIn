@@ -30,4 +30,8 @@ router.post("/subscriber-account", controller.subscriberAccountPost);
 // --------------------- BRANCH MANAGER Routes --------------------------------
 // router.post("/cashier-account", controller.cashierAccountPost);
 
+// --------------------- Email Verification for all Roles --------------------------------
+router.get("/verify-email", controller.verifyEmailRegistrationToken);
+router.post("/complete-account", controller.completeAccountRegistration);
+
 export default router;

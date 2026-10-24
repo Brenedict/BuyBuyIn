@@ -1,3 +1,14 @@
+// ==============================================================
+/** Author: John Benedict Binas
+ * Co-Authors: [Name]
+ *
+ * Description: Service layer for the account registration workflow.
+ * (1) Creates new accounts (temporary password + reset token) per role.
+ * (2) Registers the reset token used for account activation.
+ * (3) Completes the account registration by storing the final password.
+ */
+// ==============================================================
+
 // BuyBuyIn Imports
 import type { RoleType } from "@buybuyin/shared/prisma/client";
 import {
@@ -41,7 +52,6 @@ export default {
     },
 
     async registerResetToken(userId: number, hashedToken: string, expirationOffset: string) {
-        // Expiration 3 minutes from now
         const resetTokenExpires = DateUtil.getExpirationDate(expirationOffset);
 
         // Stores tokens used in password reset link
@@ -51,5 +61,17 @@ export default {
         } as User;
 
         return await UserModel.updateUser(userId, updatedUser);
+    },
+
+    // Completes the account setup: sets the user's real password, marks the account active, and clears the reset token.
+    async completeAccountRegistration(userId: number, hashedPassword: string) {
+        const updatedUser = {
+            password: hashedPassword,
+            accountStatus: "ACTIVE",
+            resetToken: null,
+            resetTokenExpiresAt: null,
+        } as User;
+
+        return UserModel.updateUser(userId, updatedUser);
     },
 };

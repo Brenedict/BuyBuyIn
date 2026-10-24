@@ -6,7 +6,8 @@ import { Outlet } from "react-router";
 import { PageHeader } from "../../components/PageHeader";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
-import { SearchInput, SelectInput } from "../../components/Input";
+import SearchInput from "../../components/inputs/SearchInput";
+import SelectInput from "../../components/inputs/SelectInput";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
@@ -120,11 +121,12 @@ function ControlsSection({
                             defaultValue="All Roles"
                             className="py-1!"
                             onChange={(e) => setRoleFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Roles">All Roles</SelectInput.Option>
-                            <SelectInput.Option value="Manager">Manager</SelectInput.Option>
-                            <SelectInput.Option value="Cashier">Cashier</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                "All Roles": "All Roles",
+                                Manager: "Manager",
+                                Cashier: "Cashier",
+                            }}
+                        />
                     </div>
 
                     <div className="w-48">
@@ -133,11 +135,12 @@ function ControlsSection({
                             defaultValue="All Branches"
                             className="py-1!"
                             onChange={(e) => setBranchFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Branches">All Branches</SelectInput.Option>
-                            <SelectInput.Option value="Branch North, Manila">Branch North</SelectInput.Option>
-                            <SelectInput.Option value="Branch West, Pasig">Branch West</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                "All Branches": "All Branches",
+                                "Branch North": "Branch North, Manila",
+                                "Branch West": "Branch West, Pasig",
+                            }}
+                        />
                     </div>
 
                     <div className="w-48">
@@ -146,12 +149,13 @@ function ControlsSection({
                             defaultValue="All Status"
                             className="py-1!"
                             onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Status">All Status</SelectInput.Option>
-                            <SelectInput.Option value="Active">Active</SelectInput.Option>
-                            <SelectInput.Option value="Offline">Offline</SelectInput.Option>
-                            <SelectInput.Option value="Suspended">Suspended</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                "All Status": "All Status",
+                                Active: "Active",
+                                Offline: "Offline",
+                                Suspended: "Suspended",
+                            }}
+                        />
                     </div>
 
                     <Button variant="main" size="medium" className="whitespace-nowrap">

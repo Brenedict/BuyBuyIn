@@ -8,7 +8,8 @@ import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-import { SearchInput, SelectInput } from "../../components/Input";
+import SearchInput from "../../components/inputs/SearchInput";
+import SelectInput from "../../components/inputs/SelectInput";
 import Icon from "../../components/Icon";
 
 // Icons
@@ -29,7 +30,7 @@ import { MOCK_BRANCHES, MOCK_BRANCH_MANAGERS } from "../../TESTINGDATA/hqAdminMa
 export default function HQAdmin_ManageUsers() {
     const navigate = useNavigatePage();
 
-    // Branch States 
+    // Branch States
     const [branchSearch, setBranchSearch] = useState("");
     const [branchLocationFilter, setBranchLocationFilter] = useState("All Locations");
     const [branchLimitFilter, setBranchLimitFilter] = useState("All Limits");
@@ -38,11 +39,11 @@ export default function HQAdmin_ManageUsers() {
     const [managerSearch, setManagerSearch] = useState("");
     const [managerLocationFilter, setManagerLocationFilter] = useState("All Locations");
 
-    // Options 
+    // Options
     const uniqueLocations = Array.from(new Set(MOCK_BRANCHES.map((b) => b.location)));
     const uniqueLimits = Array.from(new Set(MOCK_BRANCHES.map((b) => b.accountLimit))).sort((a, b) => a - b);
 
-    // Filter Logic 
+    // Filter Logic
     const filteredBranches = MOCK_BRANCHES.filter((branch) => {
         const matchesSearch = branch.id.toLowerCase().includes(branchSearch.toLowerCase());
         const matchesLocation =
@@ -63,7 +64,7 @@ export default function HQAdmin_ManageUsers() {
         return matchesSearch && matchesLocation;
     });
 
-    // Navigation Handlers 
+    // Navigation Handlers
     const handleAddBranch = () => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/add`);
     const handleEditBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/edit/${id}`);
     const handleDeleteBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/delete/${id}`);
@@ -203,14 +204,11 @@ function BranchesSection({
                             defaultValue={locationFilter}
                             className="py-1!"
                             onChange={(e: any) => onLocationChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Locations">All Locations</SelectInput.Option>
-                            {uniqueLocations.map((loc: string) => (
-                                <SelectInput.Option key={loc} value={loc}>
-                                    {loc}
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
+                            options={{
+                                "All Locations": "All Locations",
+                                ...Object.fromEntries(uniqueLocations.map((loc: string) => [loc, loc] as const)),
+                            }}
+                        />
                     </div>
                     <div className="w-48">
                         <SelectInput
@@ -218,14 +216,13 @@ function BranchesSection({
                             defaultValue={limitFilter}
                             className="py-1!"
                             onChange={(e: any) => onLimitChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Limits">All Limits</SelectInput.Option>
-                            {uniqueLimits.map((limit: number) => (
-                                <SelectInput.Option key={limit} value={String(limit)}>
-                                    {limit} Limits
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
+                            options={{
+                                "All Limits": "All Limits",
+                                ...Object.fromEntries(
+                                    uniqueLimits.map((limit: number) => [`${limit} Limits`, String(limit)] as const),
+                                ),
+                            }}
+                        />
                     </div>
                     <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
                         + Add Branch
@@ -313,14 +310,11 @@ function BranchManagersSection({
                             defaultValue={locationFilter}
                             className="py-1!"
                             onChange={(e: any) => onLocationChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Locations">All Locations</SelectInput.Option>
-                            {uniqueLocations.map((loc: string) => (
-                                <SelectInput.Option key={loc} value={loc}>
-                                    {loc}
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
+                            options={{
+                                "All Locations": "All Locations",
+                                ...Object.fromEntries(uniqueLocations.map((loc: string) => [loc, loc] as const)),
+                            }}
+                        />
                     </div>
                     <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
                         + Register Manager

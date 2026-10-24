@@ -1,3 +1,14 @@
+// ==============================================================
+/** Author: John Benedict Binas
+ * Co-Authors: [Name]
+ *
+ * Description: Defines the account registration workflow controllers.
+ * (1) Handles account creation per role (SUPER ADMIN, HQ ADMIN, BRANCH MANAGER, BRANCH MANAGER).
+ * (2) Verifies the emailed account activation token.
+ * (3) Completes the account registration by setting the user's new password.
+ */
+// ==============================================================
+
 // General Imports
 import type { Request, Response } from "express";
 
@@ -10,10 +21,12 @@ import {
     type AccountRegistrationSchemaType,
     BranchEntityRegistrationSchema,
     type BranchEntityRegistrationSchemaType,
+    CompleteAccountRegistrationSchema,
+    type CompleteAccountRegistrationSchemaType,
 } from "@buybuyin/shared/schema/registration";
 
 // Middlewares
-import { requireAccessLevel } from "../middlewares/authorized.middleware";
+import { requireAccessLevel, requireValidResetToken } from "../middlewares/authorized.middleware";
 import { validateSchema } from "../middlewares/zod.middleware";
 import { jwtAccessAuth } from "../middlewares/passport.middleware";
 
@@ -184,6 +197,57 @@ export default {
             }
 
             return res.status(400).end();
+        },
+    ],
+
+    verifyEmailRegistrationToken: [
+        requireValidResetToken,
+        async (req: Request, res: Response) => {
+            const { email } = req.user as User;
+            const [name, domain] = email.split("@");
+
+            let returnMaskedEmail = "";
+
+            // Fallback check if email still exist
+            if (!name || !domain) {
+                return res.status(401).json({ message: "Email is missing from user" });
+            }
+
+            // Checks if resetToken already expired
+            else {
+                // Show first char, mask middle chars, show last char of local part if long enough
+                let maskedName = name[0] + "****";
+                if (name.length > 2) {
+                    maskedName = `${name[0]}****${name[name.length - 1]}`;
+                }
+
+                returnMaskedEmail = `${maskedName}@${domain}`;
+
+                return res.status(200).json({
+                    email: returnMaskedEmail,
+                    isTokenExpired: false,
+                });
+            }
+        },
+    ],
+
+    // Completes the account registration by setting the user's chosen password.
+    // The reset token is validated first, then cleared once the password is stored.
+    completeAccountRegistration: [
+        requireValidResetToken,
+        validateSchema("body", CompleteAccountRegistrationSchema),
+        async (req: Request, res: Response) => {
+            const user = req.user as User;
+            const { password } = req.body as CompleteAccountRegistrationSchemaType;
+
+            const hashedPassword = await HashUtil.hashPassword(password);
+
+            await RegistrationService.completeAccountRegistration(user.id, hashedPassword);
+
+            // Sends the success email confirming the account was registered and verified.
+            await EmailService.sendAccountRegisteredSuccessEmail(user.fullName as string, user.email);
+
+            return res.status(200).json({ message: "Account verified successfully." });
         },
     ],
 };

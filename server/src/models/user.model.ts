@@ -16,6 +16,14 @@ export default {
         });
     },
 
+    async getByResetToken(resetToken: string): Promise<User | null> {
+        return prisma.user.findUnique({
+            where: {
+                resetToken: resetToken,
+            },
+        });
+    },
+
     async createUser(user: AccountRegistrationSchemaType, temporaryPassword: string, role: RoleType): Promise<User> {
         return prisma.user.create({
             data: {

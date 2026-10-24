@@ -50,3 +50,18 @@ export const BranchEntityRegistrationSchema = zfd.formData(
 );
 
 export type BranchEntityRegistrationSchemaType = z.infer<typeof BranchEntityRegistrationSchema>;
+
+// Payload for completing an account's registration (set password) via the emailed verification link.
+export const CompleteAccountRegistrationSchema = zfd.formData(
+    z
+        .object({
+            password: z.string().trim().min(8, "Password must be at least 8 characters."),
+            confirmPassword: z.string().trim().min(8, "Password must be at least 8 characters."),
+        })
+        .refine(({ password, confirmPassword }) => password === confirmPassword, {
+            message: "Passwords do not match.",
+            path: ["confirmPassword"],
+        })
+);
+
+export type CompleteAccountRegistrationSchemaType = z.infer<typeof CompleteAccountRegistrationSchema>;

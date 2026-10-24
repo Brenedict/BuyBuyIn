@@ -95,7 +95,7 @@ export const createSupplier = async ({ request }: ActionFunctionArgs) => {
 
         await ensureOkOrRedirect(res, "Failed to create supplier", request, ROUTES.HQ_ADMIN.catalogue);
 
-        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Item successfully added");
+        return redirectWithQuery(request, ROUTES.HQ_ADMIN.catalogue, "NOTIF=Supplier successfully added");
     } catch (err) {
         return handleErrRedirect(err, request, ROUTES.HQ_ADMIN.catalogue);
     }

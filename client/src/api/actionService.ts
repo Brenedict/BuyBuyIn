@@ -138,7 +138,7 @@ export const ensureOkOrRedirect = async (res: Response, message: string, request
         throw redirect(ROUTES.AUTH);
     }
 
-    if (res.status === 400) {
+    if (res.status === 400 || res.status === 404 || res.status === 409) {
         let detail = message;
 
         try {

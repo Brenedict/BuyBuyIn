@@ -25,6 +25,8 @@ import TemplateUtil from "../utils/htmlTemplate.util";
 // TODO: Move this to a dedicated directory that stores types
 export type AssignableRole = Exclude<RoleType, "SUPERADMIN">;
 
+const FALLBACK_REGISTRATION_TOKEN_EXPIRATION = "1d";
+
 export default {
     async sendRegistrationConfirmationEmal(
         recipientRole: AssignableRole,
@@ -38,8 +40,9 @@ export default {
             const smtpSourcePassword = process.env.GMAIL_SMTP_16_CHAR_PASS;
             const baseUrl = process.env.FRONTEND_URL;
 
-            // '5m' is a fallback here in case the .env is missing the SMTP_EXPIRATION_OFFSET
-            const smtpExpirationOffset = process.env.SMTP_EXPIRATION_OFFSET || "5m"; // Defines how long reset token lasts
+            // '5m' is a fallback here in case the .env is missing the SMTP_ACCOUNT_REGISTRATION_EXPIRATION
+            const smtpExpirationOffset =
+                process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION;
 
             if (!baseUrl || !smtpSourceEmail || !smtpSourcePassword) {
                 throw Error;

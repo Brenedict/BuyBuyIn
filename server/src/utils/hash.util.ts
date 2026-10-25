@@ -39,7 +39,6 @@ export default {
         }
 
         const randomPassword = password.join("");
-        console.log("Generated password: ", randomPassword);
 
         return await this.hashPassword(randomPassword);
     },

@@ -13,6 +13,7 @@ async function main() {
                 role: "SUPERADMIN",
                 firstName: "John",
                 lastName: "Doe",
+                accountStatus: "ACTIVE",
             },
             {
                 email: "hqadmin@gmail.com",
@@ -20,6 +21,7 @@ async function main() {
                 role: "HQADMIN",
                 firstName: "John",
                 lastName: "Doe",
+                accountStatus: "ACTIVE",
             },
             {
                 email: "branchmanager@gmail.com",
@@ -27,6 +29,7 @@ async function main() {
                 role: "BRANCHMANAGER",
                 firstName: "John",
                 lastName: "Doe",
+                accountStatus: "ACTIVE",
             },
             {
                 email: "cashier@gmail.com",
@@ -34,6 +37,7 @@ async function main() {
                 role: "CASHIER",
                 firstName: "John",
                 lastName: "Doe",
+                accountStatus: "ACTIVE",
             },
         ],
     });

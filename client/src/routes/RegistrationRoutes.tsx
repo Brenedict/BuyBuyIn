@@ -7,10 +7,7 @@
 
 import { type RouteObject } from "react-router";
 import { ROUTES } from "./Routes";
-import {
-    checkAccountRegistrationToken,
-    completeAccountRegistration,
-} from "../api/registrationService";
+import { checkAccountRegistrationToken, completeAccountRegistration } from "../api/registrationService";
 import AccountRegistration from "../pages/shared/AccountRegistration";
 
 export const accountVerificationRoutes: RouteObject[] = [

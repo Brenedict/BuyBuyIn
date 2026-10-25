@@ -37,7 +37,6 @@ export default {
     },
 
     // Routes defined the role per account creation.
-    // Prevents client from providing a custom role in the request body.
     async createNewAccount(user: AccountRegistrationSchemaType, role: RoleType) {
         // Generate a temporary password for the new user account
         // Actual passwords should be set by the user themselves after account creation, via a password reset flow.
@@ -68,8 +67,8 @@ export default {
         const updatedUser = {
             password: hashedPassword,
             accountStatus: "ACTIVE",
-            resetToken: null,
-            resetTokenExpiresAt: null,
+            // resetToken: null,
+            // resetTokenExpiresAt: null,
         } as User;
 
         return UserModel.updateUser(userId, updatedUser);

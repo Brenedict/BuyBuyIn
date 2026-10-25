@@ -6,6 +6,12 @@
  * (1) Handles account creation per role (SUPER ADMIN, HQ ADMIN, BRANCH MANAGER, BRANCH MANAGER).
  * (2) Verifies the emailed account activation token.
  * (3) Completes the account registration by setting the user's new password.
+ *
+ * Note:
+ *  Notice that there are similar POST methods for account creation for 3 roles. The code is repetitive, however I'm leaving it
+ *  as is for now. The idea is, if there are additional account registration workflows that is specifc to a role, it is easily
+ *  addable. However, keep in mind that if a feature that should apply to all registration routes should be added, it has to reflect
+ *  to all 3 account registration routes.
  */
 // ==============================================================
 
@@ -36,6 +42,8 @@ import EmailService from "../service/email.service";
 
 // Util
 import HashUtil from "../utils/hash.util";
+
+const FALLBACK_REGISTRATION_TOKEN_EXPIRATION = "1d";
 
 export default {
     businessEntityPost: [
@@ -97,11 +105,12 @@ export default {
                     user.email
                 );
 
+                // Only registers a reset token when the email has been sent sucessfully
                 if (emailSent) {
                     const result = await RegistrationService.registerResetToken(
                         user.id,
                         hashedToken,
-                        process.env.SMTP_EXPIRATION_OFFSET || "5m"
+                        process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
                     );
                 }
 
@@ -141,11 +150,12 @@ export default {
                     user.email
                 );
 
+                // Only registers a reset token when the email has been sent sucessfully
                 if (emailSent) {
                     const result = await RegistrationService.registerResetToken(
                         user.id,
                         hashedToken,
-                        process.env.SMTP_EXPIRATION_OFFSET || "5m"
+                        process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
                     );
                 }
 
@@ -185,11 +195,12 @@ export default {
                     user.email
                 );
 
+                // Only registers a reset token when the email has been sent sucessfully
                 if (emailSent) {
                     const result = await RegistrationService.registerResetToken(
                         user.id,
                         hashedToken,
-                        process.env.SMTP_EXPIRATION_OFFSET || "5m"
+                        process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
                     );
                 }
 

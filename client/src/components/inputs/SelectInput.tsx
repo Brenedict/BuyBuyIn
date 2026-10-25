@@ -1,5 +1,5 @@
 // General Imports
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 // Components
@@ -19,14 +19,28 @@ interface SelectInputProp extends LabelProp, Omit<React.SelectHTMLAttributes<HTM
     onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
+type DropdownPlacement = "top" | "bottom";
+
+interface DropdownPosition {
+    top: number;
+    left: number;
+    width: number;
+    placement: DropdownPlacement;
+}
+
 interface SelectInputVariantProps {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
     selectedLabel: string;
     className?: string;
+    placement?: DropdownPlacement;
 }
 
-// MAIN COMPONENT 
+const DROPDOWN_MAX_HEIGHT = 164;
+const DROPDOWN_ITEM_HEIGHT = 40;
+const VIEWPORT_MARGIN = 8;
+
+// MAIN COMPONENT
 export default function SelectInput({
     id,
     name,
@@ -43,9 +57,15 @@ export default function SelectInput({
 
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(defaultValue);
-    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+    const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({
+        top: 0,
+        left: 0,
+        width: 0,
+        placement: "bottom",
+    });
 
     const optionEntries = Object.entries(options);
+    const optionCount = optionEntries.length;
     const selectedLabel = optionEntries.find(([, value]) => value === selectedValue)?.[0] ?? selectedValue;
     const isDefaultVariant = variant === "default";
 
@@ -60,16 +80,25 @@ export default function SelectInput({
         }
     };
 
-    useEffect(() => {
-        if (isOpen && selectInputParentRef.current) {
-            const rect = selectInputParentRef.current.getBoundingClientRect();
-            setDropdownPosition({
-                top: rect.bottom,
-                left: rect.left,
-                width: rect.width,
-            });
-        }
-    }, [isOpen]);
+    useLayoutEffect(() => {
+        if (!isOpen || !selectInputParentRef.current) return;
+
+        const trigger = selectInputParentRef.current.querySelector<HTMLElement>(
+            "[data-select-trigger], :scope > button"
+        );
+        const rect = (trigger ?? selectInputParentRef.current).getBoundingClientRect();
+        const dropdownHeight = Math.min(optionCount * DROPDOWN_ITEM_HEIGHT, DROPDOWN_MAX_HEIGHT);
+        const spaceBelow = window.innerHeight - rect.bottom - VIEWPORT_MARGIN;
+        const spaceAbove = rect.top - VIEWPORT_MARGIN;
+        const shouldOpenUpward = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+
+        setDropdownPosition({
+            top: shouldOpenUpward ? rect.top : rect.bottom,
+            left: rect.left,
+            width: rect.width,
+            placement: shouldOpenUpward ? "top" : "bottom",
+        });
+    }, [isOpen, optionCount]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -95,9 +124,13 @@ export default function SelectInput({
         };
     }, [isOpen]);
 
+    const isOpenUpward = dropdownPosition.placement === "top";
+
     const dropdownVariantStyle = isDefaultVariant
-        ? "w-full rounded-b-xl border-b border-x border-slate-dark"
-        : "mt-1 min-w-40 rounded-xl border border-slate-dark";
+        ? isOpenUpward
+            ? "w-full rounded-t-xl border-t border-x border-slate-dark"
+            : "w-full rounded-b-xl border-b border-x border-slate-dark"
+        : `min-w-40 rounded-xl border border-slate-dark ${isOpenUpward ? "" : "mt-1"}`;
 
     return (
         <div className="w-full relative" ref={selectInputParentRef}>
@@ -116,6 +149,7 @@ export default function SelectInput({
                     setIsOpen={setIsOpen}
                     selectedLabel={selectedLabel}
                     className={className}
+                    placement={dropdownPosition.placement}
                 />
             ) : (
                 <SelectInputButtonVariant
@@ -123,6 +157,7 @@ export default function SelectInput({
                     setIsOpen={setIsOpen}
                     selectedLabel={selectedLabel}
                     className={className}
+                    placement={dropdownPosition.placement}
                 />
             )}
 
@@ -140,13 +175,24 @@ export default function SelectInput({
     );
 }
 
-// SUB-COMPONENTS 
+// SUB-COMPONENTS
 
-function SelectInputDefaultVariant({ isOpen, setIsOpen, selectedLabel, className }: SelectInputVariantProps) {
-    const isOpenStyle = isOpen ? "rounded-t-xl border-2! border-slate-dark!" : "rounded-2xl";
+function SelectInputDefaultVariant({
+    isOpen,
+    setIsOpen,
+    selectedLabel,
+    className,
+    placement = "bottom",
+}: SelectInputVariantProps) {
+    const isOpenStyle = isOpen
+        ? placement === "top"
+            ? "rounded-b-xl border-2! border-slate-dark!"
+            : "rounded-t-xl border-2! border-slate-dark!"
+        : "rounded-2xl";
 
     return (
         <section
+            data-select-trigger
             onClick={() => setIsOpen((open) => !open)}
             className={`
                 flex justify-between items-center px-4 border border-[#cfcabd]  
@@ -195,7 +241,7 @@ function SelectInputButtonVariant({ isOpen, setIsOpen, selectedLabel, className 
 
 interface SelectDropdownPortalProps {
     dropdownRef: React.RefObject<HTMLElement | null>;
-    position: { top: number; left: number; width: number };
+    position: DropdownPosition;
     variantStyle: string;
     optionEntries: [string, string][];
     selectedValue: string;
@@ -218,6 +264,7 @@ function SelectDropdownPortal({
                 top: position.top,
                 left: position.left,
                 width: position.width,
+                transform: position.placement === "top" ? "translateY(-100%)" : undefined,
             }}
         >
             {/* The max-h-41 overflow-auto handles the automatic scrolling when options exceed ~3 items */}

@@ -40,7 +40,7 @@ Authorization: Bearer {{login.response.body.accessToken}}
 Content-Type: application/json
 
 {
-    "email": "crescentkenai@gmail.com",
+    "email": "johnsjbinas@gmail.com",
     "firstName": "John",
     "lastName": "Benedict"
 }

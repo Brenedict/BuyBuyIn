@@ -34,6 +34,8 @@ import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutl
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
+type Supplier = (typeof TABLE_SUPPLIERS)[number];
+
 function formatStockLevel(item: InventoryItem) {
     if (item.stockLevel <= item.reorderThreshold) return `${item.stockLevel} (Low Stock)`;
     return `${item.stockLevel}`;
@@ -41,6 +43,27 @@ function formatStockLevel(item: InventoryItem) {
 
 function formatThreshold(reorderThreshold: number) {
     return `≤ ${reorderThreshold} units`;
+}
+
+// Case-insensitive "contains" match across the given fields. Empty query matches everything.
+function matchesQuery(query: string, fields: Array<string | number | null | undefined>) {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return true;
+    return fields.some((field) => String(field ?? "").toLowerCase().includes(needle));
+}
+
+function matchesItem(item: InventoryItem, query: string) {
+    return matchesQuery(query, [item.itemName, item.sku, item.category, item.supplier]);
+}
+
+function matchesSupplier(supplier: Supplier, query: string) {
+    return matchesQuery(query, [
+        supplier.supplierName,
+        supplier.contactPerson,
+        supplier.contactNumber,
+        supplier.email,
+        supplier.address,
+    ]);
 }
 
 // Page-local components
@@ -71,6 +94,22 @@ function InventoryStatCard({ icon, title, value, subtitle }: StatCardProps) {
                 </Text>
             </Card.Body>
         </Card>
+    );
+}
+
+// Search row that sits directly above a table, so it is clear which table it filters.
+interface TableSearchBarProps {
+    name: string;
+    placeholder: string;
+    defaultValue: string;
+    submit: ReturnType<typeof useFormSearchParams>["submit"];
+}
+
+function TableSearchBar({ name, placeholder, defaultValue, submit }: TableSearchBarProps) {
+    return (
+        <Form onSubmit={submit()} className="flex items-center justify-end px-6 py-4">
+            <SearchInput name={name} placeholder={placeholder} defaultValue={defaultValue} className="w-72" />
+        </Form>
     );
 }
 
@@ -145,7 +184,16 @@ function renderOutOfStockRow(item: InventoryItem) {
 
 // Main page
 export function BranchManager_Inventory() {
-    const { values, submit } = useFormSearchParams({ search: "" });
+    // One query param per table so searching one table does not filter the others.
+    const { values, submit } = useFormSearchParams({
+        outOfStockSearch: "",
+        stockSearch: "",
+        supplierSearch: "",
+    });
+
+    const filteredOutOfStock = TABLE_OUT_OF_STOCK_ITEMS.filter((item) => matchesItem(item, values.outOfStockSearch));
+    const filteredCurrentStock = TABLE_CURRENT_STOCK_ITEMS.filter((item) => matchesItem(item, values.stockSearch));
+    const filteredSuppliers = TABLE_SUPPLIERS.filter((supplier) => matchesSupplier(supplier, values.supplierSearch));
 
     const handleEditSupplier = (id: string | number) => () => {
         alert(`Edit supplier: ${id}`);
@@ -174,17 +222,9 @@ export function BranchManager_Inventory() {
                         </Text>
                     </div>
 
-                    <Form onSubmit={submit()} className="flex items-center gap-3">
-                        <SearchInput
-                            name="search"
-                            placeholder="Search items, supplier..."
-                            defaultValue={values.search}
-                            className="w-72"
-                        />
-                        <Button leftIcon={AddIcon} onClick={handleAddItem}>
-                            Add Item
-                        </Button>
-                    </Form>
+                    <Button leftIcon={AddIcon} onClick={handleAddItem}>
+                        Add Item
+                    </Button>
                 </div>
 
                 {/* Stat Cards */}
@@ -223,6 +263,12 @@ export function BranchManager_Inventory() {
                         </Text>
                     </Card.Header>
                     <Card.Body removePadding>
+                        <TableSearchBar
+                            name="outOfStockSearch"
+                            placeholder="Search out of stock items..."
+                            defaultValue={values.outOfStockSearch}
+                            submit={submit}
+                        />
                         <Table
                             bordered={false}
                             shadow={false}
@@ -254,7 +300,7 @@ export function BranchManager_Inventory() {
                                 <Table.Header text="Supplier" size="big" />
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
-                            {TABLE_OUT_OF_STOCK_ITEMS.map(renderOutOfStockRow)}
+                            {filteredOutOfStock.map(renderOutOfStockRow)}
                         </Table>
                     </Card.Body>
                 </Card>
@@ -267,6 +313,12 @@ export function BranchManager_Inventory() {
                         </Text>
                     </Card.Header>
                     <Card.Body removePadding>
+                        <TableSearchBar
+                            name="stockSearch"
+                            placeholder="Search items, supplier..."
+                            defaultValue={values.stockSearch}
+                            submit={submit}
+                        />
                         <Table
                             bordered={false}
                             shadow={false}
@@ -291,7 +343,7 @@ export function BranchManager_Inventory() {
                                 <Table.Header text="Supplier" size="big" />
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
-                            {TABLE_CURRENT_STOCK_ITEMS.map((item) => (
+                            {filteredCurrentStock.map((item) => (
                                 <Table.Row key={item.itemId}>
                                     <Table.Data wrapWords>
                                         <PrimarySecondaryText primary={item.itemName} secondary={item.sku} />
@@ -322,6 +374,12 @@ export function BranchManager_Inventory() {
                         </Text>
                     </Card.Header>
                     <Card.Body removePadding>
+                        <TableSearchBar
+                            name="supplierSearch"
+                            placeholder="Search suppliers..."
+                            defaultValue={values.supplierSearch}
+                            submit={submit}
+                        />
                         <Table
                             bordered={false}
                             shadow={false}
@@ -344,7 +402,7 @@ export function BranchManager_Inventory() {
                                 <Table.Header text="Address" size="big" />
                                 <Table.Header text="Actions" size="big" />
                             </Table.Row>
-                            {TABLE_SUPPLIERS.map((supplier) => (
+                            {filteredSuppliers.map((supplier) => (
                                 <Table.Row key={supplier.supplierId}>
                                     <Table.Data text={supplier.supplierName} wrapWords />
                                     <Table.Data text={supplier.contactPerson} wrapWords />

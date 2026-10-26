@@ -4,7 +4,7 @@ import { Text } from "../../Text";
 import { Button } from "../../Button";
 import GeneralInput from "../../inputs/GeneralInput";
 import PasswordInput from "../../inputs/PasswordInput";
-import SelectInput from "../../inputs/SelectInput"; 
+import SelectInput from "../../inputs/SelectInput";
 
 // Test Data
 import { SAMPLE_SUBSCRIBERS_DATA } from "../../../TESTINGDATA/subscribersData";
@@ -49,11 +49,10 @@ export function SubscriberAddEditPopup({ mode }: { mode: "add" | "edit" }) {
         handleClose();
     };
 
-    // Removed the empty string option to prevent the custom dropdown from crashing
     const businessOptions = {
         "Santos Fashion Boutique": "Santos Fashion Boutique",
         "Reyes Hardware Supply": "Reyes Hardware Supply",
-        "GlowUp Beauty Studio": "GlowUp Beauty Studio"
+        "GlowUp Beauty Studio": "GlowUp Beauty Studio",
     };
 
     return (
@@ -82,22 +81,27 @@ export function SubscriberAddEditPopup({ mode }: { mode: "add" | "edit" }) {
                     value={form.lastName}
                     onChange={setField("lastName")}
                 />
-                
-                {/* FIXED: Replicating the small label manually, and setting SelectInput label to "" */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-[13px] text-[#2b1a16] pl-1 font-medium">
+
+                {/* Stops PopUp drag handler from hijacking dropdown clicks & matches font */}
+                <div
+                    className="flex flex-col gap-1 cursor-pointer [&_*]:cursor-pointer [&_*]:font-normal"
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                >
+                    <Text size="normal" weight="light" variant="slate">
                         {mode === "add" ? "Business " : "Change Business "}
                         <span className="text-[#c93a23]">*</span>
-                    </label>
+                    </Text>
                     <SelectInput
                         id="business"
                         name="business"
                         label=""
                         options={businessOptions}
                         defaultValue={existing?.businessName || "Santos Fashion Boutique"}
+                        className="rounded-2xl border border-black-400 overflow-hidden"
                     />
                 </div>
-                
+
                 <GeneralInput
                     name="username"
                     type="text"
@@ -108,7 +112,7 @@ export function SubscriberAddEditPopup({ mode }: { mode: "add" | "edit" }) {
                     value={form.username}
                     onChange={setField("username")}
                 />
-                
+
                 <PasswordInput
                     name="password"
                     label="Password"
@@ -118,15 +122,17 @@ export function SubscriberAddEditPopup({ mode }: { mode: "add" | "edit" }) {
                     value={form.password}
                     onChange={setField("password")}
                 />
-                    
+
                 {mode === "edit" && (
                     <div className="flex items-center justify-between pt-1">
                         <Button type="button" variant="main" size="normal" onClick={goToRenew}>
                             Renew Subscription
                         </Button>
-                        
+
                         <div className="flex items-center gap-2">
-                            <Text size="small" variant="crimson">Forgot password?</Text>
+                            <Text size="small" variant="crimson">
+                                Forgot password?
+                            </Text>
                             <Button type="button" variant="secondary" size="small" onClick={goToReset}>
                                 Reset Password
                             </Button>
@@ -159,23 +165,49 @@ export function SubscriberRenewPopup() {
     return (
         <PopUp title="Renew Subscription" handleCloseProp={handleClose}>
             <form className="flex flex-col gap-4">
-                <GeneralInput name="firstName" type="text" label="First Name" labelVariant="small" defaultValue={existing?.firstName} required />
-                <GeneralInput name="lastName" type="text" label="Last Name" labelVariant="small" defaultValue={existing?.lastName} required />
-                
-                <div className="flex flex-col gap-1">
-                    <label className="text-[13px] text-[#2b1a16] pl-1 font-medium">
+                <GeneralInput
+                    name="firstName"
+                    type="text"
+                    label="First Name"
+                    labelVariant="small"
+                    defaultValue={existing?.firstName}
+                    required
+                />
+                <GeneralInput
+                    name="lastName"
+                    type="text"
+                    label="Last Name"
+                    labelVariant="small"
+                    defaultValue={existing?.lastName}
+                    required
+                />
+
+                <div
+                    className="flex flex-col gap-1 cursor-pointer [&_*]:cursor-pointer [&_*]:font-normal"
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onPointerDown={(e) => e.stopPropagation()}
+                >
+                    <Text size="normal" weight="light" variant="slate">
                         Business <span className="text-[#c93a23]">*</span>
-                    </label>
-                    <SelectInput 
-                        id="business" 
-                        name="business" 
-                        label="" 
+                    </Text>
+                    <SelectInput
+                        id="business"
+                        name="business"
+                        label=""
                         options={renewBusinessOption}
-                        defaultValue={currentBusinessName} 
+                        defaultValue={currentBusinessName}
+                        className="rounded-2xl border border-black-400 overflow-hidden"
                     />
                 </div>
-                
-                <GeneralInput name="username" type="text" label="Username" labelVariant="small" defaultValue={existing?.username} required />
+
+                <GeneralInput
+                    name="username"
+                    type="text"
+                    label="Username"
+                    labelVariant="small"
+                    defaultValue={existing?.username}
+                    required
+                />
                 <PasswordInput name="password" label="Password" labelVariant="small" required />
 
                 <div className="flex flex-col gap-2 pt-4">
@@ -183,7 +215,13 @@ export function SubscriberRenewPopup() {
                         This will update the information of the subscribed account
                     </Text>
                     <div className="flex gap-2">
-                        <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="normal"
+                            className="flex-1"
+                            onClick={handleClose}
+                        >
                             Cancel
                         </Button>
                         <Button type="button" variant="main" size="normal" className="flex-1" onClick={handleClose}>

@@ -19,8 +19,10 @@ export function SuperAdmin_SubscriberAccounts() {
     const navigate = useNavigatePage();
 
     const handleAdd = () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsAdd, true);
-    const handleEdit = (id: string | number) => () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsEdit(String(id)), true);
-    const handleDelete = (id: string | number) => () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsDelete(String(id)), true);
+    const handleEdit = (id: string | number) => () =>
+        navigate(ROUTES.SUPER_ADMIN.subscriberAccountsEdit(String(id)), true);
+    const handleDelete = (id: string | number) => () =>
+        navigate(ROUTES.SUPER_ADMIN.subscriberAccountsDelete(String(id)), true);
 
     return (
         <Card className="w-full">
@@ -35,7 +37,11 @@ export function SuperAdmin_SubscriberAccounts() {
                     <Card.Header
                         toggleRightButton
                         rightButton={
-                            <Button variant="main" onClick={handleAdd} className="border-none" outline-none ring-0 shadow-none>
+                            <Button
+                                variant="main"
+                                onClick={handleAdd}
+                                className="border-none outline-none ring-0 shadow-none"
+                            >
                                 Add Subscriber
                             </Button>
                         }

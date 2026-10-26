@@ -11,14 +11,16 @@ import { EditDeleteButtons } from "../../components/partials/TablePartials";
 // Test Data
 import { SAMPLE_SUBSCRIBERS_DATA } from "../../TESTINGDATA/subscribersData";
 
-export function SuperAdmin_SubscriberAccounts() {
-    const handleEdit = (id: string | number) => () => {
-        alert(`Edit subscriber: ${id}`);
-    };
+// Hooks & Routes
+import useNavigatePage from "../../hooks/useNavigatePage";
+import { ROUTES } from "../../routes/Routes";
 
-    const handleDelete = (id: string | number) => () => {
-        alert(`Delete subscriber: ${id}`);
-    };
+export function SuperAdmin_SubscriberAccounts() {
+    const navigate = useNavigatePage();
+
+    const handleAdd = () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsAdd, true);
+    const handleEdit = (id: string | number) => () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsEdit(String(id)), true);
+    const handleDelete = (id: string | number) => () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsDelete(String(id)), true);
 
     return (
         <Card className="w-full">
@@ -33,10 +35,10 @@ export function SuperAdmin_SubscriberAccounts() {
                     <Card.Header
                         toggleRightButton
                         rightButton={
-                            <Button variant="main" className="border-none" outline-none ring-0 shadow-none>
+                            <Button variant="main" onClick={handleAdd} className="border-none" outline-none ring-0 shadow-none>
                                 Add Subscriber
                             </Button>
-                        } // Just remove the outline border of the button
+                        }
                         bordered={false}
                     >
                         <Text weight="bold" size="bigger" variant="crimson">
@@ -73,11 +75,7 @@ export function SuperAdmin_SubscriberAccounts() {
                     </Card.Body>
                 </Card>
             </Card.Body>
-
-            {
-                // Displays all global and page popups
-                <Outlet />
-            }
+            <Outlet />
         </Card>
     );
 }

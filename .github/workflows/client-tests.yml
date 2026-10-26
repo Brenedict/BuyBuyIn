@@ -1,0 +1,63 @@
+name: Client-Side Integration Tests
+
+# Run on pushes and pull requests for every branch.
+# workflow_dispatch allows manual runs from the Actions tab.
+on:
+    # Commented this out kasi medyo repetitive yung test (twice ni-r-run)
+    # push:
+
+    pull_request:
+    workflow_dispatch:
+
+# The workflow only needs to read the repository contents.
+permissions:
+    contents: read
+
+# Cancel an in-progress run when a newer commit is pushed to the same ref.
+concurrency:
+    group: client-tests-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    client-test:
+        runs-on: ubuntu-latest
+
+        # Stop a hung test run instead of occupying a runner indefinitely.
+        timeout-minutes: 10
+
+        # The project requires Node.js 24+ (see README prerequisites).
+        strategy:
+            matrix:
+                node: [24.x]
+
+        steps:
+            # Fetch the repository into the runner workspace.
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            # Install the Node.js version used by the project and cache npm's
+            # download cache. The root lockfile covers all workspaces.
+            - name: Use Node.js ${{ matrix.node }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+                  cache-dependency-path: package-lock.json
+
+            # npm ci installs client, server, and shared from the root lockfile.
+            - name: Install dependencies
+              run: npm ci
+
+            # The client tests import generated code from shared/prisma and
+            # shared/zod. Those folders are gitignored, so generate them here.
+            # prisma7.config.ts requires DATABASE_URL even for generation,
+            # but generation does not connect to the database.
+            - name: Generate Prisma client and Zod schemas
+              run: npm run gen:prisma
+              env:
+                  DATABASE_URL: "postgresql://ci:ci@localhost:5432/buybuyin"
+
+            # Run "vitest run" inside the client workspace so that
+            # client/vite.config.ts (jsdom + plugins) is used.
+            - name: Run client integration tests
+              run: npm run test:client

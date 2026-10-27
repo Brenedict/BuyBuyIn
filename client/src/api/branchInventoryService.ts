@@ -36,7 +36,6 @@ export const getBranchInventory = async ({ request }: LoaderFunctionArgs): Promi
     try {
         const { query } = extractQueryToObject(request);
 
-        // The Table paginates client-side, so request the API maximum up front.
         const queryString = buildQueryString({ ...query, limit: "100" });
 
         // Main Fetch Request
@@ -65,7 +64,6 @@ export const getBranchInventoryItem = async ({
         // Main Fetch Request
         const res = await apiJson(`/branch-inventory/${itemId}`, { method: "GET" });
 
-        // Let the popup render its own not-found state.
         if (res.status === 404) {
             return null;
         }

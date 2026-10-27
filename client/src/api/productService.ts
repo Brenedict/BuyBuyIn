@@ -40,8 +40,6 @@ const parseProductId = (id?: string) => {
 export const getCatalogue = async ({ request }: LoaderFunctionArgs): Promise<CatalogueListResponse> => {
     try {
         const { query } = extractQueryToObject(request);
-
-        // The Table paginates client-side, so request the API maximum up front.
         const queryString = buildQueryString({ ...query, limit: "100" });
 
         // Main Fetch Request
@@ -114,7 +112,6 @@ export const getCatalogueProduct = async ({ params, request }: LoaderFunctionArg
 
         const options: CatalogueOptionsResponse = await optionsRes.json();
 
-        // Let the popup render its own not-found state.
         if (productRes.status === 404) {
             return { product: null, options };
         }

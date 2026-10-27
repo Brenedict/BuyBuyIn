@@ -116,9 +116,9 @@ export function HQ_Catalogue() {
                     <Form onChange={handleChange} className="flex items-center gap-3">
                         <SearchInput
                             name="search"
-                            placeholder="Search products, category..."
+                            placeholder="Search products, category & suppliers..."
                             defaultValue={values.search}
-                            className="w-72"
+                            className="w-100"
                         />
                         <Button type="button" leftIcon={AddIcon} onClick={handleAddProduct}>
                             Add Product

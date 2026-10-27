@@ -13,8 +13,10 @@ import type { CatalogueListResponse } from "@buybuyin/shared/schema/product";
 // API Services
 import {
     apiJson,
+    buildQueryString,
     ensureOk,
     ensureOkOrRedirect,
+    extractQueryToObject,
     handleErrRedirect,
     redirectWithQuery,
     validateForm,
@@ -35,8 +37,11 @@ const parseSupplierId = (id?: string) => {
 // GET: Fetches the supplier listing (Table paginates client-side)
 export const getSupplierList = async ({ request }: LoaderFunctionArgs): Promise<SupplierListResponse> => {
     try {
-        // The Table paginates client-side, so request the API maximum up front.
-        const res = await apiJson("/supplier?limit=100", { method: "GET" });
+        const { query } = extractQueryToObject(request);
+        const queryString = buildQueryString({ ...query, limit: "100" });
+
+        // Main Fetch Request
+        const res = await apiJson(`/supplier${queryString ? `?${queryString}` : ""}`, { method: "GET" });
 
         await ensureOk(res, "Failed to retrieve suppliers");
 

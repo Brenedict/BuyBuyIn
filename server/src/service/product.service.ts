@@ -57,7 +57,21 @@ export default {
 
         const where: ProductWhereInput = {
             businessId,
-            ...(search && { productName: { contains: search, mode: "insensitive" } }),
+            ...(search && {
+                OR: [
+                    { productName: { contains: search, mode: "insensitive" } },
+                    {
+                        productCategories: {
+                            some: { category: { categoryName: { contains: search, mode: "insensitive" } } },
+                        },
+                    },
+                    {
+                        supplier: {
+                            supplierName: { contains: search, mode: "insensitive" },
+                        },
+                    },
+                ],
+            }),
             ...(supplierId && { supplierId }),
             ...(categoryId && { productCategories: { some: { categoryId } } }),
         };

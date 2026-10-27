@@ -34,6 +34,13 @@ const OFFERS = [
 export function BranchManager_BranchWideOffers() {
     const [searchQuery, setSearchQuery] = useState("");
 
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const filteredOffers = OFFERS.filter(
+        (offer) =>
+            offer.title.toLowerCase().includes(normalizedQuery) ||
+            offer.date.toLowerCase().includes(normalizedQuery),
+    );
+
     return (
         <Card>
             <Card.Body className="py-6 px-10 flex flex-col gap-8 overflow-scroll">
@@ -48,31 +55,17 @@ export function BranchManager_BranchWideOffers() {
                         BRANCH-WIDE OFFERS
                     </Text>
 
-                    <div className="flex flex-row gap-6 items-center">
-                        <SearchInput
-                            id="searchBranch"
-                            name="searchBranch"
-                            label=""
-                            placeholder="Search Branch"
-                            disabled={false}
-                            hidden={false}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-64"
-                        />
-
-                        <Card isGlass={false} dropShadow={true} className="px-6 py-4 rounded-2xl bg-[#FEFCED]">
-                            <Text weight="bold" size="normal" variant="black">
-                                Branch Details
-                            </Text>
-                            <Text weight="extraBold" size="bigger" variant="crimson">
-                                Branch - Caloocan
-                            </Text>
-                            <Text size="normal" variant="black">
-                                Branch 001- 001
-                            </Text>
-                        </Card>
-                    </div>
+                    <Card isGlass={false} dropShadow={true} className="px-6 py-4 rounded-2xl bg-[#FEFCED]">
+                        <Text weight="bold" size="normal" variant="black">
+                            Branch Details
+                        </Text>
+                        <Text weight="extraBold" size="bigger" variant="crimson">
+                            Branch - Caloocan
+                        </Text>
+                        <Text size="normal" variant="black">
+                            Branch 001- 001
+                        </Text>
+                    </Card>
                 </div>
 
                 {/* --- STATS GRID SECTION --- */}
@@ -96,17 +89,37 @@ export function BranchManager_BranchWideOffers() {
 
                 {/* --- OFFERS SECTION --- */}
                 <Card dropShadow={true} className="mt-4 bg-transparent flex flex-col">
-                    <Card.Header bordered={false} className="pt-16 px-8">
+                    <Card.Header bordered={false} className="pt-16 px-8 flex flex-row justify-between items-center">
                         <Text weight="extraBold" size="bigger" variant="crimson" className="uppercase text-3xl">
                             OFFERS
                         </Text>
+
+                        <SearchInput
+                            id="searchOffers"
+                            name="searchOffers"
+                            label=""
+                            placeholder="Search offers"
+                            disabled={false}
+                            hidden={false}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-64"
+                        />
                     </Card.Header>
 
                     <Card.Body className="px-8 pb-4">
                         <div className="border border-gray-400 rounded-3xl p-6">
                             <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
-                                {OFFERS.map((offer, idx) => (
-                                    <Card key={idx} dropShadow={true} className="bg-[#FEFCED] rounded-2xl h-full">
+                                {filteredOffers.length === 0 && (
+                                    <div className="col-span-full py-10 text-center">
+                                        <Text weight="bold" size="normal" variant="maroon">
+                                            No offers match "{searchQuery}"
+                                        </Text>
+                                    </div>
+                                )}
+
+                                {filteredOffers.map((offer) => (
+                                    <Card key={offer.title} dropShadow={true} className="bg-[#FEFCED] rounded-2xl h-full">
                                         <Card.Body className="flex flex-col justify-between h-full min-h-[160px] gap-4">
                                             <Text
                                                 weight="extraBold"

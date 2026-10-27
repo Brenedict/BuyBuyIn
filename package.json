@@ -22,7 +22,9 @@
         "gensql:prisma": "npm run gensql:prisma -w server/",
         "create:prisma": "npm run create:prisma -w server/",
         "studio:prisma": "npm run studio:prisma -w server/",
-        "pull:prisma": "npm run pull:prisma -w server/"
+        "pull:prisma": "npm run pull:prisma -w server/",
+        "clean-build-install": "node scripts/clean-build.js",
+        "cbi": "node scripts/clean-build.js"
     },
     "devDependencies": {
         "concurrently": "^8.2.2"

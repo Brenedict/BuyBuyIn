@@ -58,14 +58,14 @@ export function Login() {
                                 htmlFor="email"
                                 className="mb-2 block font-sans-flex text-normal font-bold text-crimson"
                             >
-                                Email
+                                Username
                             </label>
                             <GeneralInput
                                 id="email"
                                 name="email"
                                 type="email"
-                                autoComplete="email"
-                                placeholder="Enter Email"
+                                autoComplete="username"
+                                placeholder="Enter Username"
                                 required
                                 className="login-input"
                             />
@@ -87,6 +87,7 @@ export function Login() {
                                 className="login-input"
                             />
                         </div>
+
 
                         <div className="mt-3 flex flex-col items-center gap-4">
                             <Button type="submit" variant="login">

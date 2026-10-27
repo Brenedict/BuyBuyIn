@@ -1,5 +1,5 @@
 // General Imports
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 // Components
@@ -10,6 +10,13 @@ import { Button } from "../Button";
 
 // Material UI Icons
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
+
+const DROPDOWN_MIN_WIDTH = 192;
+const DROPDOWN_MAX_HEIGHT = 164;
+const DROPDOWN_ITEM_HEIGHT = 40;
+const VIEWPORT_MARGIN = 8;
+const DEFAULT_VARIANT_OFFSET = 0;
+const BUTTON_VARIANT_OFFSET = 4;
 
 interface SelectInputProp extends LabelProp, Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "children"> {
     name: string;
@@ -30,21 +37,19 @@ interface DropdownPosition {
 
 interface SelectInputVariantProps {
     isOpen: boolean;
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    onToggle: () => void;
     selectedLabel: string;
     className?: string;
     placement?: DropdownPlacement;
+    triggerRef: React.RefObject<HTMLElement | null>;
 }
-
-const DROPDOWN_MAX_HEIGHT = 164;
-const DROPDOWN_ITEM_HEIGHT = 40;
-const VIEWPORT_MARGIN = 8;
 
 // MAIN COMPONENT
 export default function SelectInput({
     id,
     name,
     label,
+    labelVariant,
     options,
     defaultValue,
     variant = "default",
@@ -54,6 +59,7 @@ export default function SelectInput({
     const selectInputParentRef = useRef<HTMLDivElement | null>(null);
     const dropdownRef = useRef<HTMLElement | null>(null);
     const selectInputRef = useRef<HTMLSelectElement | null>(null);
+    const triggerRef = useRef<HTMLElement | null>(null);
 
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(defaultValue);
@@ -69,9 +75,20 @@ export default function SelectInput({
     const selectedLabel = optionEntries.find(([, value]) => value === selectedValue)?.[0] ?? selectedValue;
     const isDefaultVariant = variant === "default";
 
+    const close = useCallback(() => setIsOpen(false), []);
+
+    const handleToggle = () => {
+        if (isOpen) {
+            close();
+            return;
+        }
+
+        setIsOpen(true);
+    };
+
     const handleOptionSelect = (value: string) => {
         setSelectedValue(value);
-        setIsOpen(false);
+        close();
 
         const select = selectInputRef.current;
         if (select) {
@@ -81,48 +98,62 @@ export default function SelectInput({
     };
 
     useLayoutEffect(() => {
-        if (!isOpen || !selectInputParentRef.current) return;
+        if (!isOpen) return;
 
-        const trigger = selectInputParentRef.current.querySelector<HTMLElement>(
-            "[data-select-trigger], :scope > button"
-        );
-        const rect = (trigger ?? selectInputParentRef.current).getBoundingClientRect();
+        const trigger = triggerRef.current ?? selectInputParentRef.current;
+        if (!trigger) return;
+
+        const rect = trigger.getBoundingClientRect();
+        const width = isDefaultVariant ? rect.width : Math.max(rect.width, DROPDOWN_MIN_WIDTH);
         const dropdownHeight = Math.min(optionCount * DROPDOWN_ITEM_HEIGHT, DROPDOWN_MAX_HEIGHT);
+        const offset = isDefaultVariant ? DEFAULT_VARIANT_OFFSET : BUTTON_VARIANT_OFFSET;
         const spaceBelow = window.innerHeight - rect.bottom - VIEWPORT_MARGIN;
         const spaceAbove = rect.top - VIEWPORT_MARGIN;
         const shouldOpenUpward = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+        const left = Math.max(VIEWPORT_MARGIN, Math.min(rect.left, window.innerWidth - width - VIEWPORT_MARGIN));
 
         setDropdownPosition({
-            top: shouldOpenUpward ? rect.top : rect.bottom,
-            left: rect.left,
-            width: rect.width,
+            top: shouldOpenUpward ? rect.top - offset : rect.bottom + offset,
+            left,
+            width,
             placement: shouldOpenUpward ? "top" : "bottom",
         });
-    }, [isOpen, optionCount]);
+    }, [isOpen, optionCount, isDefaultVariant]);
 
     useEffect(() => {
         if (!isOpen) return;
 
-        const handleOutsideClick = (event: MouseEvent) => {
+        const handlePointerDown = (event: MouseEvent) => {
             const target = event.target as Node;
-            if (selectInputParentRef.current?.contains(target) || dropdownRef.current?.contains(target)) {
-                return;
-            }
-            setIsOpen(false);
+            if (selectInputParentRef.current?.contains(target) || dropdownRef.current?.contains(target)) return;
+            close();
         };
 
-        const handleScrollOrResize = () => setIsOpen(false);
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") close();
+        };
 
-        document.addEventListener("mousedown", handleOutsideClick);
-        window.addEventListener("scroll", handleScrollOrResize, true);
-        window.addEventListener("resize", handleScrollOrResize);
+        // The list is fixed-positioned, so any scroll would leave it detached from the trigger
+        const handleScroll = (event: Event) => {
+            // Scrolling inside the list itself should keep it open
+            if (dropdownRef.current?.contains(event.target as Node)) return;
+            close();
+        };
+
+        const handleResize = () => close();
+
+        document.addEventListener("mousedown", handlePointerDown);
+        document.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("scroll", handleScroll, true);
+        window.addEventListener("resize", handleResize);
 
         return () => {
-            document.removeEventListener("mousedown", handleOutsideClick);
-            window.removeEventListener("scroll", handleScrollOrResize, true);
-            window.removeEventListener("resize", handleScrollOrResize);
+            document.removeEventListener("mousedown", handlePointerDown);
+            document.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("scroll", handleScroll, true);
+            window.removeEventListener("resize", handleResize);
         };
-    }, [isOpen]);
+    }, [isOpen, close]);
 
     const isOpenUpward = dropdownPosition.placement === "top";
 
@@ -130,11 +161,11 @@ export default function SelectInput({
         ? isOpenUpward
             ? "w-full rounded-t-xl border-t border-x border-slate-dark"
             : "w-full rounded-b-xl border-b border-x border-slate-dark"
-        : `min-w-40 rounded-xl border border-slate-dark ${isOpenUpward ? "" : "mt-1"}`;
+        : `min-w-40 rounded-xl border border-slate-dark`;
 
     return (
-        <div className="w-full relative" ref={selectInputParentRef}>
-            <Label htmlFor={id} label={label} />
+        <div className="w-full relative" ref={selectInputParentRef} data-no-drag>
+            <Label htmlFor={id} label={label} labelVariant={labelVariant} />
             <select id={id} ref={selectInputRef} hidden name={name} value={selectedValue} onChange={onChange}>
                 {optionEntries.map(([label, value]) => (
                     <option key={label} value={value}>
@@ -146,18 +177,20 @@ export default function SelectInput({
             {isDefaultVariant ? (
                 <SelectInputDefaultVariant
                     isOpen={isOpen}
-                    setIsOpen={setIsOpen}
+                    onToggle={handleToggle}
                     selectedLabel={selectedLabel}
                     className={className}
                     placement={dropdownPosition.placement}
+                    triggerRef={triggerRef}
                 />
             ) : (
                 <SelectInputButtonVariant
                     isOpen={isOpen}
-                    setIsOpen={setIsOpen}
+                    onToggle={handleToggle}
                     selectedLabel={selectedLabel}
                     className={className}
                     placement={dropdownPosition.placement}
+                    triggerRef={triggerRef}
                 />
             )}
 
@@ -179,10 +212,11 @@ export default function SelectInput({
 
 function SelectInputDefaultVariant({
     isOpen,
-    setIsOpen,
+    onToggle,
     selectedLabel,
     className,
     placement = "bottom",
+    triggerRef,
 }: SelectInputVariantProps) {
     const isOpenStyle = isOpen
         ? placement === "top"
@@ -192,12 +226,13 @@ function SelectInputDefaultVariant({
 
     return (
         <section
+            ref={triggerRef}
             data-select-trigger
-            onClick={() => setIsOpen((open) => !open)}
+            onClick={onToggle}
             className={`
-                flex justify-between items-center px-4 border border-[#cfcabd]  
-                bg-off-white w-full min-w-48 placeholder-slate-light hover:bg-off-white-border transition-colors 
-                ${isOpenStyle}              
+                flex justify-between items-center px-4 border border-[#cfcabd]
+                bg-off-white w-full min-w-48 placeholder-slate-light hover:bg-off-white-border transition-colors
+                ${isOpenStyle}
                 ${className}
             `}
         >
@@ -223,19 +258,26 @@ function SelectInputDefaultVariant({
     );
 }
 
-function SelectInputButtonVariant({ isOpen, setIsOpen, selectedLabel, className }: SelectInputVariantProps) {
+function SelectInputButtonVariant({ isOpen, onToggle, selectedLabel, className, triggerRef }: SelectInputVariantProps) {
     return (
-        <Button
-            onClick={() => setIsOpen((open) => !open)}
-            type="button"
-            variant="main"
-            size="medium"
-            className={`transition ease-in ${className}`}
-            rightIcon={ArrowDropDownOutlinedIcon}
-            iconExtraClass={`transition-transform duration-300 ease-in-out ${isOpen ? "rotate-180" : "rotate-0"}`}
+        <span
+            ref={(node: HTMLSpanElement | null) => {
+                triggerRef.current = node;
+            }}
+            className="relative inline-flex"
         >
-            {selectedLabel}
-        </Button>
+            <Button
+                onClick={onToggle}
+                type="button"
+                variant="main"
+                size="medium"
+                className={`transition ease-in ${className}`}
+                rightIcon={ArrowDropDownOutlinedIcon}
+                iconExtraClass={`transition-transform duration-300 ease-in-out ${isOpen ? "rotate-180" : "rotate-0"}`}
+            >
+                {selectedLabel}
+            </Button>
+        </span>
     );
 }
 
@@ -259,6 +301,7 @@ function SelectDropdownPortal({
     return createPortal(
         <section
             ref={dropdownRef}
+            data-no-drag
             className={`fixed z-[9999] max-h-41 overflow-hidden bg-off-white shadow-xl ${variantStyle}`}
             style={{
                 top: position.top,

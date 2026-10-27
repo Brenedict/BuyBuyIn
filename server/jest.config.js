@@ -7,6 +7,7 @@
 const config = {
     clearMocks: true,
     testEnvironment: "node",
+    maxWorkers: 1,
     projects: [
         {
             displayName: "unit",

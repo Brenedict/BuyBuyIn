@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // General Imports
 import React from "react";
 // Components
@@ -27,6 +28,11 @@ export const ButtonColorClasses = {
     },
     transparent: {
         button: "text-crimson border-crimson border-1 font-bold hover:bg-crimson-muted hover:text-cream hover:cursor-pointer",
+        icon: "crimson",
+        iconExtra: "",
+    },
+    popup: {
+        button: "bg-off-white text-crimson border border-off-white font-bold hover:bg-cream",
         icon: "crimson",
         iconExtra: "",
     },

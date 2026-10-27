@@ -1,12 +1,15 @@
 import request from "supertest";
 import bcrypt from "bcryptjs";
-import { beforeEach, expect, describe, it } from "@jest/globals";
+import { jest, beforeEach, expect, describe, it } from "@jest/globals";
 
 import authRouter from "../../src/routes/auth.route";
 import prisma from "../../src/config/prisma.config";
 import { app } from "../../jest.integration";
 
 import { mockUser } from "../fixtures/user.fixture";
+
+// Use the original passport middleware
+jest.unmock("../../src/middlewares/passport.middleware");
 
 describe("Auth routes", () => {
     app.use("/auth", authRouter);

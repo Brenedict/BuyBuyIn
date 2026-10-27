@@ -7,6 +7,7 @@ import testBg from "../../assets/testbg.png";
 
 // Components
 import { NavBar } from "../../components/NavBar";
+import { NotificationPopup } from "../../components/popups/global/NotificationPopup";
 
 // Context
 import { useGlobalContext } from "./AccessValidator";
@@ -39,6 +40,8 @@ function StaticLayout() {
             <section className="p-8 grow overflow-y-auto overscroll-y-auto">
                 <Outlet />
             </section>
+
+            <NotificationPopup />
         </main>
     );
 }

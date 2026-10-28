@@ -174,7 +174,7 @@ function DenominationPopup({ mode }: DenominationPopupProps) {
     );
 
     const countPanel = (
-        <section className="flex flex-col gap-4 rounded-3xl border border-[#d8d2c4] bg-off-white p-4">
+        <section className="flex flex-col gap-4 rounded-3xl border border-cream bg-off-white p-4">
             <div className="grid grid-cols-2 gap-x-5 gap-y-2">
                 <div className="flex flex-col gap-2">{smallDenominations.map(renderField)}</div>
                 <div className="flex flex-col gap-2">{largeDenominations.map(renderField)}</div>
@@ -217,7 +217,7 @@ function DenominationPopup({ mode }: DenominationPopupProps) {
 
     const summaryColumn = (
         <section className="flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-x-6 rounded-3xl border border-[#d8d2c4] bg-off-white p-4">
+            <div className="grid grid-cols-2 gap-x-6 rounded-3xl border border-cream bg-off-white p-4">
                 <div className="flex flex-col gap-2">
                     {SUMMARY_LEFT.map(([label, key]) => (
                         <SummaryRow key={key} label={label} value={MOCK_SHIFT_SUMMARY[key]} />

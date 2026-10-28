@@ -26,6 +26,8 @@ import { Outlet } from "react-router";
 
 // Hooks
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+import useNavigatePage from "../../hooks/useNavigatePage";
+import { ROUTES } from "../../routes/Routes";
 
 interface BranchStatusProps {
     status: "active" | "inactive";
@@ -73,6 +75,7 @@ function SubscriptionHeaderSection() {
 }
 
 function CurrentPlanSection() {
+    const navigate = useNavigatePage();
     // Test data containing the current HQ subscription plan
     const testPlan = HQ_SUBSCRIPTION;
 
@@ -109,7 +112,7 @@ function CurrentPlanSection() {
                     </div>
 
                     <a
-                        href="#"
+                        onClick={() => navigate(`${ROUTES.HQ_ADMIN.subscriptions}/manage-billing`, true)}
                         className="border-none shadow-none bg-transparent p-0 text-larger-description font-larger text-crimson hover:underline mt-5 "
                     >
                         MANAGE BILLING
@@ -122,6 +125,7 @@ function CurrentPlanSection() {
 
 function BranchSubscriptionSection() {
     const { values, submit } = useFormSearchParams({ search: "" });
+    const navigate = useNavigatePage();
 
     // Filters the branch list based on the search param
     const filteredBranches = useMemo(
@@ -137,7 +141,7 @@ function BranchSubscriptionSection() {
             <Card.Header
                 toggleRightButton
                 rightButton={
-                    <Button size="normal" variant="main" leftIcon={AddIcon} className="border-none shadow-none">
+                    <Button size="normal" variant="main" leftIcon={AddIcon} className="border-none shadow-none" onClick={() => navigate(`${ROUTES.HQ_ADMIN.subscriptions}/add-branch`, true)}>
                         Add Branch
                     </Button>
                 }

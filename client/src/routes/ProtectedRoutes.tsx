@@ -66,6 +66,12 @@ import {
 } from "../components/popups/hq-admin/ManageUserPopups";
 import { ProductFormPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
 import { SupplierFormPopup, SupplierDeletePopup } from "../components/popups/hq-admin/SupplierPopups";
+import { 
+    HQManageBillingPopup, 
+    HQNewPaymentMethodPopup, 
+    HQChangeSubscriptionPopup, 
+    HQAddBranchPopup 
+} from "../components/popups/hq-admin/SubscriptionsPopups";
 
 // Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -260,7 +266,13 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.subscriptions,
                                 element: <HQ_Subscriptions />,
-                                children: [...globalPopups],
+                                children: [
+                                    { path: "manage-billing", element: <HQManageBillingPopup /> },
+                                    { path: "new-payment", element: <HQNewPaymentMethodPopup /> },
+                                    { path: "change-plan", element: <HQChangeSubscriptionPopup /> },
+                                    { path: "add-branch", element: <HQAddBranchPopup /> },
+                                    ...globalPopups,
+                                ],
                             },
                             {
                                 path: ROUTES.HQ_ADMIN.branchOffers,

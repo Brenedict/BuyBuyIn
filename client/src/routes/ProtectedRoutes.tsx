@@ -51,6 +51,8 @@ import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
 import Cashier_Transactions from "../pages/cashier/Cashier.Transactions";
 import Cashier_XRead from "../pages/cashier/Cashier.XRead";
 
+import { StartShiftPopup, EndShiftPopup } from "../components/popups/cashier/ShiftPopups";
+
 // HQ Admin Pages and Popups
 import HQ_BranchWideOffers from "../pages/hq-admin/HQ.BranchWideOffers";
 import HQ_Dashboard from "../pages/hq-admin/HQ.Dashboard";
@@ -185,7 +187,11 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.CASHIER.pointOfSale,
                                 element: <Cashier_PointOfSale />,
-                                children: [...globalPopups],
+                                children: [
+                                    { path: "start-shift", element: <StartShiftPopup /> },
+                                    { path: "end-shift", element: <EndShiftPopup /> },
+                                    ...globalPopups,
+                                ],
                             },
                             { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead />, children: [...globalPopups] },
                         ],

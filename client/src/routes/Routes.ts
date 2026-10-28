@@ -14,6 +14,8 @@ export const ROUTES = {
             transactions: `${base}/transactions`,
             transactionsEdit: (id?: string) => (id ? `${base}/transactions/${id}/edit` : `${base}/transactions/edit`),
             pointOfSale: `${base}/point-of-sale`,
+            startShift: `${base}/point-of-sale/start-shift`,
+            endShift: `${base}/point-of-sale/end-shift`,
             xRead: `${base}/x-read`,
         };
     })(),

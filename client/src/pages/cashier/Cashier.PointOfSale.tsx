@@ -11,11 +11,18 @@ import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
 
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
+
+// Routes & Utils
+import { ROUTES } from "../../routes/Routes";
+
 // Material UI Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/icons-material";
 
 export function Cashier_PointOfSale() {
+    const navigate = useNavigatePage();
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
@@ -57,6 +64,25 @@ export function Cashier_PointOfSale() {
                 {/* top section */}
                 <div className="flex flex-row gap-2 w-full">
                     <SearchInput className="flex-1" />
+                    {/* Opens the cash denomination popups */}
+                    <div className="flex flex-row items-center gap-2">
+                        <Button
+                            type="button"
+                            variant="main"
+                            size="normal"
+                            onClick={() => navigate(ROUTES.CASHIER.startShift)}
+                        >
+                            Start Shift
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="normal"
+                            onClick={() => navigate(ROUTES.CASHIER.endShift)}
+                        >
+                            End Shift
+                        </Button>
+                    </div>
                     <div className="flex flex-row">
                         <Icon icon={AccountCircleIcon} size="large" variant="cream" />
                         <Text size="bigger" variant="cream" weight="extraBold">

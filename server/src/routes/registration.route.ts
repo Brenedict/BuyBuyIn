@@ -24,11 +24,11 @@ router.post("/business-entity", controller.businessEntityPost);
 router.post("/subscriber-account", controller.subscriberAccountPost);
 
 // --------------------- HQ ADMIN Routes --------------------------------
-// router.post("/branch-entity", controller.branchEntityPost);
-// router.post("/manager-account", controller.managerAccountPost);
+router.post("/branch-entity", controller.branchEntityPost);
+router.post("/manager-account", controller.managerAccountPost);
 
 // --------------------- BRANCH MANAGER Routes --------------------------------
-// router.post("/cashier-account", controller.cashierAccountPost);
+router.post("/cashier-account", controller.cashierAccountPost);
 
 // --------------------- Email Verification for all Roles --------------------------------
 router.get("/verify-email", controller.verifyEmailRegistrationToken);

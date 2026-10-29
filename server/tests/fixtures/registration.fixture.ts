@@ -1,7 +1,6 @@
 import type { RoleType } from "@buybuyin/shared/prisma/enums";
 
 export type MockUser = {
-    username: string;
     email: string;
     password: string;
     firstName: string;
@@ -10,7 +9,6 @@ export type MockUser = {
 };
 
 export const mockSuperAdmin: MockUser = {
-    username: "Xx_superadmin_xX",
     email: "superadmin@gmail.com",
     password: "password123",
     firstName: "Super",
@@ -19,7 +17,6 @@ export const mockSuperAdmin: MockUser = {
 };
 
 export const mockHqAdmin: MockUser = {
-    username: "TheHQAdmin",
     email: "hqadmin@gmail.com",
     password: "password123",
     firstName: "HQ",
@@ -28,7 +25,6 @@ export const mockHqAdmin: MockUser = {
 };
 
 export const mockBranchManager: MockUser = {
-    username: "LocalManager029",
     email: "branchmanager@gmail.com",
     password: "password123",
     firstName: "Branch",
@@ -37,7 +33,6 @@ export const mockBranchManager: MockUser = {
 };
 
 export const mockCashier: MockUser = {
-    username: "SquidwardCashier",
     email: "cashier@gmail.com",
     password: "password123",
     firstName: "Squidward",
@@ -50,8 +45,12 @@ export const mockBusinessPayload = {
     location: "Manila",
 };
 
+export const mockBranchPayload = {
+    location: "Quezon City Branch",
+    accountLimit: 10,
+};
+
 export const mockSubscriberPayload = {
-    username: "SomeSubscriber",
     email: "subscriber.acc@gmail.com",
     firstName: "Steve",
     lastName: "MC",

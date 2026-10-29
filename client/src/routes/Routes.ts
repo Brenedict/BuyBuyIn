@@ -72,6 +72,11 @@ export const ROUTES = {
             subscriptionsEdit: (id: string) => `${base}/subscriptions/${id}/edit`,
             subscriptionsDelete: (id: string) => `${base}/subscriptions/${id}/delete`,
             subscriberAccounts: `${base}/subscriber-accounts`,
+            subscriberAccountsAdd: "/super-admin/subscriber-accounts/add",
+            subscriberAccountsEdit: (id: string) => `/super-admin/subscriber-accounts/edit/${id}`,
+            subscriberAccountsRenew: (id: string) => `/super-admin/subscriber-accounts/renew/${id}`,
+            subscriberAccountsReset: (id: string) => `/super-admin/subscriber-accounts/reset/${id}`,
+            subscriberAccountsDelete: (id: string) => `/super-admin/subscriber-accounts/delete/${id}`,
         };
     })(),
 } as const;

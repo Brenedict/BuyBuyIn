@@ -75,6 +75,13 @@ import SuperAdmin_SubscriberAccounts from "../pages/super-admin/SuperAdmin.Subsc
 
 import { DeleteSubscriptionPopup, SubscriptionFormPopup } from "../components/popups/super-admin/SubscriptionsPopups";
 
+import { 
+    SubscriberAddEditPopup, 
+    SubscriberRenewPopup, 
+    SubscriberResetPasswordPopup, 
+    SubscriberDeletePopup 
+} from "../components/popups/super-admin/SubscriberAccountsPopups";
+
 // Predefined Routes
 import { ROLE_HOME, ROUTES } from "./Routes";
 import { RoleType } from "@buybuyin/shared/prisma/enums";
@@ -324,7 +331,14 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.SUPER_ADMIN.subscriberAccounts,
                                 element: <SuperAdmin_SubscriberAccounts />,
-                                children: [...globalPopups],
+                                children: [
+                                    { path: "add", element: <SubscriberAddEditPopup mode="add" /> },
+                                    { path: "edit/:id", element: <SubscriberAddEditPopup mode="edit" /> },
+                                    { path: "renew/:id", element: <SubscriberRenewPopup /> },
+                                    { path: "reset/:id", element: <SubscriberResetPasswordPopup /> },
+                                    { path: "delete/:id", element: <SubscriberDeletePopup /> },
+                                    ...globalPopups,
+                                ],
                             },
                         ],
                     },

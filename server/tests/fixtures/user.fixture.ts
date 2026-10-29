@@ -98,3 +98,70 @@ export const seedUsers = async (
 
     return { hqAdmin, branchManager, cashier, secondBranchManager };
 };
+
+export const mockHqAdmin: UserCreate = {
+    email: "hqadmin@test.local",
+    password: PASSWORD,
+    firstName: "Hana",
+    lastName: "Admin",
+    role: RoleType.HQADMIN,
+    businessId: 1,
+};
+
+export const mockBranchManager: UserCreate = {
+    email: "branchmanager@test.local",
+    password: PASSWORD,
+    firstName: "Berto",
+    lastName: "Manager",
+    role: RoleType.BRANCHMANAGER,
+    businessId: 1,
+    branchId: 1,
+};
+
+export const mockCashier: UserCreate = {
+    email: "cashier@test.local",
+    password: PASSWORD,
+    firstName: "Cara",
+    lastName: "Cashier",
+    role: RoleType.CASHIER,
+    businessId: 1,
+    branchId: 1,
+};
+
+export const mockSecondBranchManager: UserCreate = {
+    email: "branchmanager2@test.local",
+    password: PASSWORD,
+    firstName: "Bruno",
+    lastName: "Manager",
+    role: RoleType.BRANCHMANAGER,
+    businessId: 1,
+    branchId: 2,
+};
+
+export const mockHqAdminNoBusiness: UserCreate = {
+    email: "hqadmin.nobusiness@test.local",
+    password: PASSWORD,
+    firstName: "Nora",
+    lastName: "NoBusiness",
+    role: RoleType.HQADMIN,
+    businessId: null,
+};
+
+// ----------------------------- PUBLIC FUNCTIONS ------------------------------------------
+
+export const seedUsers = async (
+    businessId: number,
+    branchId: number,
+    secondBranchId: number = branchId
+): Promise<SeededUsers> => {
+    const password = await bcrypt.hash(PASSWORD, 10);
+
+    const [hqAdmin, branchManager, cashier, secondBranchManager] = await prisma.$transaction([
+        prisma.user.create({ data: { ...mockHqAdmin, password, businessId, branchId: null } }),
+        prisma.user.create({ data: { ...mockBranchManager, password, businessId, branchId } }),
+        prisma.user.create({ data: { ...mockCashier, password, businessId, branchId } }),
+        prisma.user.create({ data: { ...mockSecondBranchManager, password, businessId, branchId: secondBranchId } }),
+    ]);
+
+    return { hqAdmin, branchManager, cashier, secondBranchManager };
+};

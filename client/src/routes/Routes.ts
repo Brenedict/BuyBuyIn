@@ -8,13 +8,23 @@ export const ROUTES = {
     // ALL CASHIER ROUTES: Define all actions here for popup URL's
     CASHIER: (() => {
         const base = "/cashier";
+        const pointOfSale = `${base}/point-of-sale`;
+        const xRead = `${base}/x-read`;
         return {
             root: `${base}/`,
             dashboard: `${base}/dashboard`,
             transactions: `${base}/transactions`,
             transactionsEdit: (id?: string) => (id ? `${base}/transactions/${id}/edit` : `${base}/transactions/edit`),
-            pointOfSale: `${base}/point-of-sale`,
-            xRead: `${base}/x-read`,
+            pointOfSale,
+            pointOfSaleSeniorPwd: `${pointOfSale}/senior-pwd`,
+            pointOfSaleSeniorPwdConfirm: `${pointOfSale}/senior-pwd/confirm`,
+            pointOfSaleFOverride: `${pointOfSale}/f-override`,
+            pointOfSaleVoid: `${pointOfSale}/void`,
+            xRead,
+            xReadPrint: `${xRead}/print`,
+            xReadPrintPrinting: `${xRead}/print/printing`,
+            xReadPrintPrinted: `${xRead}/print/printed`,
+            xReadEndShift: `${xRead}/end-shift`,
         };
     })(),
 

@@ -7,12 +7,16 @@ import { SearchInput } from "../../components/Input";
 import SelectInput from "../../components/inputs/SelectInput";
 import Table from "../../components/Table";
 
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
+import { ROUTES } from "../../routes/Routes";
+
 //Mock Data
 import { TABLE_XREAD } from "../../TESTINGDATA/xreadData";
 
 function Date_Section() {
+    const navigate = useNavigatePage();
     const gap = "gap-[0.8rem]";
-    const margin = "m-[1rem]";
     const paymentMethods = { option1: "Cash", option2: "Card", option3: "E-Cash" };
     return (
         <Card>
@@ -60,7 +64,11 @@ function Date_Section() {
                                 defaultValue={paymentMethods.option1}
                             ></SelectInput>
                         </div>
-                        <Button size="medium" className="self-end">
+                        <Button
+                            size="medium"
+                            className="self-end"
+                            onClick={() => navigate(ROUTES.CASHIER.xReadPrint, true)}
+                        >
                             Print
                         </Button>
                     </div>
@@ -120,6 +128,8 @@ function XREAD_Table() {
 }
 
 export function Cashier_XRead() {
+    const navigate = useNavigatePage();
+
     return (
         <Card>
             <Card.Body className="flex flex-col gap-6">
@@ -127,7 +137,11 @@ export function Cashier_XRead() {
                     <Text size="bigger" variant="crimson" weight="bold">
                         X-Read
                     </Text>
-                    <Button variant="main" size="medium">
+                    <Button
+                        variant="main"
+                        size="medium"
+                        onClick={() => navigate(ROUTES.CASHIER.xReadEndShift, true)}
+                    >
                         End Shift
                     </Button>
                 </div>

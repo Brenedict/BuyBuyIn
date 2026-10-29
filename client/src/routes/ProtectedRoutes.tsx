@@ -26,11 +26,22 @@ import {
     InventoryItemDeletePopup,
 } from "../components/popups/branch-manager/InventoryPopups";
 
-// Cashier Pages
+// Cashier Pages and Popups
 import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
 import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
 import Cashier_Transactions from "../pages/cashier/Cashier.Transactions";
 import Cashier_XRead from "../pages/cashier/Cashier.XRead";
+
+import {
+    SeniorPwdPopup,
+    SeniorPwdConfirmPopup,
+    FOverridePopup,
+    VoidPopup,
+    PrintConfirmPopup,
+    PrintPrintingPopup,
+    PrintPrintedPopup,
+    EndShiftPopup,
+} from "../components/popups/cashier/CashierPopups";
 
 // HQ Admin Pages and Popups
 import HQ_BranchWideOffers from "../pages/hq-admin/HQ.BranchWideOffers";
@@ -157,9 +168,25 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.CASHIER.pointOfSale,
                                 element: <Cashier_PointOfSale />,
-                                children: [...globalPopups],
+                                children: [
+                                    { path: "senior-pwd", element: <SeniorPwdPopup /> },
+                                    { path: "senior-pwd/confirm", element: <SeniorPwdConfirmPopup /> },
+                                    { path: "f-override", element: <FOverridePopup /> },
+                                    { path: "void", element: <VoidPopup /> },
+                                    ...globalPopups,
+                                ],
                             },
-                            { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead />, children: [...globalPopups] },
+                            {
+                                path: ROUTES.CASHIER.xRead,
+                                element: <Cashier_XRead />,
+                                children: [
+                                    { path: "print", element: <PrintConfirmPopup /> },
+                                    { path: "print/printing", element: <PrintPrintingPopup /> },
+                                    { path: "print/printed", element: <PrintPrintedPopup /> },
+                                    { path: "end-shift", element: <EndShiftPopup /> },
+                                    ...globalPopups,
+                                ],
+                            },
                         ],
                     },
 

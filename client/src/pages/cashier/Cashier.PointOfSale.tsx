@@ -11,11 +11,16 @@ import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
 
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
+import { ROUTES } from "../../routes/Routes";
+
 // Material UI Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/icons-material";
 
 export function Cashier_PointOfSale() {
+    const navigate = useNavigatePage();
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
@@ -179,15 +184,36 @@ export function Cashier_PointOfSale() {
                                             </Text>
                                             <div className="bg-brown h-[2px] w-full flex-1"></div>
                                         </div>
-                                        <div className="flex flex-row gap-3 items-center w-full">
+                                        <div className="flex flex-row flex-wrap gap-3 items-center w-full">
                                             <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 Suspend
                                             </Button>
                                             <Button className={`${buttonSize}`} variant="transparent" size="medium">
                                                 Resume
                                             </Button>
-                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
+                                            <Button
+                                                className={`${buttonSize}`}
+                                                variant="transparent"
+                                                size="medium"
+                                                onClick={() => navigate(ROUTES.CASHIER.pointOfSaleVoid, true)}
+                                            >
                                                 Void
+                                            </Button>
+                                            <Button
+                                                className={`${buttonSize}`}
+                                                variant="transparent"
+                                                size="medium"
+                                                onClick={() => navigate(ROUTES.CASHIER.pointOfSaleSeniorPwd, true)}
+                                            >
+                                                Senior/PWD
+                                            </Button>
+                                            <Button
+                                                className={`${buttonSize}`}
+                                                variant="transparent"
+                                                size="medium"
+                                                onClick={() => navigate(ROUTES.CASHIER.pointOfSaleFOverride, true)}
+                                            >
+                                                F-Override
                                             </Button>
                                         </div>
                                     </div>

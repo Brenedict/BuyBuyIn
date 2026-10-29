@@ -6,7 +6,7 @@ export const resetDatabase = async (): Promise<void> => {
         prisma.branchInventoryItem.deleteMany(),
         prisma.transactionItem.deleteMany(),
         prisma.transaction.deleteMany(),
-        prisma.branchWideOfferBranches.deleteMany(),
+        prisma.branchWideOfferBranch.deleteMany(),
         prisma.branchWideOfferProduct.deleteMany(),
         prisma.branchWideOffer.deleteMany(),
         prisma.productCategory.deleteMany(),

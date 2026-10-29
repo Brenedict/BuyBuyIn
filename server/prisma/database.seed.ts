@@ -204,7 +204,7 @@ async function main() {
     await prisma.transaction.deleteMany();
     await prisma.branchInventoryItem.deleteMany();
     await prisma.branchWideOfferProduct.deleteMany();
-    await prisma.branchWideOfferBranches.deleteMany();
+    await prisma.branchWideOfferBranch.deleteMany();
     await prisma.branchWideOffer.deleteMany();
     await prisma.productCategory.deleteMany();
     await prisma.product.deleteMany();

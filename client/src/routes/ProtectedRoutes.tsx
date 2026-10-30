@@ -45,7 +45,8 @@ import {
     InventoryItemAddPopup,
 } from "../components/popups/branch-manager/InventoryPopups";
 
-// Cashier Pages
+// Cashier Pages and Popups
+import { CashPaymentPopup, ECashPaymentPopup, CardPaymentPopup } from "../components/popups/cashier/ModesOfPayment";
 import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
 import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
 import Cashier_Transactions from "../pages/cashier/Cashier.Transactions";
@@ -185,7 +186,12 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.CASHIER.pointOfSale,
                                 element: <Cashier_PointOfSale />,
-                                children: [...globalPopups],
+                                children: [
+                                    { path: "pay/cash", element: <CashPaymentPopup /> },
+                                    { path: "pay/e-cash", element: <ECashPaymentPopup /> },
+                                    { path: "pay/card", element: <CardPaymentPopup /> },
+                                    ...globalPopups,
+                                ],
                             },
                             { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead />, children: [...globalPopups] },
                         ],

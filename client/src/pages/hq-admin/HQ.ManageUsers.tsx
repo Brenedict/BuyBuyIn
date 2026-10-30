@@ -1,5 +1,5 @@
 // General Imports
-import { Outlet } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 import { useState } from "react";
 
 // Components
@@ -8,7 +8,8 @@ import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-import { SearchInput, SelectInput } from "../../components/Input";
+import SearchInput from "../../components/inputs/SearchInput";
+import SelectInput from "../../components/inputs/SelectInput";
 import Icon from "../../components/Icon";
 
 // Icons
@@ -22,14 +23,16 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import { ROUTES } from "../../routes/Routes";
 
-// Mock Data
-import { MOCK_BRANCHES, MOCK_BRANCH_MANAGERS } from "../../TESTINGDATA/hqAdminManageAccountsData";
+// API Services
+import type { ManageUsersPageData } from "../../api/registrationService";
 
 /* MAIN COMPONENT */
 export default function HQAdmin_ManageUsers() {
     const navigate = useNavigatePage();
 
-    // Branch States 
+    const { branches, managers } = useLoaderData<ManageUsersPageData>();
+
+    // Branch States
     const [branchSearch, setBranchSearch] = useState("");
     const [branchLocationFilter, setBranchLocationFilter] = useState("All Locations");
     const [branchLimitFilter, setBranchLimitFilter] = useState("All Limits");
@@ -38,13 +41,13 @@ export default function HQAdmin_ManageUsers() {
     const [managerSearch, setManagerSearch] = useState("");
     const [managerLocationFilter, setManagerLocationFilter] = useState("All Locations");
 
-    // Options 
-    const uniqueLocations = Array.from(new Set(MOCK_BRANCHES.map((b) => b.location)));
-    const uniqueLimits = Array.from(new Set(MOCK_BRANCHES.map((b) => b.accountLimit))).sort((a, b) => a - b);
+    // Options
+    const uniqueLocations = Array.from(new Set(branches.map((b) => b.location)));
+    const uniqueLimits = Array.from(new Set(branches.map((b) => b.accountLimit))).sort((a, b) => a - b);
 
-    // Filter Logic 
-    const filteredBranches = MOCK_BRANCHES.filter((branch) => {
-        const matchesSearch = branch.id.toLowerCase().includes(branchSearch.toLowerCase());
+    // Filter Logic
+    const filteredBranches = branches.filter((branch) => {
+        const matchesSearch = String(branch.id).toLowerCase().includes(branchSearch.toLowerCase());
         const matchesLocation =
             branchLocationFilter === "All Locations" ? true : branch.location === branchLocationFilter;
         const matchesLimit =
@@ -52,18 +55,19 @@ export default function HQAdmin_ManageUsers() {
         return matchesSearch && matchesLocation && matchesLimit;
     });
 
-    const filteredManagers = MOCK_BRANCH_MANAGERS.filter((manager) => {
+    const filteredManagers = managers.filter((manager) => {
+        const managerLocation = manager.branch?.location ?? "";
         const matchesSearch =
             manager.firstName.toLowerCase().includes(managerSearch.toLowerCase()) ||
             manager.lastName.toLowerCase().includes(managerSearch.toLowerCase()) ||
-            manager.id.toLowerCase().includes(managerSearch.toLowerCase()) ||
+            String(manager.id).toLowerCase().includes(managerSearch.toLowerCase()) ||
             manager.email.toLowerCase().includes(managerSearch.toLowerCase());
         const matchesLocation =
-            managerLocationFilter === "All Locations" ? true : manager.location === managerLocationFilter;
+            managerLocationFilter === "All Locations" ? true : managerLocation === managerLocationFilter;
         return matchesSearch && matchesLocation;
     });
 
-    // Navigation Handlers 
+    // Navigation Handlers
     const handleAddBranch = () => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/add`);
     const handleEditBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/edit/${id}`);
     const handleDeleteBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/delete/${id}`);
@@ -75,7 +79,7 @@ export default function HQAdmin_ManageUsers() {
     return (
         <main className="flex flex-col w-full gap-6 pb-10">
             <PageHeaderSection />
-            <StatCardsSection />
+            <StatCardsSection branches={branches} managers={managers} />
             <BranchesSection
                 search={branchSearch}
                 onSearchChange={setBranchSearch}
@@ -120,11 +124,11 @@ function PageHeaderSection() {
     );
 }
 
-function StatCardsSection() {
-    const totalBranches = MOCK_BRANCHES.length;
-    const totalManagers = MOCK_BRANCH_MANAGERS.length;
-    const totalAccountLimits = MOCK_BRANCHES.reduce((sum, branch) => sum + branch.accountLimit, 0);
-    const activeManagers = MOCK_BRANCH_MANAGERS.length;
+function StatCardsSection({ branches, managers }: { branches: ManageUsersPageData["branches"]; managers: ManageUsersPageData["managers"] }) {
+    const totalBranches = branches.length;
+    const totalManagers = managers.length;
+    const totalAccountLimits = branches.reduce((sum, branch) => sum + branch.accountLimit, 0);
+    const activeManagers = managers.length;
 
     const StatCard = ({ title, value, icon, iconColor }: any) => (
         <Card isGlass={false} className="flex-1 min-w-[230px]">
@@ -203,14 +207,11 @@ function BranchesSection({
                             defaultValue={locationFilter}
                             className="py-1!"
                             onChange={(e: any) => onLocationChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Locations">All Locations</SelectInput.Option>
-                            {uniqueLocations.map((loc: string) => (
-                                <SelectInput.Option key={loc} value={loc}>
-                                    {loc}
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
+                            options={{
+                                "All Locations": "All Locations",
+                                ...Object.fromEntries(uniqueLocations.map((loc: string) => [loc, loc] as const)),
+                            }}
+                        />
                     </div>
                     <div className="w-48">
                         <SelectInput
@@ -218,14 +219,13 @@ function BranchesSection({
                             defaultValue={limitFilter}
                             className="py-1!"
                             onChange={(e: any) => onLimitChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Limits">All Limits</SelectInput.Option>
-                            {uniqueLimits.map((limit: number) => (
-                                <SelectInput.Option key={limit} value={String(limit)}>
-                                    {limit} Limits
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
+                            options={{
+                                "All Limits": "All Limits",
+                                ...Object.fromEntries(
+                                    uniqueLimits.map((limit: number) => [`${limit} Limits`, String(limit)] as const),
+                                ),
+                            }}
+                        />
                     </div>
                     <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
                         + Add Branch
@@ -244,7 +244,7 @@ function BranchesSection({
                     {filteredBranches.length > 0 ? (
                         filteredBranches.map((branch: any) => (
                             <Table.Row key={branch.id} borderedBottom>
-                                <Table.Data text={branch.id} />
+                                <Table.Data text={String(branch.id)} />
                                 <Table.Data text={branch.location} />
                                 <Table.Data text={branch.accountLimit.toString()} />
                                 <Table.Data>
@@ -313,14 +313,11 @@ function BranchManagersSection({
                             defaultValue={locationFilter}
                             className="py-1!"
                             onChange={(e: any) => onLocationChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Locations">All Locations</SelectInput.Option>
-                            {uniqueLocations.map((loc: string) => (
-                                <SelectInput.Option key={loc} value={loc}>
-                                    {loc}
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
+                            options={{
+                                "All Locations": "All Locations",
+                                ...Object.fromEntries(uniqueLocations.map((loc: string) => [loc, loc] as const)),
+                            }}
+                        />
                     </div>
                     <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
                         + Register Manager
@@ -341,8 +338,8 @@ function BranchManagersSection({
                     {filteredManagers.length > 0 ? (
                         filteredManagers.map((manager: any) => (
                             <Table.Row key={manager.id} borderedBottom>
-                                <Table.Data text={manager.id} />
-                                <Table.Data text={manager.location} />
+                                <Table.Data text={String(manager.id)} />
+                                <Table.Data text={manager.branch?.location ?? "—"} />
                                 <Table.Data text={manager.firstName} />
                                 <Table.Data text={manager.lastName} />
                                 <Table.Data text={manager.email} />

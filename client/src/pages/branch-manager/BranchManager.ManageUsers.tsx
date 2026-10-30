@@ -1,18 +1,16 @@
 // General Imports
 import { useState } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 
 // Components
 import { PageHeader } from "../../components/PageHeader";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
-import { SearchInput, SelectInput } from "../../components/Input";
+import SearchInput from "../../components/inputs/SearchInput";
+import SelectInput from "../../components/inputs/SelectInput";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
-
-// Mock Data
-import { SAMPLE_USERS } from "../../TESTINGDATA/manageUsersData";
 
 // Icons
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
@@ -24,21 +22,21 @@ import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 
+// Hooks & Routes
+import useNavigatePage from "../../hooks/useNavigatePage";
+import { ROUTES } from "../../routes/Routes";
+
+// API Services
+import type { RegistrationUserEntry } from "@buybuyin/shared/schema/registration";
+
 // SUB COMPONENTS
-interface StatCardsProps {
-    users: typeof SAMPLE_USERS;
-}
 
 // StatCards
-interface StatCardsProps {
-    users: typeof SAMPLE_USERS;
-}
-
-function StatCardsSection({ users }: StatCardsProps) {
+function StatCardsSection({ users }: { users: RegistrationUserEntry[] }) {
     const total = users.length;
-    const active = users.filter((u) => u.status === "Active").length;
-    const suspended = users.filter((u) => u.status === "Suspended").length;
-    const offline = users.filter((u) => u.status === "Offline").length;
+    const active = users.filter((u) => u.accountStatus === "ACTIVE").length;
+    const suspended = users.filter((u) => u.accountStatus === "SUSPENDED").length;
+    const offline = total - active - suspended;
 
     const StatCard = ({
         title,
@@ -88,24 +86,28 @@ function StatCardsSection({ users }: StatCardsProps) {
 interface ControlsProps {
     searchQuery: string;
     setSearchQuery: (val: string) => void;
-    setRoleFilter: (val: string) => void;
     setBranchFilter: (val: string) => void;
     setStatusFilter: (val: string) => void;
+    uniqueBranches: string[];
+    uniqueStatuses: string[];
+    onAddUser: () => void;
 }
 
 function ControlsSection({
     searchQuery,
     setSearchQuery,
-    setRoleFilter,
     setBranchFilter,
     setStatusFilter,
+    uniqueBranches,
+    uniqueStatuses,
+    onAddUser,
 }: ControlsProps) {
     return (
         <Card isGlass={false} className="overflow-visible! z-20 relative">
             <Card.Body className="flex flex-wrap items-center justify-between gap-6 overflow-visible!">
                 <div className="flex-1 min-w-[300px]">
                     <SearchInput
-                        placeholder="Search by name or contact number"
+                        placeholder="Search by name or email"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full!"
@@ -116,28 +118,15 @@ function ControlsSection({
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="w-48">
                         <SelectInput
-                            name="roleFilter"
-                            defaultValue="All Roles"
-                            className="py-1!"
-                            onChange={(e) => setRoleFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Roles">All Roles</SelectInput.Option>
-                            <SelectInput.Option value="Manager">Manager</SelectInput.Option>
-                            <SelectInput.Option value="Cashier">Cashier</SelectInput.Option>
-                        </SelectInput>
-                    </div>
-
-                    <div className="w-48">
-                        <SelectInput
                             name="branchFilter"
                             defaultValue="All Branches"
                             className="py-1!"
                             onChange={(e) => setBranchFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Branches">All Branches</SelectInput.Option>
-                            <SelectInput.Option value="Branch North, Manila">Branch North</SelectInput.Option>
-                            <SelectInput.Option value="Branch West, Pasig">Branch West</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                "All Branches": "All Branches",
+                                ...Object.fromEntries(uniqueBranches.map((branch) => [branch, branch] as const)),
+                            }}
+                        />
                     </div>
 
                     <div className="w-48">
@@ -146,15 +135,14 @@ function ControlsSection({
                             defaultValue="All Status"
                             className="py-1!"
                             onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Status">All Status</SelectInput.Option>
-                            <SelectInput.Option value="Active">Active</SelectInput.Option>
-                            <SelectInput.Option value="Offline">Offline</SelectInput.Option>
-                            <SelectInput.Option value="Suspended">Suspended</SelectInput.Option>
-                        </SelectInput>
+                            options={{
+                                "All Status": "All Status",
+                                ...Object.fromEntries(uniqueStatuses.map((status) => [status, status] as const)),
+                            }}
+                        />
                     </div>
 
-                    <Button variant="main" size="medium" className="whitespace-nowrap">
+                    <Button variant="main" size="medium" className="whitespace-nowrap" onClick={onAddUser}>
                         + Register User
                     </Button>
                 </div>
@@ -164,11 +152,7 @@ function ControlsSection({
 }
 
 // Employee List
-interface EmployeeListProps {
-    users: typeof SAMPLE_USERS;
-}
-
-function EmployeeListSection({ users }: EmployeeListProps) {
+function EmployeeListSection({ users }: { users: RegistrationUserEntry[] }) {
     return (
         <Card isGlass={false}>
             <Card.Body>
@@ -181,8 +165,7 @@ function EmployeeListSection({ users }: EmployeeListProps) {
                 <Table pagination={{ maxItems: 3 }} rounded={false} bordered={false}>
                     <Table.Row borderedBottom>
                         <Table.Header text="Name" />
-                        <Table.Header text="Contact No." />
-                        <Table.Header text="Role" />
+                        <Table.Header text="Email" />
                         <Table.Header text="Branch" />
                         <Table.Header text="Status" />
                         <Table.Header text="Actions" />
@@ -190,20 +173,10 @@ function EmployeeListSection({ users }: EmployeeListProps) {
 
                     {users.map((user) => (
                         <Table.Row key={user.id} borderedBottom>
-                            <Table.Data text={user.name} />
-                            <Table.Data text={user.contact} />
-                            <Table.Data text={user.role} />
-                            <Table.Data>
-                                <div className="flex flex-col items-center">
-                                    <Text size="normal" variant="brown" weight="medium">
-                                        {user.branch.split(",")[0]}
-                                    </Text>
-                                    <Text size="description" variant="slate-light">
-                                        {user.branch.split(",")[1]}
-                                    </Text>
-                                </div>
-                            </Table.Data>
-                            <Table.Data text={user.status} />
+                            <Table.Data text={`${user.firstName} ${user.lastName}`} />
+                            <Table.Data text={user.email} />
+                            <Table.Data text={user.branch?.location ?? "—"} />
+                            <Table.Data text={user.accountStatus} />
                             <Table.Data>
                                 <div className="flex justify-center gap-2">
                                     <Button
@@ -242,21 +215,29 @@ function EmployeeListSection({ users }: EmployeeListProps) {
 
 // MAIN COMPONENT
 export default function BranchManager_ManageUsers() {
+    const navigate = useNavigatePage();
+
+    const cashiers = useLoaderData<RegistrationUserEntry[]>();
+
     const [searchQuery, setSearchQuery] = useState("");
-    const [roleFilter, setRoleFilter] = useState("All Roles");
     const [branchFilter, setBranchFilter] = useState("All Branches");
     const [statusFilter, setStatusFilter] = useState("All Status");
 
-    const filteredUsers = SAMPLE_USERS.filter((user) => {
+    const handleAddUser = () => navigate(ROUTES.BRANCH_MANAGER.manageUsersAddCashier, true);
+
+    const uniqueBranches = Array.from(new Set(cashiers.map((user) => user.branch?.location).filter(Boolean))) as string[];
+    const uniqueStatuses = Array.from(new Set(cashiers.map((user) => user.accountStatus)));
+
+    const filteredUsers = cashiers.filter((user) => {
         const searchLower = searchQuery.toLowerCase();
-        const matchesSearch =
-            user.name.toLowerCase().includes(searchLower) || String(user.contact).toLowerCase().includes(searchLower);
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        const matchesSearch = fullName.includes(searchLower) || user.email.toLowerCase().includes(searchLower);
 
-        const matchesRole = roleFilter === "All Roles" ? true : user.role === roleFilter;
-        const matchesBranch = branchFilter === "All Branches" ? true : user.branch === branchFilter;
-        const matchesStatus = statusFilter === "All Status" ? true : user.status === statusFilter;
+        const matchesBranch =
+            branchFilter === "All Branches" ? true : user.branch?.location === branchFilter;
+        const matchesStatus = statusFilter === "All Status" ? true : user.accountStatus === statusFilter;
 
-        return matchesSearch && matchesRole && matchesBranch && matchesStatus;
+        return matchesSearch && matchesBranch && matchesStatus;
     });
 
     return (
@@ -268,14 +249,16 @@ export default function BranchManager_ManageUsers() {
                         descriptionText="Register user and give roles and permission"
                     />
 
-                    <StatCardsSection users={SAMPLE_USERS} />
+                    <StatCardsSection users={cashiers} />
 
                     <ControlsSection
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
-                        setRoleFilter={setRoleFilter}
                         setBranchFilter={setBranchFilter}
                         setStatusFilter={setStatusFilter}
+                        uniqueBranches={uniqueBranches}
+                        uniqueStatuses={uniqueStatuses}
+                        onAddUser={handleAddUser}
                     />
 
                     <EmployeeListSection users={filteredUsers} />

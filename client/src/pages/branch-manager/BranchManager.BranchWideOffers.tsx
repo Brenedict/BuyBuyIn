@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
-import { SearchInput } from "../../components/Input";
+import SearchInput from "../../components/inputs/SearchInput";
 import Icon from "../../components/Icon";
 
 // MUI Icons

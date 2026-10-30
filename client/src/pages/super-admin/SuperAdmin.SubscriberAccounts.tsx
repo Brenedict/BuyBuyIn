@@ -1,24 +1,25 @@
 // General Import
-import { Outlet } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-import { EditDeleteButtons } from "../../components/partials/TablePartials";
 
-// Test Data
-import { SAMPLE_SUBSCRIBERS_DATA } from "../../TESTINGDATA/subscribersData";
+// Hooks & Routes
+import useNavigatePage from "../../hooks/useNavigatePage";
+import { ROUTES } from "../../routes/Routes";
+
+// API Services
+import type { RegistrationUserEntry } from "@buybuyin/shared/schema/registration";
 
 export function SuperAdmin_SubscriberAccounts() {
-    const handleEdit = (id: string | number) => () => {
-        alert(`Edit subscriber: ${id}`);
-    };
+    const navigate = useNavigatePage();
 
-    const handleDelete = (id: string | number) => () => {
-        alert(`Delete subscriber: ${id}`);
-    };
+    const subscribers = useLoaderData<RegistrationUserEntry[]>();
+
+    const handleAdd = () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsAdd, true);
 
     return (
         <Card className="w-full">
@@ -33,10 +34,14 @@ export function SuperAdmin_SubscriberAccounts() {
                     <Card.Header
                         toggleRightButton
                         rightButton={
-                            <Button variant="main" className="border-none" outline-none ring-0 shadow-none>
+                            <Button
+                                variant="main"
+                                onClick={handleAdd}
+                                className="border-none outline-none ring-0 shadow-none"
+                            >
                                 Add Subscriber
                             </Button>
-                        } // Just remove the outline border of the button
+                        }
                         bordered={false}
                     >
                         <Text weight="bold" size="bigger" variant="crimson">
@@ -49,35 +54,23 @@ export function SuperAdmin_SubscriberAccounts() {
                             <Table.Row borderedBottom>
                                 <Table.Header text="Last Name" />
                                 <Table.Header text="First Name" />
-                                <Table.Header text="Username" />
+                                <Table.Header text="Email" />
                                 <Table.Header text="Business Name" />
-                                <Table.Header text="Actions" />
                             </Table.Row>
 
-                            {SAMPLE_SUBSCRIBERS_DATA.map((sub) => (
+                            {subscribers.map((sub) => (
                                 <Table.Row key={sub.id}>
                                     <Table.Data size="normal" text={sub.lastName} />
                                     <Table.Data size="normal" text={sub.firstName} />
-                                    <Table.Data size="normal" text={sub.username} />
-                                    <Table.Data size="normal" text={sub.businessName} />
-                                    <Table.Data>
-                                        <EditDeleteButtons
-                                            id={sub.id}
-                                            handleEdit={handleEdit}
-                                            handleDelete={handleDelete}
-                                        />
-                                    </Table.Data>
+                                    <Table.Data size="normal" text={sub.email} />
+                                    <Table.Data size="normal" text={sub.business?.name ?? "—"} />
                                 </Table.Row>
                             ))}
                         </Table>
                     </Card.Body>
                 </Card>
             </Card.Body>
-
-            {
-                // Displays all global and page popups
-                <Outlet />
-            }
+            <Outlet />
         </Card>
     );
 }

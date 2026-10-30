@@ -22,7 +22,7 @@ import BranchWideOfferService from "../service/branchWideOffer.service";
 export default {
     getOffers: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER),
+        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
         validateSchema("query", BranchWideOfferQuerySchema),
         async (req: Request, res: Response) => {
             const query = req.query as unknown as BranchWideOfferQueryType;
@@ -34,7 +34,7 @@ export default {
 
     getOptions: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER),
+        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
         async (req: Request, res: Response) => {
             const options = await BranchWideOfferService.getOptions(req.user as User);
 
@@ -44,7 +44,7 @@ export default {
 
     getOffer: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER),
+        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
         async (req: Request, res: Response) => {
             const offerId = BranchWideOfferService.parseOfferId(req, res);
             if (offerId === null) return;
@@ -57,7 +57,7 @@ export default {
 
     createOffer: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER),
+        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
         validateSchema("body", BranchWideOfferFormSchema),
         async (req: Request, res: Response) => {
             const input = req.body as unknown as BranchWideOfferFormType;
@@ -69,7 +69,7 @@ export default {
 
     updateOffer: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER),
+        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
         validateSchema("body", BranchWideOfferFormSchema),
         async (req: Request, res: Response) => {
             const offerId = BranchWideOfferService.parseOfferId(req, res);
@@ -84,7 +84,7 @@ export default {
 
     deleteOffer: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER),
+        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
         async (req: Request, res: Response) => {
             const offerId = BranchWideOfferService.parseOfferId(req, res);
             if (offerId === null) return;

@@ -1,6 +1,7 @@
 // General Imports
 import type { Request, Response } from "express";
 import type { BranchWideOfferUncheckedUpdateInput, BranchWideOfferWhereInput } from "@buybuyin/shared/prisma/models";
+import { RoleType } from "@buybuyin/shared/prisma/enums";
 import type { User } from "@buybuyin/shared/prisma/browser";
 import type {
     BranchWideOfferEntry,
@@ -42,6 +43,9 @@ type NormalizedOfferInput = {
 export type DeleteOfferResult = { message: string; deleted: boolean; archived: boolean };
 
 // ----------------------------- PRIVATE FUNCTIONS -----------------------------------------
+
+const isHqScope = (requestor: Requestor): boolean =>
+    requestor.role === RoleType.HQADMIN || requestor.role === RoleType.SUPERADMIN;
 
 const resolveBranchId = (requestor: Requestor): number => {
     if (requestor.branchId === null) {
@@ -160,8 +164,34 @@ const assertProductsBelongToBusiness = async (businessId: number, products: Offe
     }
 };
 
+const assertBranchesBelongToBusiness = async (businessId: number, branchIds: number[]): Promise<number[]> => {
+    const uniqueBranchIds = [...new Set(branchIds)];
+
+    if (uniqueBranchIds.length === 0) {
+        throw new HttpError(400, "Select at least one branch");
+    }
+
+    const branchCount = await BranchWideOfferModel.countBranchesForBusiness(businessId, uniqueBranchIds);
+
+    if (branchCount !== uniqueBranchIds.length) {
+        throw new HttpError(400, "Branch not found in your business");
+    }
+
+    return uniqueBranchIds;
+};
+
 const getVisibleOfferOrThrow = async (offerId: number, businessId: number, branchId: number): Promise<OfferRow> => {
     const offer = await BranchWideOfferModel.getVisibleOffer(offerId, businessId, branchId);
+
+    if (!offer) {
+        throw new HttpError(404, "Offer not found");
+    }
+
+    return offer;
+};
+
+const getBusinessOfferOrThrow = async (offerId: number, businessId: number): Promise<OfferRow> => {
+    const offer = await BranchWideOfferModel.getOfferForBusiness(offerId, businessId);
 
     if (!offer) {
         throw new HttpError(404, "Offer not found");
@@ -178,10 +208,12 @@ export default {
 
     async getOffers(requestor: Requestor, query: BranchWideOfferQueryType): Promise<BranchWideOfferListResponse> {
         const businessId = resolveBusinessId(requestor);
-        const branchId = resolveBranchId(requestor);
+        const branchId = isHqScope(requestor) ? null : resolveBranchId(requestor);
         const { search, offerStatus, offerType, page, limit } = query;
 
-        const filters: BranchWideOfferWhereInput[] = [BranchWideOfferModel.getVisibleWhere(businessId, branchId)];
+        const filters: BranchWideOfferWhereInput[] = [
+            branchId === null ? { businessId } : BranchWideOfferModel.getVisibleWhere(businessId, branchId),
+        ];
 
         if (search) {
             filters.push({
@@ -210,7 +242,9 @@ export default {
                 orderBy: [{ startDate: "desc" }, { id: "desc" }],
             }),
             BranchWideOfferModel.count({ where }),
-            BranchWideOfferModel.getVisibleSummaryRows(businessId, branchId),
+            branchId === null
+                ? BranchWideOfferModel.getBusinessSummaryRows(businessId)
+                : BranchWideOfferModel.getVisibleSummaryRows(businessId, branchId),
             BranchWideOfferModel.countBusinessBranches(businessId),
         ]);
 
@@ -228,8 +262,9 @@ export default {
 
     async getOffer(requestor: Requestor, offerId: number): Promise<BranchWideOfferEntry> {
         const businessId = resolveBusinessId(requestor);
-        const branchId = resolveBranchId(requestor);
-        const offer = await getVisibleOfferOrThrow(offerId, businessId, branchId);
+        const offer = isHqScope(requestor)
+            ? await getBusinessOfferOrThrow(offerId, businessId)
+            : await getVisibleOfferOrThrow(offerId, businessId, resolveBranchId(requestor));
 
         return mapEntry(offer);
     },
@@ -242,15 +277,38 @@ export default {
             orderBy: { productName: "asc" },
         });
 
-        return { products: products.map(mapProduct) };
+        if (isHqScope(requestor)) {
+            const branches = await BranchWideOfferModel.getBranchesForBusiness(businessId);
+
+            return {
+                products: products.map(mapProduct),
+                branches: branches.map((branch) => ({ branchId: branch.id, location: branch.location })),
+            };
+        }
+
+        const branch = await BranchWideOfferModel.getBranchForBusiness(resolveBranchId(requestor), businessId);
+
+        return {
+            products: products.map(mapProduct),
+            branches: branch ? [{ branchId: branch.id, location: branch.location }] : [],
+        };
     },
 
     async createOffer(requestor: Requestor, input: BranchWideOfferFormType): Promise<BranchWideOfferEntry> {
         const businessId = resolveBusinessId(requestor);
-        const branchId = resolveBranchId(requestor);
         const normalized = normalizeInput(input);
 
         await assertProductsBelongToBusiness(businessId, normalized.products);
+
+        let isExclusive = true;
+        let branchIds: number[];
+
+        if (isHqScope(requestor)) {
+            isExclusive = input.isExclusive;
+            branchIds = isExclusive ? await assertBranchesBelongToBusiness(businessId, input.branchIds) : [];
+        } else {
+            branchIds = [resolveBranchId(requestor)];
+        }
 
         const offer = await BranchWideOfferModel.createOffer({
             offerName: normalized.offerName,
@@ -261,9 +319,9 @@ export default {
             offerType: normalized.offerType,
             discountType: normalized.discountType,
             overallDiscountValue: normalized.overallDiscountValue,
-            isExclusive: true,
+            isExclusive,
             businessId,
-            branchWideOfferBranches: { create: [{ branchId }] },
+            branchWideOfferBranches: { create: branchIds.map((branchId) => ({ branchId })) },
             branchWideOfferProducts: { create: toOfferProductRows(normalized.products) },
         });
 
@@ -276,17 +334,8 @@ export default {
         input: BranchWideOfferFormType
     ): Promise<BranchWideOfferEntry> {
         const businessId = resolveBusinessId(requestor);
-        const branchId = resolveBranchId(requestor);
-        const existing = await getVisibleOfferOrThrow(offerId, businessId, branchId);
-
-        const isBranchExclusive =
-            existing.branchWideOfferBranches.length === 1 && existing.branchWideOfferBranches[0]?.branchId === branchId;
-
-        if (!existing.isExclusive || !isBranchExclusive) {
-            throw new HttpError(403, "You can only update offers exclusive to your branch");
-        }
-
         const normalized = normalizeInput(input);
+
         await assertProductsBelongToBusiness(businessId, normalized.products);
 
         const data: BranchWideOfferUncheckedUpdateInput = {
@@ -298,12 +347,37 @@ export default {
             offerType: normalized.offerType,
             discountType: normalized.discountType,
             overallDiscountValue: normalized.overallDiscountValue,
-            isExclusive: true,
         };
+
+        if (isHqScope(requestor)) {
+            await getBusinessOfferOrThrow(offerId, businessId);
+
+            const isExclusive = input.isExclusive;
+            const branchIds = isExclusive ? await assertBranchesBelongToBusiness(businessId, input.branchIds) : [];
+
+            const offer = await BranchWideOfferModel.updateOfferWithBranchesAndProducts(
+                offerId,
+                { ...data, isExclusive },
+                branchIds,
+                toOfferProductRows(normalized.products)
+            );
+
+            return mapEntry(offer);
+        }
+
+        const branchId = resolveBranchId(requestor);
+        const existing = await getVisibleOfferOrThrow(offerId, businessId, branchId);
+
+        const isBranchExclusive =
+            existing.branchWideOfferBranches.length === 1 && existing.branchWideOfferBranches[0]?.branchId === branchId;
+
+        if (!existing.isExclusive || !isBranchExclusive) {
+            throw new HttpError(403, "You can only update offers exclusive to your branch");
+        }
 
         const offer = await BranchWideOfferModel.updateOfferWithProducts(
             offerId,
-            data,
+            { ...data, isExclusive: true },
             toOfferProductRows(normalized.products)
         );
 
@@ -312,6 +386,25 @@ export default {
 
     async deleteOffer(requestor: Requestor, offerId: number): Promise<DeleteOfferResult> {
         const businessId = resolveBusinessId(requestor);
+
+        if (isHqScope(requestor)) {
+            await getBusinessOfferOrThrow(offerId, businessId);
+
+            await BranchWideOfferModel.detachAllBranches(offerId);
+
+            const transactionItems = await BranchWideOfferModel.countTransactionItems(offerId);
+
+            if (transactionItems > 0) {
+                await BranchWideOfferModel.archiveOfferById(offerId);
+
+                return { message: "Offer archived", deleted: false, archived: true };
+            }
+
+            await BranchWideOfferModel.deleteOfferById(offerId);
+
+            return { message: "Offer deleted", deleted: true, archived: false };
+        }
+
         const branchId = resolveBranchId(requestor);
         const existing = await getVisibleOfferOrThrow(offerId, businessId, branchId);
 

@@ -29,6 +29,12 @@ export const BranchWideOfferProductInputSchema = z.object({
     discountType: BranchWideOfferDiscountTypeSchema,
 });
 
+const booleanFlag = z.preprocess((value) => {
+    if (value === undefined || value === null || value === "") return false;
+    if (typeof value === "string") return value === "true" || value === "on";
+    return value;
+}, z.boolean());
+
 export const BranchWideOfferFormSchema = zfd
     .formData(
         z.object({
@@ -38,10 +44,11 @@ export const BranchWideOfferFormSchema = zfd
             endDate: zfd.text(z.iso.date()),
             offerStatus: zfd.text(BranchWideOfferStatusSchema).default("DRAFT"),
             offerType: zfd.text(BranchWideOfferTypeSchema),
-            isExclusive: zfd.checkbox(),
+            isExclusive: booleanFlag,
             discountType: zfd.text(BranchWideOfferDiscountTypeSchema).nullish(),
             overallDiscountValue: zfd.numeric(z.number().nonnegative()).nullish(),
             products: zfd.json(z.array(BranchWideOfferProductInputSchema)).default([]),
+            branchIds: zfd.json(z.array(z.number().int().positive())).default([]),
         })
     )
     .superRefine((data, ctx) => {
@@ -52,6 +59,20 @@ export const BranchWideOfferFormSchema = zfd
                 message: "End date must be on or after the start date",
             });
         }
+
+        const seenBranchIds = new Set<number>();
+
+        data.branchIds.forEach((branchId, index) => {
+            if (seenBranchIds.has(branchId)) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["branchIds", index],
+                    message: "Duplicate branch in offer",
+                });
+            }
+
+            seenBranchIds.add(branchId);
+        });
 
         if (data.offerType === "OVERALL") {
             if (data.discountType === null || data.discountType === undefined || data.overallDiscountValue == null) {
@@ -152,4 +173,7 @@ export type BranchWideOfferListResponse = {
     pagination: { page: number; limit: number; total: number; totalPages: number };
 };
 
-export type BranchWideOfferOptionsResponse = { products: CatalogueProduct[] };
+export type BranchWideOfferOptionsResponse = {
+    products: CatalogueProduct[];
+    branches: BranchWideOfferBranchEntry[];
+};

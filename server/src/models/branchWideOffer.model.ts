@@ -73,8 +73,44 @@ export default {
         });
     },
 
+    async getOfferForBusiness(id: number, businessId: number) {
+        return prisma.branchWideOffer.findFirst({
+            where: { id, businessId },
+            select: OFFER_SELECT,
+        });
+    },
+
     async createOffer(data: BranchWideOfferUncheckedCreateInput) {
         return prisma.branchWideOffer.create({ data, select: OFFER_SELECT });
+    },
+
+    async updateOfferWithBranchesAndProducts(
+        id: number,
+        data: BranchWideOfferUncheckedUpdateInput,
+        branchIds: number[],
+        products: Omit<BranchWideOfferProductCreateManyInput, "branchWideOfferId">[]
+    ) {
+        return prisma.$transaction(async (tx) => {
+            await tx.branchWideOffer.update({ where: { id }, data });
+
+            await tx.branchWideOfferBranch.deleteMany({ where: { branchWideOfferId: id } });
+
+            if (branchIds.length > 0) {
+                await tx.branchWideOfferBranch.createMany({
+                    data: branchIds.map((branchId) => ({ branchId, branchWideOfferId: id })),
+                });
+            }
+
+            await tx.branchWideOfferProduct.deleteMany({ where: { branchWideOfferId: id } });
+
+            if (products.length > 0) {
+                await tx.branchWideOfferProduct.createMany({
+                    data: products.map((product) => ({ ...product, branchWideOfferId: id })),
+                });
+            }
+
+            return tx.branchWideOffer.findUniqueOrThrow({ where: { id }, select: OFFER_SELECT });
+        });
     },
 
     async updateOfferWithProducts(
@@ -109,12 +145,19 @@ export default {
         return prisma.branchWideOfferBranch.deleteMany({ where: { branchWideOfferId: offerId, branchId } });
     },
 
+    async detachAllBranches(offerId: number) {
+        return prisma.branchWideOfferBranch.deleteMany({ where: { branchWideOfferId: offerId } });
+    },
+
     async deleteOfferById(id: number) {
         return prisma.branchWideOffer.delete({ where: { id } });
     },
 
     async archiveOfferById(id: number) {
-        return prisma.branchWideOffer.update({ where: { id }, data: { offerStatus: "DISABLED" } });
+        return prisma.branchWideOffer.update({
+            where: { id },
+            data: { offerStatus: "DISABLED", isExclusive: true },
+        });
     },
 
     async getVisibleSummaryRows(businessId: number, branchId: number) {
@@ -126,6 +169,36 @@ export default {
                 endDate: true,
             },
         });
+    },
+
+    async getBusinessSummaryRows(businessId: number) {
+        return prisma.branchWideOffer.findMany({
+            where: { businessId },
+            select: {
+                offerStatus: true,
+                startDate: true,
+                endDate: true,
+            },
+        });
+    },
+
+    async getBranchesForBusiness(businessId: number) {
+        return prisma.branch.findMany({
+            where: { businessId },
+            select: { id: true, location: true },
+            orderBy: { location: "asc" },
+        });
+    },
+
+    async getBranchForBusiness(branchId: number, businessId: number) {
+        return prisma.branch.findFirst({
+            where: { id: branchId, businessId },
+            select: { id: true, location: true },
+        });
+    },
+
+    async countBranchesForBusiness(businessId: number, branchIds: number[]) {
+        return prisma.branch.count({ where: { businessId, id: { in: branchIds } } });
     },
 
     async countBusinessBranches(businessId: number) {

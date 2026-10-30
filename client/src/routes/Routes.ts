@@ -53,6 +53,7 @@ export const ROUTES = {
             branchOffersSave: `${base}/branch-offers/save`,
             branchOffersEdit: (id?: string) => `${base}/branch-offers/${id}/edit`,
             branchOffersEditSave: (id?: string) => `${base}/branch-offers/${id}/edit/save`,
+            branchOffersDelete: (id?: string) => `${base}/branch-offers/${id}/delete`,
         };
     })(),
 

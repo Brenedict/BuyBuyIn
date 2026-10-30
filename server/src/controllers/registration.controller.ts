@@ -46,6 +46,64 @@ import HashUtil from "../utils/hash.util";
 const FALLBACK_REGISTRATION_TOKEN_EXPIRATION = "1d";
 
 export default {
+    // --------------------- GET Routes --------------------------------
+    businessesGet: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "minimum"),
+        async (req: Request, res: Response) => {
+            const businesses = await RegistrationService.getAllBusinesses();
+
+            return res.json(businesses);
+        },
+    ],
+
+    // Fetches branches scoped to the requestor's business (HQ ADMIN creates managers, BRANCH MANAGER creates cashiers)
+    branchesGet: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "minimum"),
+        async (req: Request, res: Response) => {
+            const { businessId } = req.user as User;
+            const branches = await RegistrationService.getBranchesByBusiness(businessId);
+
+            return res.json(branches);
+        },
+    ],
+
+    // Fetches all SUBSCRIBER (HQ ADMIN) accounts
+    subscribersGet: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const subscribers = await RegistrationService.getUsersByRole(RoleType.HQADMIN);
+
+            return res.json(subscribers);
+        },
+    ],
+
+    // Fetches all BRANCH MANAGER accounts scoped to the requestor's business
+    managersGet: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const { businessId } = req.user as User;
+            const managers = await RegistrationService.getUsersByRole(RoleType.BRANCHMANAGER, businessId);
+
+            return res.json(managers);
+        },
+    ],
+
+    // Fetches all CASHIER accounts scoped to the requestor's business
+    cashiersGet: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "exclusive"),
+        async (req: Request, res: Response) => {
+            const { businessId } = req.user as User;
+            const cashiers = await RegistrationService.getUsersByRole(RoleType.CASHIER, businessId);
+
+            return res.json(cashiers);
+        },
+    ],
+
     businessEntityPost: [
         jwtAccessAuth,
         requireAccessLevel("SUPERADMIN", "exclusive"),
@@ -82,6 +140,8 @@ export default {
         requireAccessLevel("SUPERADMIN", "exclusive"),
         validateSchema("body", AccountRegistrationSchema),
         async (req: Request, res: Response) => {
+            console.log("=========================================> REACHED");
+
             // Payload from the request
             const accountDataPayload: AccountRegistrationSchemaType = req.body;
 

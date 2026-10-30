@@ -4,7 +4,8 @@ import type { RoleType } from "@buybuyin/shared/prisma/enums";
 export const ROUTES = {
     AUTH: "/auth",
     FORBIDDEN: "/forbidden",
-    VERIFY_ACCOUNT: "/verify-account",
+
+    VERIFY_ACCOUNT: "/verify-email",
 
     // ALL CASHIER ROUTES: Define all actions here for popup URL's
     CASHIER: (() => {
@@ -30,6 +31,7 @@ export const ROUTES = {
             inventoryItemRestock: (id?: string) => `${base}/inventory/item/${id}/restock`,
             inventoryItemDelete: (id?: string) => `${base}/inventory/item/${id}/delete`,
             manageUsers: `${base}/manage-users`,
+            manageUsersAddCashier: `${base}/manage-users/cashier/add`,
             branchOffers: `${base}/branch-offers`,
             transactions: `${base}/transactions`,
         };
@@ -67,16 +69,15 @@ export const ROUTES = {
             plansEdit: (id?: string) => `${base}/plans/${id}/edit`,
             plansDelete: (id?: string) => `${base}/plans/${id}/delete`,
             businesses: `${base}/businesses`,
+            businessesAdd: `${base}/businesses/add`,
             subscriptions: `${base}/subscriptions`,
             subscriptionsAdd: `${base}/subscriptions/add`,
             subscriptionsEdit: (id: string) => `${base}/subscriptions/${id}/edit`,
             subscriptionsDelete: (id: string) => `${base}/subscriptions/${id}/delete`,
             subscriberAccounts: `${base}/subscriber-accounts`,
-            subscriberAccountsAdd: "/super-admin/subscriber-accounts/add",
-            subscriberAccountsEdit: (id: string) => `/super-admin/subscriber-accounts/edit/${id}`,
-            subscriberAccountsRenew: (id: string) => `/super-admin/subscriber-accounts/renew/${id}`,
-            subscriberAccountsReset: (id: string) => `/super-admin/subscriber-accounts/reset/${id}`,
-            subscriberAccountsDelete: (id: string) => `/super-admin/subscriber-accounts/delete/${id}`,
+            subscriberAccountsAdd: `${base}/subscriber-accounts/add`,
+            subscriberAccountsEdit: (id: string) => `${base}/subscriber-accounts/${id}/edit`,
+            subscriberAccountsDelete: (id: string) => `${base}/subscriber-accounts/delete/${id}`,
         };
     })(),
 } as const;

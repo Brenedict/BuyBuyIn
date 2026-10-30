@@ -32,6 +32,18 @@ export default {
         return BusinessModel.createBusiness(business);
     },
 
+    getAllBusinesses() {
+        return BusinessModel.getAll();
+    },
+
+    getBranchesByBusiness(businessId?: number | null) {
+        return businessId ? BranchModel.getByBusinessId(businessId) : Promise.resolve([]);
+    },
+
+    getUsersByRole(role: RoleType, businessId?: number | null) {
+        return UserModel.getByRole(role, businessId);
+    },
+
     createNewBranchEntity(branch: BranchEntityRegistrationSchemaType) {
         return BranchModel.createBranch(branch);
     },

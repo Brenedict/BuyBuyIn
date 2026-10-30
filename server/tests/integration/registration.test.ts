@@ -408,6 +408,170 @@ describe("Registration routes", () => {
         });
     });
 
+    describe("GET /registration/businesses", () => {
+        it("returns all businesses for a super admin", async () => {
+            await prisma.business.create({ data: { name: "BuyBuyIn Cebu", location: "Cebu" } });
+
+            setCurrentAuthUser(roles[RoleType.SUPERADMIN]);
+
+            const res = await request(app).get("/registration/businesses").expect(200);
+
+            expect(res.body).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ name: mockBusinessPayload.name, location: mockBusinessPayload.location }),
+                    expect.objectContaining({ name: "BuyBuyIn Cebu", location: "Cebu" }),
+                ])
+            );
+        });
+
+        it("does not expose the business list to frontline roles", async () => {
+            for (const user of allRoleUsers.filter((entry) => entry.role === RoleType.BRANCHMANAGER || entry.role === RoleType.CASHIER)) {
+                setCurrentAuthUser(roles[user.role]);
+
+                await request(app).get("/registration/businesses").expect(403);
+            }
+        });
+    });
+
+    describe("GET /registration/subscribers", () => {
+        it("returns all HQ admin accounts for a super admin", async () => {
+            await prisma.user.create({
+                data: {
+                    email: "new.subscriber@gmail.com",
+                    password: passwordHash,
+                    firstName: "New",
+                    lastName: "Subscriber",
+                    role: RoleType.HQADMIN,
+                },
+            });
+
+            setCurrentAuthUser(roles[RoleType.SUPERADMIN]);
+
+            const res = await request(app).get("/registration/subscribers").expect(200);
+
+            expect(res.body).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ email: mockHqAdmin.email, role: RoleType.HQADMIN }),
+                    expect.objectContaining({ email: "new.subscriber@gmail.com", role: RoleType.HQADMIN }),
+                ])
+            );
+        });
+
+        it("only allows super admins", async () => {
+            for (const user of allRoleUsers.filter((entry) => entry.role !== RoleType.SUPERADMIN)) {
+                setCurrentAuthUser(roles[user.role]);
+
+                await request(app).get("/registration/subscribers").expect(403);
+            }
+        });
+    });
+
+    describe("GET /registration/branches", () => {
+        it("returns branches scoped to the requestor's business", async () => {
+            await prisma.branch.create({ data: { location: "Davao Branch", accountLimit: 5, businessId: business.id } });
+
+            const branchManager = await prisma.user.update({
+                where: { id: roles[RoleType.BRANCHMANAGER].id },
+                data: { businessId: business.id },
+            });
+
+            setCurrentAuthUser(branchManager);
+
+            const res = await request(app).get("/registration/branches").expect(200);
+
+            expect(res.body).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ location: mockBranchPayload.location }),
+                    expect.objectContaining({ location: "Davao Branch" }),
+                ])
+            );
+        });
+
+        it("returns an empty list when the requestor has no business", async () => {
+            setCurrentAuthUser(roles[RoleType.BRANCHMANAGER]);
+
+            const res = await request(app).get("/registration/branches").expect(200);
+
+            expect(res.body).toEqual([]);
+        });
+    });
+
+    describe("GET /registration/managers", () => {
+        it("returns branch managers scoped to the requestor's business", async () => {
+            await prisma.user.create({
+                data: {
+                    email: "new.manager@gmail.com",
+                    password: passwordHash,
+                    firstName: "New",
+                    lastName: "Manager",
+                    role: RoleType.BRANCHMANAGER,
+                    businessId: business.id,
+                },
+            });
+
+            const hqAdmin = await prisma.user.update({
+                where: { id: roles[RoleType.HQADMIN].id },
+                data: { businessId: business.id },
+            });
+
+            setCurrentAuthUser(hqAdmin);
+
+            const res = await request(app).get("/registration/managers").expect(200);
+
+            expect(res.body).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ email: "new.manager@gmail.com", role: RoleType.BRANCHMANAGER }),
+                ])
+            );
+        });
+
+        it("only allows HQ admins", async () => {
+            for (const user of allRoleUsers.filter((entry) => entry.role !== RoleType.HQADMIN)) {
+                setCurrentAuthUser(roles[user.role]);
+
+                await request(app).get("/registration/managers").expect(403);
+            }
+        });
+    });
+
+    describe("GET /registration/cashiers", () => {
+        it("returns cashiers scoped to the requestor's business", async () => {
+            await prisma.user.create({
+                data: {
+                    email: "new.cashier@gmail.com",
+                    password: passwordHash,
+                    firstName: "New",
+                    lastName: "Cashier",
+                    role: RoleType.CASHIER,
+                    businessId: business.id,
+                },
+            });
+
+            const branchManager = await prisma.user.update({
+                where: { id: roles[RoleType.BRANCHMANAGER].id },
+                data: { businessId: business.id },
+            });
+
+            setCurrentAuthUser(branchManager);
+
+            const res = await request(app).get("/registration/cashiers").expect(200);
+
+            expect(res.body).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ email: "new.cashier@gmail.com", role: RoleType.CASHIER }),
+                ])
+            );
+        });
+
+        it("only allows branch managers", async () => {
+            for (const user of allRoleUsers.filter((entry) => entry.role !== RoleType.BRANCHMANAGER)) {
+                setCurrentAuthUser(roles[user.role]);
+
+                await request(app).get("/registration/cashiers").expect(403);
+            }
+        });
+    });
+
     describe("GET /registration/verify-email", () => {
         it("returns a masked email for a valid reset token", async () => {
             await seedResetTokenUser();

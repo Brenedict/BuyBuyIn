@@ -13,74 +13,54 @@ import { SAMPLE_SUBSCRIBERS_DATA } from "../../../TESTINGDATA/subscribersData";
 import useNavigatePage from "../../../hooks/useNavigatePage";
 
 // General Imports
-import { useState, type SubmitEvent } from "react";
-import { useParams } from "react-router";
+import { Form, useLoaderData, useParams } from "react-router";
 import { ROUTES } from "../../../routes/Routes";
 
-interface SubscriberForm {
-    firstName: string;
-    lastName: string;
-    username: string;
-    password: string;
-}
+// API Services
+import type { RegistrationBusinessEntry } from "@buybuyin/shared/schema/registration";
 
 export function SubscriberAddEditPopup({ mode }: { mode: "add" | "edit" }) {
-    const { id } = useParams();
     const navigate = useNavigatePage();
 
+    const businesses = useLoaderData<RegistrationBusinessEntry[]>();
+
     const handleClose = () => navigate(ROUTES.SUPER_ADMIN.subscriberAccounts, true);
-    const goToReset = () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsReset(String(id)), true);
-    const goToRenew = () => navigate(ROUTES.SUPER_ADMIN.subscriberAccountsRenew(String(id)), true);
 
-    const existing = SAMPLE_SUBSCRIBERS_DATA.find((sub) => String(sub.id) === String(id));
-
-    const [form, setForm] = useState<SubscriberForm>({
-        firstName: existing?.firstName ?? "",
-        lastName: existing?.lastName ?? "",
-        username: existing?.username ?? "",
-        password: "",
-    });
-
-    const setField = (key: keyof SubscriberForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
-        setForm((prev) => ({ ...prev, [key]: e.target.value }));
-
-    const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        handleClose();
-    };
-
-    const businessOptions = {
-        "Santos Fashion Boutique": "Santos Fashion Boutique",
-        "Reyes Hardware Supply": "Reyes Hardware Supply",
-        "GlowUp Beauty Studio": "GlowUp Beauty Studio",
-    };
+    const businessOptions = Object.fromEntries(businesses.map((business) => [business.name, String(business.id)]));
+    const defaultBusinessId = businesses[0] ? String(businesses[0].id) : "";
 
     return (
-        <PopUp
-            title={mode === "add" ? "Add Subscriber" : "Edit Subscriber Details"}
-            handleCloseProp={handleClose}
-        >
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <PopUp title={mode === "add" ? "Add Subscriber" : "Edit Subscriber Details"} handleCloseProp={handleClose}>
+            <Form method="post" className="flex flex-col gap-4">
                 <GeneralInput
-                    name="firstName"
-                    type="text"
-                    label="First Name"
+                    name="email"
+                    type="email"
+                    label="Email"
                     labelVariant="small"
-                    placeholder="Pedro"
+                    placeholder="sample@email.com"
                     required
-                    value={form.firstName}
-                    onChange={setField("firstName")}
+                    // value={form.email}
                 />
-                <GeneralInput
-                    name="lastName"
-                    type="text"
-                    label="Last Name"
-                    labelVariant="small"
-                    placeholder="Santos"
-                    required
-                    value={form.lastName}
-                    onChange={setField("lastName")}
-                />
+                <div className="flex gap-4">
+                    <GeneralInput
+                        name="firstName"
+                        type="text"
+                        label="First Name"
+                        labelVariant="small"
+                        placeholder="Pedro"
+                        required
+                        // value={form.firstName}
+                    />
+                    <GeneralInput
+                        name="lastName"
+                        type="text"
+                        label="Last Name"
+                        labelVariant="small"
+                        placeholder="Santos"
+                        required
+                        // value={form.lastName}
+                    />
+                </div>
 
                 {/* Stops PopUp drag handler from hijacking dropdown clicks & matches font */}
                 <div
@@ -88,57 +68,16 @@ export function SubscriberAddEditPopup({ mode }: { mode: "add" | "edit" }) {
                     onMouseDown={(e) => e.stopPropagation()}
                     onPointerDown={(e) => e.stopPropagation()}
                 >
-                    <Text size="normal" weight="light" variant="slate">
-                        {mode === "add" ? "Business " : "Change Business "}
-                        <span className="text-[#c93a23]">*</span>
-                    </Text>
                     <SelectInput
                         id="business"
-                        name="business"
-                        label=""
+                        name="businessId"
+                        label={mode === "add" ? "Business " : "Change Business "}
+                        labelVariant="small"
                         options={businessOptions}
-                        defaultValue={existing?.businessName || "Santos Fashion Boutique"}
+                        defaultValue={defaultBusinessId}
                         className="rounded-2xl border border-black-400 overflow-hidden"
                     />
                 </div>
-
-                <GeneralInput
-                    name="username"
-                    type="text"
-                    label="Username"
-                    labelVariant="small"
-                    placeholder="Iloveyou123"
-                    required
-                    value={form.username}
-                    onChange={setField("username")}
-                />
-
-                <PasswordInput
-                    name="password"
-                    label="Password"
-                    labelVariant="small"
-                    placeholder="Iloveyou123"
-                    required
-                    value={form.password}
-                    onChange={setField("password")}
-                />
-
-                {mode === "edit" && (
-                    <div className="flex items-center justify-between pt-1">
-                        <Button type="button" variant="main" size="normal" onClick={goToRenew}>
-                            Renew Subscription
-                        </Button>
-
-                        <div className="flex items-center gap-2">
-                            <Text size="small" variant="crimson">
-                                Forgot password?
-                            </Text>
-                            <Button type="button" variant="secondary" size="small" onClick={goToReset}>
-                                Reset Password
-                            </Button>
-                        </div>
-                    </div>
-                )}
 
                 <div className="flex gap-2 pt-2">
                     <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
@@ -148,7 +87,7 @@ export function SubscriberAddEditPopup({ mode }: { mode: "add" | "edit" }) {
                         Add
                     </Button>
                 </div>
-            </form>
+            </Form>
         </PopUp>
     );
 }

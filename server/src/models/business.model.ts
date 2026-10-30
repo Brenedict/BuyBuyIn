@@ -10,6 +10,12 @@ export default {
         });
     },
 
+    async getAll(): Promise<Business[]> {
+        return prisma.business.findMany({
+            orderBy: { name: "asc" },
+        });
+    },
+
     async createBusiness(business: BusinessEntityRegistrationSchemaType) {
         return prisma.business.create({
             data: business,

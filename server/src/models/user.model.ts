@@ -24,6 +24,20 @@ export default {
         });
     },
 
+    async getByRole(role: RoleType, businessId?: number | null): Promise<User[]> {
+        return prisma.user.findMany({
+            where: {
+                role,
+                ...(businessId ? { businessId } : {}),
+            },
+            include: {
+                business: { select: { id: true, name: true, location: true } },
+                branch: { select: { id: true, location: true } },
+            },
+            orderBy: { createdAt: "asc" },
+        });
+    },
+
     async createUser(user: AccountRegistrationSchemaType, temporaryPassword: string, role: RoleType): Promise<User> {
         return prisma.user.create({
             data: {

@@ -10,6 +10,13 @@ export default {
         });
     },
 
+    async getByBusinessId(businessId: number): Promise<Branch[]> {
+        return prisma.branch.findMany({
+            where: { businessId },
+            orderBy: { location: "asc" },
+        });
+    },
+
     async createBranch(branch: BranchEntityRegistrationSchemaType) {
         return prisma.branch.create({
             data: branch,

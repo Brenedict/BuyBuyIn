@@ -1,5 +1,5 @@
 // General Imports
-import { Outlet } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
@@ -7,10 +7,6 @@ import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import { PageHeader } from "../../components/PageHeader";
 import Table from "../../components/Table";
-import { EditDeleteButtons } from "../../components/partials/TablePartials";
-
-// Test Data
-import { SAMPLE_BUSINESS_SUBSCRIPTIONS } from "../../TESTINGDATA/subscriptionsData";
 
 // Routes
 import { ROUTES } from "../../routes/Routes";
@@ -18,16 +14,16 @@ import { ROUTES } from "../../routes/Routes";
 // Hooks
 import useNavigatePage from "../../hooks/useNavigatePage";
 
+// API Services
+import type { RegistrationBusinessEntry } from "@buybuyin/shared/schema/registration";
+
 export function SuperAdmin_Businesses() {
     // Used for redirecting
     const navigate = useNavigatePage();
 
-    const handleAdd = () => navigate(ROUTES.SUPER_ADMIN.subscriptionsAdd, true);
+    const businesses = useLoaderData<RegistrationBusinessEntry[]>();
 
-    const handleEdit = (id: string | number) => () => navigate(ROUTES.SUPER_ADMIN.subscriptionsEdit(String(id)), true);
-
-    const handleDelete = (id: string | number) => () =>
-        navigate(ROUTES.SUPER_ADMIN.subscriptionsDelete(String(id)), true);
+    const handleAdd = () => navigate(ROUTES.SUPER_ADMIN.businessesAdd, true);
 
     return (
         <Card className="w-full">
@@ -65,21 +61,15 @@ export function SuperAdmin_Businesses() {
                         >
                             <Table.Row borderedBottom>
                                 <Table.Header text="Business ID" />
+                                <Table.Header text="Name" />
                                 <Table.Header text="Location" />
-                                <Table.Header text="Actions" />
                             </Table.Row>
 
-                            {SAMPLE_BUSINESS_SUBSCRIPTIONS.map((row) => (
-                                <Table.Row key={row.id}>
-                                    <Table.Data size="normal" text={row.businessSubscriptionLabel} />
-                                    <Table.Data size="normal" text={row.businessLabel} />
-                                    <Table.Data>
-                                        <EditDeleteButtons
-                                            id={row.id}
-                                            handleEdit={handleEdit}
-                                            handleDelete={handleDelete}
-                                        />
-                                    </Table.Data>
+                            {businesses.map((business) => (
+                                <Table.Row key={business.id}>
+                                    <Table.Data size="normal" text={String(business.id)} />
+                                    <Table.Data size="normal" text={business.name} />
+                                    <Table.Data size="normal" text={business.location} />
                                 </Table.Row>
                             ))}
                         </Table>

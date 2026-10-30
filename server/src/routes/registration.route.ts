@@ -19,6 +19,15 @@ import controller from "../controllers/registration.controller";
 
 const router = express.Router();
 
+// --------------------- SUPER ADMIN GET Routes --------------------------------
+router.get("/businesses", controller.businessesGet);
+router.get("/subscribers", controller.subscribersGet);
+
+// --------------------- GET Routes for Account Assignment --------------------------------
+router.get("/branches", controller.branchesGet);
+router.get("/managers", controller.managersGet);
+router.get("/cashiers", controller.cashiersGet);
+
 // --------------------- SUPER ADMIN Routes --------------------------------
 router.post("/business-entity", controller.businessEntityPost);
 router.post("/subscriber-account", controller.subscriberAccountPost);

@@ -14,6 +14,9 @@ export const ROUTES = {
             transactions: `${base}/transactions`,
             transactionsEdit: (id?: string) => (id ? `${base}/transactions/${id}/edit` : `${base}/transactions/edit`),
             pointOfSale: `${base}/point-of-sale`,
+            pointOfSalePayCash: `${base}/point-of-sale/pay/cash`,
+            pointOfSalePayECash: `${base}/point-of-sale/pay/e-cash`,
+            pointOfSalePayCard: `${base}/point-of-sale/pay/card`,
             xRead: `${base}/x-read`,
         };
     })(),

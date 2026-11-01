@@ -1,5 +1,5 @@
 // General Imports
-import { Outlet } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 import { useState } from "react";
 
 // Components
@@ -23,12 +23,14 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import { ROUTES } from "../../routes/Routes";
 
-// Mock Data
-import { MOCK_BRANCHES, MOCK_BRANCH_MANAGERS } from "../../TESTINGDATA/hqAdminManageAccountsData";
+// API Services
+import type { ManageUsersPageData } from "../../api/registrationService";
 
 /* MAIN COMPONENT */
 export default function HQAdmin_ManageUsers() {
     const navigate = useNavigatePage();
+
+    const { branches, managers } = useLoaderData<ManageUsersPageData>();
 
     // Branch States
     const [branchSearch, setBranchSearch] = useState("");
@@ -40,12 +42,12 @@ export default function HQAdmin_ManageUsers() {
     const [managerLocationFilter, setManagerLocationFilter] = useState("All Locations");
 
     // Options
-    const uniqueLocations = Array.from(new Set(MOCK_BRANCHES.map((b) => b.location)));
-    const uniqueLimits = Array.from(new Set(MOCK_BRANCHES.map((b) => b.accountLimit))).sort((a, b) => a - b);
+    const uniqueLocations = Array.from(new Set(branches.map((b) => b.location)));
+    const uniqueLimits = Array.from(new Set(branches.map((b) => b.accountLimit))).sort((a, b) => a - b);
 
     // Filter Logic
-    const filteredBranches = MOCK_BRANCHES.filter((branch) => {
-        const matchesSearch = branch.id.toLowerCase().includes(branchSearch.toLowerCase());
+    const filteredBranches = branches.filter((branch) => {
+        const matchesSearch = String(branch.id).toLowerCase().includes(branchSearch.toLowerCase());
         const matchesLocation =
             branchLocationFilter === "All Locations" ? true : branch.location === branchLocationFilter;
         const matchesLimit =
@@ -53,36 +55,36 @@ export default function HQAdmin_ManageUsers() {
         return matchesSearch && matchesLocation && matchesLimit;
     });
 
-    const filteredManagers = MOCK_BRANCH_MANAGERS.filter((manager) => {
+    const filteredManagers = managers.filter((manager) => {
+        const managerLocation = manager.branch?.location ?? "";
         const matchesSearch =
             manager.firstName.toLowerCase().includes(managerSearch.toLowerCase()) ||
             manager.lastName.toLowerCase().includes(managerSearch.toLowerCase()) ||
-            manager.id.toLowerCase().includes(managerSearch.toLowerCase()) ||
+            String(manager.id).toLowerCase().includes(managerSearch.toLowerCase()) ||
             manager.email.toLowerCase().includes(managerSearch.toLowerCase());
         const matchesLocation =
-            managerLocationFilter === "All Locations" ? true : manager.location === managerLocationFilter;
+            managerLocationFilter === "All Locations" ? true : managerLocation === managerLocationFilter;
         return matchesSearch && matchesLocation;
     });
 
     // Navigation Handlers
-    const handleAddBranch = () => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/add`);
-    const handleEditBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/edit/${id}`);
-    const handleDeleteBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/delete/${id}`);
+    const handleAddBranch = () => navigate(ROUTES.HQ_ADMIN.manageUsersBranchAdd, true);
+    const handleEditBranch = (id: string) => () => navigate(ROUTES.HQ_ADMIN.manageUsersBranchEdit(id), true);
+    const handleDeleteBranch = (id: string) => () => navigate(ROUTES.HQ_ADMIN.manageUsersBranchDelete(id), true);
 
-    const handleAddManager = () => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/manager/add`);
-    const handleViewManager = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/manager/view/${id}`);
-    const handleEditManager = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/manager/edit/${id}`);
+    const handleAddManager = () => navigate(ROUTES.HQ_ADMIN.manageUsersManagerAdd, true);
+    const handleEditManager = (id: string) => () => navigate(ROUTES.HQ_ADMIN.manageUsersManagerEdit(id), true);
+    const handleManageManager = (id: string) => () => navigate(ROUTES.HQ_ADMIN.manageUsersManagerManage(id), true);
 
     return (
         <main className="flex flex-col w-full gap-6 pb-10">
             <PageHeaderSection />
-            <StatCardsSection />
+            <StatCardsSection branches={branches} managers={managers} />
             <BranchesSection
                 search={branchSearch}
                 onSearchChange={setBranchSearch}
                 locationFilter={branchLocationFilter}
                 onLocationChange={setBranchLocationFilter}
-                limitFilter={branchLimitFilter}
                 onLimitChange={setBranchLimitFilter}
                 uniqueLocations={uniqueLocations}
                 uniqueLimits={uniqueLimits}
@@ -99,8 +101,8 @@ export default function HQAdmin_ManageUsers() {
                 uniqueLocations={uniqueLocations}
                 filteredManagers={filteredManagers}
                 handleAdd={handleAddManager}
-                handleView={handleViewManager}
                 handleEdit={handleEditManager}
+                handleManage={handleManageManager}
             />
             <Outlet />
         </main>
@@ -121,11 +123,17 @@ function PageHeaderSection() {
     );
 }
 
-function StatCardsSection() {
-    const totalBranches = MOCK_BRANCHES.length;
-    const totalManagers = MOCK_BRANCH_MANAGERS.length;
-    const totalAccountLimits = MOCK_BRANCHES.reduce((sum, branch) => sum + branch.accountLimit, 0);
-    const activeManagers = MOCK_BRANCH_MANAGERS.length;
+function StatCardsSection({
+    branches,
+    managers,
+}: {
+    branches: ManageUsersPageData["branches"];
+    managers: ManageUsersPageData["managers"];
+}) {
+    const totalBranches = branches.length;
+    const totalManagers = managers.length;
+    const totalAccountLimits = branches.reduce((sum, branch) => sum + branch.accountLimit, 0);
+    const activeManagers = managers.length;
 
     const StatCard = ({ title, value, icon, iconColor }: any) => (
         <Card isGlass={false} className="flex-1 min-w-[230px]">
@@ -171,10 +179,7 @@ function BranchesSection({
     onSearchChange,
     locationFilter,
     onLocationChange,
-    limitFilter,
-    onLimitChange,
     uniqueLocations,
-    uniqueLimits,
     filteredBranches,
     handleAdd,
     handleEdit,
@@ -210,20 +215,6 @@ function BranchesSection({
                             }}
                         />
                     </div>
-                    <div className="w-48">
-                        <SelectInput
-                            name="branchLimitFilter"
-                            defaultValue={limitFilter}
-                            className="py-1!"
-                            onChange={(e: any) => onLimitChange(e.target.value)}
-                            options={{
-                                "All Limits": "All Limits",
-                                ...Object.fromEntries(
-                                    uniqueLimits.map((limit: number) => [`${limit} Limits`, String(limit)] as const),
-                                ),
-                            }}
-                        />
-                    </div>
                     <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
                         + Add Branch
                     </Button>
@@ -241,7 +232,7 @@ function BranchesSection({
                     {filteredBranches.length > 0 ? (
                         filteredBranches.map((branch: any) => (
                             <Table.Row key={branch.id} borderedBottom>
-                                <Table.Data text={branch.id} />
+                                <Table.Data text={String(branch.id)} />
                                 <Table.Data text={branch.location} />
                                 <Table.Data text={branch.accountLimit.toString()} />
                                 <Table.Data>
@@ -250,7 +241,7 @@ function BranchesSection({
                                             variant="secondary"
                                             size="small"
                                             className="rounded-3xl! px-4!"
-                                            onClick={() => handleEdit(branch.id)}
+                                            onClick={handleEdit(branch.id)}
                                         >
                                             Edit
                                         </Button>
@@ -258,7 +249,7 @@ function BranchesSection({
                                             variant="main"
                                             size="small"
                                             className="rounded-3xl! px-4!"
-                                            onClick={() => handleDelete(branch.id)}
+                                            onClick={handleDelete(branch.id)}
                                         >
                                             Delete
                                         </Button>
@@ -283,8 +274,8 @@ function BranchManagersSection({
     uniqueLocations,
     filteredManagers,
     handleAdd,
-    handleView,
     handleEdit,
+    handleManage,
 }: any) {
     return (
         <Card className="overflow-visible! z-10 relative">
@@ -330,33 +321,35 @@ function BranchManagersSection({
                         <Table.Header text="First Name" />
                         <Table.Header text="Last Name" />
                         <Table.Header text="Email" />
+                        <Table.Header text="Status" />
                         <Table.Header text="Actions" />
                     </Table.Row>
                     {filteredManagers.length > 0 ? (
                         filteredManagers.map((manager: any) => (
                             <Table.Row key={manager.id} borderedBottom>
-                                <Table.Data text={manager.id} />
-                                <Table.Data text={manager.location} />
+                                <Table.Data text={String(manager.id)} />
+                                <Table.Data text={manager.branch?.location ?? "—"} />
                                 <Table.Data text={manager.firstName} />
                                 <Table.Data text={manager.lastName} />
                                 <Table.Data text={manager.email} />
+                                <Table.Data text={manager.accountStatus} />
                                 <Table.Data>
                                     <div className="flex justify-center gap-2">
                                         <Button
                                             variant="secondary"
                                             size="small"
                                             className="rounded-3xl! px-4!"
-                                            onClick={() => handleView(manager.id)}
+                                            onClick={handleEdit(manager.id)}
                                         >
-                                            View
+                                            Edit
                                         </Button>
                                         <Button
                                             variant="secondary"
                                             size="small"
                                             className="rounded-3xl! px-4!"
-                                            onClick={() => handleEdit(manager.id)}
+                                            onClick={handleManage(manager.id)}
                                         >
-                                            Edit
+                                            Manage
                                         </Button>
                                     </div>
                                 </Table.Data>

@@ -43,7 +43,7 @@ export default {
         let populatedHtml = htmlTemplate;
 
         // Formats email sent
-        const confirmationLink = `${baseUrl}/verify-account?token=${hashedToken}`;
+        const confirmationLink = `${baseUrl}/verify-email?token=${hashedToken}`;
         populatedHtml = htmlTemplate.replaceAll("${resetLink}", () => confirmationLink);
 
         const linkDuration = DateUtil.formatResetLinkDurationEmail(smtpExpirationOffset);

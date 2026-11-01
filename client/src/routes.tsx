@@ -10,7 +10,7 @@ const routes: RouteObject[] = [
     // Account auth related URLs
     ...authRoutes,
 
-    // Emailed account verification link: /verify-account?token=...
+    // Emailed account verification link: /verify-email?token=...
     ...accountVerificationRoutes,
 
     // Role based URLs: /cashier, /branch-manager, /hq-admin, /super-admin

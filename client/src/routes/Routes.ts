@@ -4,7 +4,8 @@ import type { RoleType } from "@buybuyin/shared/prisma/enums";
 export const ROUTES = {
     AUTH: "/auth",
     FORBIDDEN: "/forbidden",
-    VERIFY_ACCOUNT: "/verify-account",
+
+    VERIFY_ACCOUNT: "/verify-email",
 
     // ALL CASHIER ROUTES: Define all actions here for popup URL's
     CASHIER: (() => {
@@ -30,6 +31,10 @@ export const ROUTES = {
             inventoryItemRestock: (id?: string) => `${base}/inventory/item/${id}/restock`,
             inventoryItemDelete: (id?: string) => `${base}/inventory/item/${id}/delete`,
             manageUsers: `${base}/manage-users`,
+            manageUsersAddCashier: `${base}/manage-users/cashier/add`,
+            manageUsersEditCashier: (id?: string) => `${base}/manage-users/cashier/${id}/edit`,
+            manageUsersManageCashier: (id?: string) => `${base}/manage-users/cashier/${id}/manage`,
+            manageUsersDeleteCashier: (id?: string) => `${base}/manage-users/cashier/${id}/delete`,
             branchOffers: `${base}/branch-offers`,
             transactions: `${base}/transactions`,
         };
@@ -49,6 +54,13 @@ export const ROUTES = {
             supplierEdit: (id?: string) => `${base}/catalogue/supplier/${id}/edit`,
             supplierDelete: (id?: string) => `${base}/catalogue/supplier/${id}/delete`,
             manageUsers: `${base}/manage-users`,
+            manageUsersBranchAdd: `${base}/manage-users/branch/add`,
+            manageUsersBranchEdit: (id?: string) => `${base}/manage-users/branch/edit/${id}`,
+            manageUsersBranchDelete: (id?: string) => `${base}/manage-users/branch/delete/${id}`,
+            manageUsersManagerAdd: `${base}/manage-users/manager/add`,
+            manageUsersManagerEdit: (id?: string) => `${base}/manage-users/manager/${id}/edit`,
+            manageUsersManagerManage: (id?: string) => `${base}/manage-users/manager/${id}/manage`,
+            manageUsersManagerDelete: (id?: string) => `${base}/manage-users/manager/${id}/delete`,
             subscriptions: `${base}/subscriptions`,
             branchOffers: `${base}/branch-offers`,
             branchOffersSave: `${base}/branch-offers/save`,
@@ -67,16 +79,18 @@ export const ROUTES = {
             plansEdit: (id?: string) => `${base}/plans/${id}/edit`,
             plansDelete: (id?: string) => `${base}/plans/${id}/delete`,
             businesses: `${base}/businesses`,
+            businessesAdd: `${base}/businesses/add`,
+            businessesEdit: (id?: string) => `${base}/businesses/${id}/edit`,
+            businessesDelete: (id?: string) => `${base}/businesses/${id}/delete`,
             subscriptions: `${base}/subscriptions`,
             subscriptionsAdd: `${base}/subscriptions/add`,
             subscriptionsEdit: (id: string) => `${base}/subscriptions/${id}/edit`,
             subscriptionsDelete: (id: string) => `${base}/subscriptions/${id}/delete`,
             subscriberAccounts: `${base}/subscriber-accounts`,
-            subscriberAccountsAdd: "/super-admin/subscriber-accounts/add",
-            subscriberAccountsEdit: (id: string) => `/super-admin/subscriber-accounts/edit/${id}`,
-            subscriberAccountsRenew: (id: string) => `/super-admin/subscriber-accounts/renew/${id}`,
-            subscriberAccountsReset: (id: string) => `/super-admin/subscriber-accounts/reset/${id}`,
-            subscriberAccountsDelete: (id: string) => `/super-admin/subscriber-accounts/delete/${id}`,
+            subscriberAccountsAdd: `${base}/subscriber-accounts/add`,
+            subscriberAccountsEdit: (id: string) => `${base}/subscriber-accounts/${id}/edit`,
+            subscriberAccountsManage: (id: string) => `${base}/subscriber-accounts/${id}/manage`,
+            subscriberAccountsDelete: (id: string) => `${base}/subscriber-accounts/${id}/delete`,
         };
     })(),
 } as const;

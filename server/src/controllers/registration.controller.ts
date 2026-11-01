@@ -23,12 +23,20 @@ import { RoleType, type User } from "@buybuyin/shared/prisma/client";
 import {
     BusinessEntityRegistrationSchema,
     type BusinessEntityRegistrationSchemaType,
+    BusinessEntityUpdateSchema,
+    type BusinessEntityUpdateSchemaType,
     AccountRegistrationSchema,
     type AccountRegistrationSchemaType,
+    AccountUpdateSchema,
+    type AccountUpdateSchemaType,
     BranchEntityRegistrationSchema,
     type BranchEntityRegistrationSchemaType,
+    BranchEntityUpdateSchema,
+    type BranchEntityUpdateSchemaType,
     CompleteAccountRegistrationSchema,
     type CompleteAccountRegistrationSchemaType,
+    ManageAccountStatusSchema,
+    type ManageAccountStatusSchemaType,
 } from "@buybuyin/shared/schema/registration";
 
 // Middlewares
@@ -42,10 +50,69 @@ import EmailService from "../service/email.service";
 
 // Util
 import HashUtil from "../utils/hash.util";
+import { HttpError } from "../utils/error.util";
 
 const FALLBACK_REGISTRATION_TOKEN_EXPIRATION = "1d";
 
 export default {
+    // --------------------- GET Routes --------------------------------
+    businessesGet: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "minimum"),
+        async (req: Request, res: Response) => {
+            const businesses = await RegistrationService.getAllBusinesses();
+
+            return res.json(businesses);
+        },
+    ],
+
+    // Fetches branches scoped to the requestor's business (HQ ADMIN creates managers, BRANCH MANAGER creates cashiers)
+    branchesGet: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "minimum"),
+        async (req: Request, res: Response) => {
+            const { businessId } = req.user as User;
+            const branches = await RegistrationService.getBranchesByBusiness(businessId);
+
+            return res.json(branches);
+        },
+    ],
+
+    // Fetches all SUBSCRIBER (HQ ADMIN) accounts
+    subscribersGet: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const subscribers = await RegistrationService.getUsersByRole(RoleType.HQADMIN);
+
+            return res.json(subscribers);
+        },
+    ],
+
+    // Fetches all BRANCH MANAGER accounts scoped to the requestor's business
+    managersGet: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const { businessId } = req.user as User;
+            const managers = await RegistrationService.getUsersByRole(RoleType.BRANCHMANAGER, businessId);
+
+            return res.json(managers);
+        },
+    ],
+
+    // Fetches all CASHIER accounts scoped to the requestor's business
+    cashiersGet: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "exclusive"),
+        async (req: Request, res: Response) => {
+            const { businessId } = req.user as User;
+            const cashiers = await RegistrationService.getUsersByRole(RoleType.CASHIER, businessId);
+
+            return res.json(cashiers);
+        },
+    ],
+
     businessEntityPost: [
         jwtAccessAuth,
         requireAccessLevel("SUPERADMIN", "exclusive"),
@@ -63,11 +130,22 @@ export default {
 
     branchEntityPost: [
         jwtAccessAuth,
-        requireAccessLevel("SUPERADMIN", "exclusive"),
+        requireAccessLevel("HQADMIN", "exclusive"),
         validateSchema("body", BranchEntityRegistrationSchema),
         async (req: Request, res: Response) => {
-            // Payload from the request
-            const branchDataPayload: BranchEntityRegistrationSchemaType = req.body;
+            // A branch is always attached to the HQ Admin's own business, never to a selected business.
+            const requestor = req.user as User;
+            const businessId = requestor.businessId;
+
+            if (!businessId) {
+                return res.status(400).json({ message: "HQ admin is not attached to a business." });
+            }
+
+            // Payload from the request + the HQ Admin's business assignment
+            const branchDataPayload: BranchEntityRegistrationSchemaType & { businessId: number } = {
+                ...(req.body as BranchEntityRegistrationSchemaType),
+                businessId,
+            };
 
             // Result of the service response
             const result = await RegistrationService.createNewBranchEntity(branchDataPayload);
@@ -82,6 +160,8 @@ export default {
         requireAccessLevel("SUPERADMIN", "exclusive"),
         validateSchema("body", AccountRegistrationSchema),
         async (req: Request, res: Response) => {
+            console.log("=========================================> REACHED");
+
             // Payload from the request
             const accountDataPayload: AccountRegistrationSchemaType = req.body;
 
@@ -261,4 +341,318 @@ export default {
             return res.status(200).json({ message: "Account verified successfully." });
         },
     ],
+
+    // ----------------------------- EDIT / MANAGE / DELETE ROUTES -----------------------------
+    // Business: single fetch, update, delete (SUPER ADMIN only)
+    businessSingleGet: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const businessId = parseEntityId(req.params.businessId, "Business not found");
+            const business = await RegistrationService.getBusinessById(businessId);
+            if (!business) return res.status(404).json({ message: "Business not found" });
+
+            return res.json(business);
+        },
+    ],
+
+    businessPatch: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        validateSchema("body", BusinessEntityUpdateSchema),
+        async (req: Request, res: Response) => {
+            const businessId = parseEntityId(req.params.businessId, "Business not found");
+            const payload = req.body as BusinessEntityUpdateSchemaType;
+
+            await RegistrationService.updateBusinessEntity(businessId, payload);
+
+            return res.json({ message: "Business updated" });
+        },
+    ],
+
+    businessDelete: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const businessId = parseEntityId(req.params.businessId, "Business not found");
+
+            await RegistrationService.deleteBusinessEntity(businessId);
+
+            return res.json({ message: "Business deleted" });
+        },
+    ],
+
+    // Branch: single fetch, update, delete (HQ ADMIN, scoped to own business)
+    branchSingleGet: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const branchId = parseEntityId(req.params.branchId, "Branch not found");
+            const branch = await RegistrationService.getBranchById(branchId);
+            if (!branch) return res.status(404).json({ message: "Branch not found" });
+
+            RegistrationService.assertSameBusiness(branch.businessId, requestor.businessId);
+
+            return res.json(branch);
+        },
+    ],
+
+    branchPatch: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        validateSchema("body", BranchEntityUpdateSchema),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const branchId = parseEntityId(req.params.branchId, "Branch not found");
+            const payload = req.body as BranchEntityUpdateSchemaType;
+
+            await RegistrationService.updateBranchEntity(branchId, payload);
+            const updated = await RegistrationService.getBranchById(branchId);
+            RegistrationService.assertSameBusiness(updated?.businessId, requestor.businessId);
+
+            return res.json({ message: "Branch updated" });
+        },
+    ],
+
+    branchDelete: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const branchId = parseEntityId(req.params.branchId, "Branch not found");
+            const existing = await RegistrationService.getBranchById(branchId);
+            if (!existing) return res.status(404).json({ message: "Branch not found" });
+
+            RegistrationService.assertSameBusiness(existing.businessId, requestor.businessId);
+
+            // CASCADE delete: inventory + offer junctions are removed, users/transactions are orphaned.
+            await RegistrationService.deleteBranchEntity(branchId);
+
+            return res.json({ message: "Branch deleted" });
+        },
+    ],
+
+    // Subscriber (HQ ADMIN): single fetch, update, delete (SUPER ADMIN only)
+    subscriberSingleGet: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const userId = parseEntityId(req.params.userId, "Subscriber account not found");
+            const account = await RegistrationService.getUserById(userId);
+            if (!account || account.role !== RoleType.HQADMIN) {
+                return res.status(404).json({ message: "Subscriber account not found" });
+            }
+
+            return res.json(account);
+        },
+    ],
+
+    subscriberDeleteContextGet: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const userId = parseEntityId(req.params.userId, "Subscriber account not found");
+            const context = await RegistrationService.getSubscriberDeleteContext(userId);
+
+            return res.json(context);
+        },
+    ],
+
+    subscriberPatch: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        validateSchema("body", AccountUpdateSchema),
+        async (req: Request, res: Response) => {
+            const userId = parseEntityId(req.params.userId, "Subscriber account not found");
+            const payload = req.body as AccountUpdateSchemaType;
+
+            await RegistrationService.updateSubscriberAccount(userId, payload);
+
+            return res.json({ message: "Subscriber updated" });
+        },
+    ],
+
+    subscriberDelete: [
+        jwtAccessAuth,
+        requireAccessLevel("SUPERADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const userId = parseEntityId(req.params.userId, "Subscriber account not found");
+
+            await RegistrationService.deleteUserById(userId);
+
+            return res.json({ message: "Subscriber deleted" });
+        },
+    ],
+
+    // Branch Manager: single fetch, update, delete (HQ ADMIN, scoped to own business)
+    managerSingleGet: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Manager account not found");
+            const account = await RegistrationService.getUserById(userId);
+            if (!account || account.role !== RoleType.BRANCHMANAGER) {
+                return res.status(404).json({ message: "Manager account not found" });
+            }
+
+            RegistrationService.assertSameBusiness(account.businessId, requestor.businessId);
+
+            return res.json(account);
+        },
+    ],
+
+    managerDeleteContextGet: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Manager account not found");
+            const context = await RegistrationService.getManagerDeleteContext(userId);
+
+            RegistrationService.assertSameBusiness(context.account.businessId, requestor.businessId);
+
+            return res.json(context);
+        },
+    ],
+
+    managerPatch: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        validateSchema("body", AccountUpdateSchema),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Manager account not found");
+            const payload = req.body as AccountUpdateSchemaType;
+
+            await RegistrationService.updateManagerAccount(userId, payload, requestor.businessId);
+
+            return res.json({ message: "Manager updated" });
+        },
+    ],
+
+    managerDelete: [
+        jwtAccessAuth,
+        requireAccessLevel("HQADMIN", "exclusive"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Manager account not found");
+            const existing = await RegistrationService.getUserById(userId);
+            if (!existing || existing.role !== RoleType.BRANCHMANAGER) {
+                return res.status(404).json({ message: "Manager account not found" });
+            }
+
+            RegistrationService.assertSameBusiness(existing.businessId, requestor.businessId);
+
+            await RegistrationService.deleteUserById(userId);
+
+            return res.json({ message: "Manager deleted" });
+        },
+    ],
+
+    // Cashier: single fetch, update, delete (BRANCH MANAGER, scoped to own business)
+    cashierSingleGet: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "exclusive"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Cashier account not found");
+            const account = await RegistrationService.getUserById(userId);
+            if (!account || account.role !== RoleType.CASHIER) {
+                return res.status(404).json({ message: "Cashier account not found" });
+            }
+
+            RegistrationService.assertSameBusiness(account.businessId, requestor.businessId);
+
+            return res.json(account);
+        },
+    ],
+
+    cashierPatch: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "exclusive"),
+        validateSchema("body", AccountUpdateSchema),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Cashier account not found");
+            const payload = req.body as AccountUpdateSchemaType;
+
+            await RegistrationService.updateCashierAccount(userId, payload, requestor.businessId);
+
+            return res.json({ message: "Cashier updated" });
+        },
+    ],
+
+    cashierDelete: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "exclusive"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Cashier account not found");
+            const existing = await RegistrationService.getUserById(userId);
+            if (!existing || existing.role !== RoleType.CASHIER) {
+                return res.status(404).json({ message: "Cashier account not found" });
+            }
+
+            RegistrationService.assertSameBusiness(existing.businessId, requestor.businessId);
+
+            await RegistrationService.deleteUserById(userId);
+
+            return res.json({ message: "Cashier deleted" });
+        },
+    ],
+
+    // Account status (deactivate/reactivate) used by the Manage radio popup.
+    // Each role may only manage the account tier directly below it, and only within its own business.
+    accountStatusPatch: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "minimum"),
+        validateSchema("body", ManageAccountStatusSchema),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Account not found");
+            const { action } = req.body as ManageAccountStatusSchemaType;
+
+            const target = await RegistrationService.getUserById(userId);
+            if (!target) return res.status(404).json({ message: "Account not found" });
+
+            if (target.id === requestor.id) {
+                return res.status(400).json({ message: "You cannot manage your own account" });
+            }
+
+            const manageableRole =
+                requestor.role === RoleType.SUPERADMIN
+                    ? RoleType.HQADMIN
+                    : requestor.role === RoleType.HQADMIN
+                      ? RoleType.BRANCHMANAGER
+                      : RoleType.CASHIER;
+
+            if (target.role !== manageableRole) {
+                return res.status(403).json({ message: "Forbidden: You cannot manage this account" });
+            }
+
+            RegistrationService.assertSameBusiness(target.businessId, requestor.businessId);
+
+            await RegistrationService.manageAccountStatus(userId, action);
+
+            const resultMessage =
+                action === "deactivate" ? "Account deactivated" : "Account reactivated";
+
+            return res.json({ message: resultMessage });
+        },
+    ],
+};
+
+const parseEntityId = (raw: string | string[] | undefined, notFoundMessage: string): number => {
+    if (typeof raw !== "string") {
+        throw new HttpError(404, notFoundMessage);
+    }
+
+    const id = Number(raw);
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new HttpError(404, notFoundMessage);
+    }
+
+    return id;
 };

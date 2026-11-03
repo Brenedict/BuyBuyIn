@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
-import { Calculator } from "../../components/Calculator";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
@@ -15,8 +14,37 @@ import Icon from "../../components/Icon";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/icons-material";
 
+function SideBar() {
+    return (
+        <nav className="flex flex-col justify-center p-[1.25rem] gap-[1.5rem] rounded-[10px] bg-cream/40 card-glass-effect card-drop-shadow">
+            <Button variant="grey" size="medium">
+                QTY
+            </Button>
+            <Button variant="grey" size="medium">
+                ADD PRDCT
+            </Button>
+            <Button variant="grey" size="medium">
+                DISC
+            </Button>
+            <Button variant="grey" size="medium">
+                CHK PRC
+            </Button>
+            <Button variant="grey" size="medium">
+                RETAIL
+            </Button>
+            <Button variant="grey" size="medium">
+                REPRINT
+            </Button>
+            <Button variant="grey" size="medium">
+                CASHOUT
+            </Button>
+            <Button variant="main" size="medium">
+                SUBTOTAL
+            </Button>
+        </nav>
+    );
+}
 export function Cashier_PointOfSale() {
-    const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
     useEffect(() => {
@@ -200,20 +228,7 @@ export function Cashier_PointOfSale() {
                                 </div>
                             </Card>
                         </div>
-                        {/* Calculator toggle */}
-                        {isCalculatorToggled ? (
-                            <Calculator handleToggle={setIsCalculatorToggled} />
-                        ) : (
-                            <Button
-                                className="absolute group -right-14.5 bottom-1/2"
-                                variant="grey"
-                                size="medium"
-                                leftIcon={ArrowLeftRounded}
-                                onClick={() => setIsCalculatorToggled((e) => !e)}
-                            >
-                                <span className="hidden group-hover:inline">Keypad</span>
-                            </Button>
-                        )}
+                        <SideBar></SideBar>
                     </div>
                 </div>
             </section>

@@ -18,6 +18,16 @@ export class ApiError extends Error {
     }
 }
 
+export class ValidationError extends Error {
+    readonly issues: string[];
+
+    constructor(message: string, issues: string[]) {
+        super(message);
+        this.name = "ValidationError";
+        this.issues = issues;
+    }
+}
+
 export const JSON_HEADERS = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -77,6 +87,12 @@ export const handleErrRedirect = (err: unknown, request: Request, path: string, 
     if (err instanceof Response) throw err;
 
     if (err instanceof ApiError && err.status === 403) return redirect(ROUTES.FORBIDDEN);
+
+    if (err instanceof ValidationError) {
+        const detail = err.issues.length > 0 ? `${err.message}: ${err.issues.join("; ")}` : err.message;
+
+        return redirectWithQuery(request, path, `ERROR=${encodeURIComponent(detail)}`);
+    }
 
     console.error(err);
 
@@ -166,7 +182,10 @@ export function validateForm<T extends z.ZodType>(
 
     if (!result.success) {
         console.error(z.prettifyError(result.error));
-        throw new Error(errorMessage);
+
+        const issues = [...new Set(result.error.issues.map((issue) => issue.message))];
+
+        throw new ValidationError(errorMessage, issues);
     }
 
     return result.data;

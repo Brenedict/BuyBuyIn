@@ -89,7 +89,7 @@ export const handleErrRedirect = (err: unknown, request: Request, path: string, 
     if (err instanceof ApiError && err.status === 403) return redirect(ROUTES.FORBIDDEN);
 
     if (err instanceof ValidationError) {
-        const detail = err.issues.length > 0 ? `${err.message}: ${err.issues.join("; ")}` : err.message;
+        const detail = err.issues.length > 0 ? [err.message, ...err.issues].join("\n") : err.message;
 
         return redirectWithQuery(request, path, `ERROR=${encodeURIComponent(detail)}`);
     }

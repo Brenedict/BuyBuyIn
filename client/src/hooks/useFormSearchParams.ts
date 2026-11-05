@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router";
 interface UseFormSearchParamsReturn<T extends Record<string, string>> {
     values: T;
     reset: () => void;
-    handleChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+    handleChange: (event: ChangeEvent<HTMLFormElement>) => void;
     submit: (onSubmit?: (params: URLSearchParams) => void) => (event: SubmitEvent<HTMLFormElement>) => void;
 }
 
@@ -57,13 +57,8 @@ export function useFormSearchParams<T extends Record<string, string>>(defaults: 
     );
 
     const handleChange = useCallback(
-        (event: ChangeEvent<HTMLSelectElement>) => {
-            const { name, value } = event.target;
-            if (name in defaults) {
-                const params = new URLSearchParams(searchParams);
-                params.set(name, value);
-                setSearchParams(params);
-            }
+        (event: ChangeEvent<HTMLFormElement>) => {
+            formUpdate(event);
         },
         [defaults, searchParams, setSearchParams]
     );

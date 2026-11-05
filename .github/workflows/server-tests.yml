@@ -1,0 +1,91 @@
+name: Server-Side Integration Tests
+
+# Run on pushes and pull requests for every branch.
+# workflow_dispatch allows manual runs from the Actions tab.
+on:
+    # Commented this out kasi medyo repetitive yung test (twice ni-r-run)
+    # push:
+
+    pull_request:
+    workflow_dispatch:
+
+# The workflow only needs to read the repository contents.
+permissions:
+    contents: read
+
+# Cancel an in-progress run when a newer commit is pushed to the same ref.
+concurrency:
+    group: server-tests-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    server-test:
+        runs-on: ubuntu-latest
+
+        # Stop a hung test run instead of occupying a runner indefinitely.
+        timeout-minutes: 15
+
+        # The project requires Node.js 24+ (see README prerequisites).
+        strategy:
+            matrix:
+                node: [24.x]
+
+        # The integration tests hit a real PostgreSQL database, so start one
+        # and wait until it is ready before running any steps.
+        services:
+            postgres:
+                image: postgres:17
+                env:
+                    POSTGRES_USER: ci
+                    POSTGRES_PASSWORD: ci
+                    POSTGRES_DB: buybuyin_test
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+        # NODE_ENV=test tells prisma7.config.ts and prisma.config.ts to use
+        # TEST_DATABASE_URL instead of DATABASE_URL.
+        env:
+            NODE_ENV: test
+            DATABASE_URL: "postgresql://ci:ci@localhost:5432/buybuyin_test?schema=public"
+            TEST_DATABASE_URL: "postgresql://ci:ci@localhost:5432/buybuyin_test?schema=public"
+
+        steps:
+            # Fetch the repository into the runner workspace.
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            # Install the Node.js version used by the project and cache npm's
+            # download cache. The root lockfile covers all workspaces.
+            - name: Use Node.js ${{ matrix.node }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+                  cache-dependency-path: package-lock.json
+
+            # npm ci installs client, server, and shared from the root lockfile.
+            - name: Install dependencies
+              run: npm ci
+
+            # Tests import generated code from shared/prisma and shared/zod.
+            # Those folders are gitignored, so generate them here.
+            # Generation reads TEST_DATABASE_URL but does not connect to it.
+            - name: Generate Prisma client and Zod schemas
+              run: npm run gen:prisma
+
+            # Apply all migrations to the throwaway PostgreSQL service.
+            # "migrate deploy" is the non-interactive command for CI.
+            - name: Migrate test database
+              run: npx prisma migrate deploy
+              working-directory: server
+
+            # Run "jest --runInBand --ci" inside the server workspace.
+            # --runInBand matches the local setup and keeps database access
+            # sequential; --ci disables watch mode and snapshots writing.
+            - name: Run server integration tests
+              run: npm run test:server:ci

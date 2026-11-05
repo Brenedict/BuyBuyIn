@@ -21,7 +21,7 @@ const protectedPages = [
     ROUTES.CASHIER.pointOfSale,
     ROUTES.CASHIER.xRead,
     ROUTES.HQ_ADMIN.dashboard,
-    ROUTES.HQ_ADMIN.inventory,
+    ROUTES.HQ_ADMIN.catalogue,
     ROUTES.HQ_ADMIN.manageUsers,
     ROUTES.HQ_ADMIN.subscriptions,
     ROUTES.HQ_ADMIN.branchOffers,

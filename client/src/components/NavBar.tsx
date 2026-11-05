@@ -4,9 +4,6 @@ import { NavLink, useLocation } from "react-router";
 // BuyBuyIn Shared Imports
 import type { RoleType } from "@buybuyin/shared/prisma/enums";
 
-//BuyBuyinIcon
-import { BuyBuyInWordmark } from "./BuyBuyInWordmark";
-
 // Components
 import Icon from "./Icon";
 import { Text } from "./Text";
@@ -15,6 +12,7 @@ import { Text } from "./Text";
 import BuyBuyInIcon from "@mui/icons-material/LocalOffer";
 import DashboardIcon from "@mui/icons-material/SpaceDashboard";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import UsersIcon from "@mui/icons-material/Group";
 import TransactionsIcon from "@mui/icons-material/ReceiptLong";
 import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
@@ -47,9 +45,9 @@ const NavItems: Record<RoleType, NavItem[]> = {
             path: ROUTES.HQ_ADMIN.dashboard,
         },
         {
-            label: "Inventory",
-            icon: InventoryIcon,
-            path: ROUTES.HQ_ADMIN.inventory,
+            label: "Catalogue",
+            icon: CategoryOutlinedIcon,
+            path: ROUTES.HQ_ADMIN.catalogue,
         },
         {
             label: "Manage Users",
@@ -146,14 +144,14 @@ const NavItems: Record<RoleType, NavItem[]> = {
 
 export function NavBar({ role }: NavBarProps) {
     // Used for redirecting
-    const useNavigate = useNavigatePage();
+    const navigate = useNavigatePage();
 
     const location = useLocation();
     const logoutPath = `${location.pathname.replace(/\/$/, "")}/logout`;
 
     // Temp logout reroute
     const handleLogout = async () => {
-        useNavigate(logoutPath);
+        navigate(logoutPath);
     };
 
     const items = NavItems[role];

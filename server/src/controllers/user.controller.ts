@@ -21,7 +21,6 @@ export default {
             const userContextPayload: UserGlobalContextSchemaType = {
                 id: user.id,
                 email: user.email,
-                username: user.username,
                 role: user.role,
                 firstName: user.firstName,
                 lastName: user.lastName,

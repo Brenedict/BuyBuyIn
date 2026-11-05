@@ -10,6 +10,25 @@ import { RoleBoundary } from "../pages/shared/RoleBoundary";
 import Forbidden from "../pages/shared/Forbidden";
 import { primaryAuthLoader, homeRedirectLoader } from "../api/authService";
 
+// API Services
+import {
+    createProduct,
+    deleteProduct,
+    getCatalogueProduct,
+    getProduct,
+    getProductForm,
+    updateProduct,
+} from "../api/productService";
+import { createSupplier, deleteSupplier, getCataloguePage, getSupplier, updateSupplier } from "../api/supplierService";
+import {
+    createBranchInventoryItem,
+    deleteBranchInventoryItem,
+    getBranchInventory,
+    getBranchInventoryItem,
+    getBranchInventoryOptions,
+    restockBranchInventoryItem,
+} from "../api/branchInventoryService";
+
 // Global Pages and Popups
 import { globalPopups } from "./GlobalPopupRoutes";
 
@@ -21,9 +40,9 @@ import BranchManager_ManageUsers from "../pages/branch-manager/BranchManager.Man
 import BranchManager_Transactions from "../pages/branch-manager/BranchManager.Transactions";
 
 import {
-    InventoryItemViewPopup,
     InventoryItemRestockPopup,
     InventoryItemDeletePopup,
+    InventoryItemAddPopup,
 } from "../components/popups/branch-manager/InventoryPopups";
 
 // Cashier Pages
@@ -35,7 +54,7 @@ import Cashier_XRead from "../pages/cashier/Cashier.XRead";
 // HQ Admin Pages and Popups
 import HQ_BranchWideOffers from "../pages/hq-admin/HQ.BranchWideOffers";
 import HQ_Dashboard from "../pages/hq-admin/HQ.Dashboard";
-import HQ_Inventory from "../pages/hq-admin/HQ.Inventory";
+import HQ_Catalogue from "../pages/hq-admin/HQ.Catalogue";
 import HQ_ManageUsers from "../pages/hq-admin/HQ.ManageUsers";
 import HQ_Subscriptions from "../pages/hq-admin/HQ.Subscriptions";
 
@@ -45,6 +64,8 @@ import {
     DeleteBranchPopup,
     BranchManagerFormPopup,
 } from "../components/popups/hq-admin/ManageUserPopups";
+import { ProductFormPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
+import { SupplierFormPopup, SupplierDeletePopup } from "../components/popups/hq-admin/SupplierPopups";
 
 // Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -101,18 +122,25 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.BRANCH_MANAGER.inventory,
                                 element: <BranchManager_Inventory />,
+                                loader: getBranchInventory,
                                 children: [
                                     {
-                                        path: "item/:id/view",
-                                        element: <InventoryItemViewPopup />,
+                                        path: "item/add",
+                                        element: <InventoryItemAddPopup />,
+                                        loader: getBranchInventoryOptions,
+                                        action: createBranchInventoryItem,
                                     },
                                     {
                                         path: "item/:id/restock",
                                         element: <InventoryItemRestockPopup />,
+                                        loader: getBranchInventoryItem,
+                                        action: restockBranchInventoryItem,
                                     },
                                     {
                                         path: "item/:id/delete",
                                         element: <InventoryItemDeletePopup />,
+                                        loader: getBranchInventoryItem,
+                                        action: deleteBranchInventoryItem,
                                     },
                                     ...globalPopups,
                                 ],
@@ -173,7 +201,49 @@ export const protectedRoutes: RouteObject[] = [
                                 element: <Navigate to={ROLE_HOME[RoleType.HQADMIN]} replace />,
                             },
                             { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard />, children: [...globalPopups] },
-                            { path: ROUTES.HQ_ADMIN.inventory, element: <HQ_Inventory />, children: [...globalPopups] },
+                            {
+                                path: ROUTES.HQ_ADMIN.catalogue,
+                                element: <HQ_Catalogue />,
+                                loader: getCataloguePage,
+                                children: [
+                                    {
+                                        path: "product/add",
+                                        element: <ProductFormPopup mode="add" />,
+                                        loader: getProductForm,
+                                        action: createProduct,
+                                    },
+                                    {
+                                        path: "product/:id/edit",
+                                        element: <ProductFormPopup mode="edit" />,
+                                        loader: getCatalogueProduct,
+                                        action: updateProduct,
+                                    },
+                                    {
+                                        path: "product/:id/delete",
+                                        element: <ProductDeletePopup />,
+                                        loader: getProduct,
+                                        action: deleteProduct,
+                                    },
+                                    {
+                                        path: "supplier/add",
+                                        element: <SupplierFormPopup mode="add" />,
+                                        action: createSupplier,
+                                    },
+                                    {
+                                        path: "supplier/:id/edit",
+                                        element: <SupplierFormPopup mode="edit" />,
+                                        loader: getSupplier,
+                                        action: updateSupplier,
+                                    },
+                                    {
+                                        path: "supplier/:id/delete",
+                                        element: <SupplierDeletePopup />,
+                                        loader: getSupplier,
+                                        action: deleteSupplier,
+                                    },
+                                    ...globalPopups,
+                                ],
+                            },
                             {
                                 path: ROUTES.HQ_ADMIN.manageUsers,
                                 element: <HQ_ManageUsers />,

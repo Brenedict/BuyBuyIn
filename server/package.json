@@ -5,8 +5,9 @@
     "main": "server.ts",
     "scripts": {
         "start": "tsx --env-file=.env ./src/server.ts",
-        "dev": "tsx --inspect --watch --env-file=.env ./src/server.ts",
+        "dev": "tsx watch --inspect --env-file=.env ./src/server.ts",
         "test": "jest --watch --runInBand",
+        "test:ci": "jest --runInBand --ci",
         "mig:prisma": "prisma migrate dev",
         "res:prisma": "prisma migrate reset",
         "gen:prisma": "prisma generate",

@@ -5,6 +5,7 @@ import { Card } from "../components/Card";
 import { Text } from "../components/Text";
 
 import "../index.css";
+import { MemoryRouter } from "react-router";
 
 const meta = {
     title: "All-Components/PopUp",
@@ -20,13 +21,15 @@ const meta = {
     tags: ["autodocs"],
     args: {
         children: (
-            <Card>
-                <Card.Header>
-                    <Text variant="crimson" size="iconHero">
-                        This is a Pop Up
-                    </Text>
-                </Card.Header>
-            </Card>
+            <MemoryRouter>
+                <Card>
+                    <Card.Header>
+                        <Text variant="crimson" size="iconHero">
+                            This is a Pop Up
+                        </Text>
+                    </Card.Header>
+                </Card>
+            </MemoryRouter>
         ),
     },
 } satisfies Meta<typeof PopUp>;
@@ -44,17 +47,19 @@ export const PopUpUse: Story = {
         },
     },
     render: () => (
-        <div className="min-h-[700px]">
-            <PopUp>
-                <Card className="w-[500px]">
-                    <Card.Header>
-                        <Text variant="crimson" size="iconHero">
-                            This is a Pop Up
-                        </Text>
-                    </Card.Header>
-                </Card>
-            </PopUp>
-        </div>
+        <MemoryRouter>
+            <div className="min-h-[700px]">
+                <PopUp>
+                    <Card className="w-[500px]">
+                        <Card.Header>
+                            <Text variant="crimson" size="iconHero">
+                                This is a Pop Up
+                            </Text>
+                        </Card.Header>
+                    </Card>
+                </PopUp>
+            </div>
+        </MemoryRouter>
     ),
 };
 export const DisableDrag: Story = {
@@ -67,19 +72,21 @@ export const DisableDrag: Story = {
         },
     },
     render: () => (
-        <div className="min-h-[700px]">
-            <PopUp>
-                <Card className="w-[500px]">
-                    <Card.Header>
-                        <Text variant="crimson" size="iconHero">
-                            This is a Pop Up
-                        </Text>
-                    </Card.Header>
-                    <Card.Body data-no-drag>
-                        <Text>This cannot be used to drag</Text>
-                    </Card.Body>
-                </Card>
-            </PopUp>
-        </div>
+        <MemoryRouter>
+            <div className="min-h-[700px]">
+                <PopUp>
+                    <Card className="w-[500px]">
+                        <Card.Header>
+                            <Text variant="crimson" size="iconHero">
+                                This is a Pop Up
+                            </Text>
+                        </Card.Header>
+                        <Card.Body data-no-drag>
+                            <Text>This cannot be used to drag</Text>
+                        </Card.Body>
+                    </Card>
+                </PopUp>
+            </div>
+        </MemoryRouter>
     ),
 };

@@ -16,7 +16,7 @@ export default {
             const { accessToken, refreshToken } = AuthService.generateTokens(user);
             AuthService.sendRefreshCookie(res, refreshToken);
 
-            console.log(accessToken);
+            // console.log(accessToken);
             return res.json({ message: "Login successful", accessToken });
         },
     ],
@@ -28,7 +28,6 @@ export default {
             const { accessToken, refreshToken } = AuthService.generateTokens(user);
             AuthService.sendRefreshCookie(res, refreshToken);
 
-            console;
             return res.json({ message: "Refresh successful", accessToken });
         },
     ],

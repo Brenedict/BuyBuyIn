@@ -97,22 +97,6 @@ function InventoryStatCard({ icon, title, value, subtitle }: StatCardProps) {
     );
 }
 
-// Search row that sits directly above a table, so it is clear which table it filters.
-interface TableSearchBarProps {
-    name: string;
-    placeholder: string;
-    defaultValue: string;
-    submit: ReturnType<typeof useFormSearchParams>["submit"];
-}
-
-function TableSearchBar({ name, placeholder, defaultValue, submit }: TableSearchBarProps) {
-    return (
-        <Form onSubmit={submit()} className="flex items-center justify-end px-6 py-4">
-            <SearchInput name={name} placeholder={placeholder} defaultValue={defaultValue} className="w-72" />
-        </Form>
-    );
-}
-
 function ItemRowActions({ id }: { id: string }) {
     // Used for redirecting
     const navigate = useNavigatePage();
@@ -263,12 +247,6 @@ export function BranchManager_Inventory() {
                         </Text>
                     </Card.Header>
                     <Card.Body removePadding>
-                        <TableSearchBar
-                            name="outOfStockSearch"
-                            placeholder="Search out of stock items..."
-                            defaultValue={values.outOfStockSearch}
-                            submit={submit}
-                        />
                         <Table
                             bordered={false}
                             shadow={false}
@@ -313,12 +291,6 @@ export function BranchManager_Inventory() {
                         </Text>
                     </Card.Header>
                     <Card.Body removePadding>
-                        <TableSearchBar
-                            name="stockSearch"
-                            placeholder="Search items, supplier..."
-                            defaultValue={values.stockSearch}
-                            submit={submit}
-                        />
                         <Table
                             bordered={false}
                             shadow={false}
@@ -374,12 +346,6 @@ export function BranchManager_Inventory() {
                         </Text>
                     </Card.Header>
                     <Card.Body removePadding>
-                        <TableSearchBar
-                            name="supplierSearch"
-                            placeholder="Search suppliers..."
-                            defaultValue={values.supplierSearch}
-                            submit={submit}
-                        />
                         <Table
                             bordered={false}
                             shadow={false}

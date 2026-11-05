@@ -94,17 +94,7 @@ export function BranchManager_BranchWideOffers() {
                             OFFERS
                         </Text>
 
-                        <SearchInput
-                            id="searchOffers"
-                            name="searchOffers"
-                            label=""
-                            placeholder="Search offers"
-                            disabled={false}
-                            hidden={false}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-64"
-                        />
+        
                     </Card.Header>
 
                     <Card.Body className="px-8 pb-4">

@@ -8,8 +8,10 @@ import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-import { SearchInput, SelectInput } from "../../components/Input";
+import { SearchInput } from "../../components/Input";
+import SelectInput from "../../components/inputs/SelectInput";
 import Icon from "../../components/Icon";
+import { TableFilterBar } from "../../components/TableFilterBar";
 
 // Icons
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
@@ -29,7 +31,7 @@ import { MOCK_BRANCHES, MOCK_BRANCH_MANAGERS } from "../../TESTINGDATA/hqAdminMa
 export default function HQAdmin_ManageUsers() {
     const navigate = useNavigatePage();
 
-    // Branch States 
+    // Branch States
     const [branchSearch, setBranchSearch] = useState("");
     const [branchLocationFilter, setBranchLocationFilter] = useState("All Locations");
     const [branchLimitFilter, setBranchLimitFilter] = useState("All Limits");
@@ -38,11 +40,26 @@ export default function HQAdmin_ManageUsers() {
     const [managerSearch, setManagerSearch] = useState("");
     const [managerLocationFilter, setManagerLocationFilter] = useState("All Locations");
 
-    // Options 
+    // Options
     const uniqueLocations = Array.from(new Set(MOCK_BRANCHES.map((b) => b.location)));
     const uniqueLimits = Array.from(new Set(MOCK_BRANCHES.map((b) => b.accountLimit))).sort((a, b) => a - b);
 
-    // Filter Logic 
+    const branchLocationOptions = {
+        "All Locations": "All Locations",
+        ...Object.fromEntries(uniqueLocations.map((loc: string) => [loc, loc])),
+    };
+
+    const branchLimitOptions = {
+        "All Limits": "All Limits",
+        ...Object.fromEntries(uniqueLimits.map((limit: number) => [`${limit} Limits`, String(limit)])),
+    };
+
+    const managerLocationOptions = {
+        "All Locations": "All Locations",
+        ...Object.fromEntries(uniqueLocations.map((loc: string) => [loc, loc])),
+    };
+
+    // Filter Logic
     const filteredBranches = MOCK_BRANCHES.filter((branch) => {
         const matchesSearch = branch.id.toLowerCase().includes(branchSearch.toLowerCase());
         const matchesLocation =
@@ -63,7 +80,7 @@ export default function HQAdmin_ManageUsers() {
         return matchesSearch && matchesLocation;
     });
 
-    // Navigation Handlers 
+    // Navigation HandlerS
     const handleAddBranch = () => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/add`);
     const handleEditBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/edit/${id}`);
     const handleDeleteBranch = (id: string) => navigate(`${ROUTES.HQ_ADMIN.manageUsers}/branch/delete/${id}`);
@@ -83,8 +100,8 @@ export default function HQAdmin_ManageUsers() {
                 onLocationChange={setBranchLocationFilter}
                 limitFilter={branchLimitFilter}
                 onLimitChange={setBranchLimitFilter}
-                uniqueLocations={uniqueLocations}
-                uniqueLimits={uniqueLimits}
+                branchLocationOptions={branchLocationOptions}
+                branchLimitOptions={branchLimitOptions}
                 filteredBranches={filteredBranches}
                 handleAdd={handleAddBranch}
                 handleEdit={handleEditBranch}
@@ -95,7 +112,7 @@ export default function HQAdmin_ManageUsers() {
                 onSearchChange={setManagerSearch}
                 locationFilter={managerLocationFilter}
                 onLocationChange={setManagerLocationFilter}
-                uniqueLocations={uniqueLocations}
+                managerLocationOptions={managerLocationOptions}
                 filteredManagers={filteredManagers}
                 handleAdd={handleAddManager}
                 handleView={handleViewManager}
@@ -172,8 +189,8 @@ function BranchesSection({
     onLocationChange,
     limitFilter,
     onLimitChange,
-    uniqueLocations,
-    uniqueLimits,
+    branchLocationOptions,
+    branchLimitOptions,
     filteredBranches,
     handleAdd,
     handleEdit,
@@ -187,50 +204,39 @@ function BranchesSection({
                 </Text>
             </Card.Body>
 
-            <Card.Body className="flex flex-wrap items-center justify-between gap-6 py-6 px-10 overflow-visible!">
-                <div className="flex-1 min-w-[300px]">
-                    <SearchInput
-                        placeholder="Search by Branch ID"
-                        value={search}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        className="w-full!"
-                    />
-                </div>
-                <div className="flex flex-wrap items-center gap-4">
-                    <div className="w-48">
-                        <SelectInput
-                            name="branchLocationFilter"
-                            defaultValue={locationFilter}
-                            className="py-1!"
-                            onChange={(e: any) => onLocationChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Locations">All Locations</SelectInput.Option>
-                            {uniqueLocations.map((loc: string) => (
-                                <SelectInput.Option key={loc} value={loc}>
-                                    {loc}
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
-                    </div>
-                    <div className="w-48">
-                        <SelectInput
-                            name="branchLimitFilter"
-                            defaultValue={limitFilter}
-                            className="py-1!"
-                            onChange={(e: any) => onLimitChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Limits">All Limits</SelectInput.Option>
-                            {uniqueLimits.map((limit: number) => (
-                                <SelectInput.Option key={limit} value={String(limit)}>
-                                    {limit} Limits
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
-                    </div>
-                    <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
-                        + Add Branch
-                    </Button>
-                </div>
+            <Card.Body className="py-6 px-10 overflow-visible!">
+                <TableFilterBar
+                    isComplex={false}
+                    searchValue={search}
+                    onSearchChange={(e) => onSearchChange(e.target.value)}
+                    searchPlaceholder="Search by Branch ID"
+                    filters={
+                        <>
+                            <div className="w-48">
+                                <SelectInput
+                                    name="branchLocationFilter"
+                                    defaultValue={locationFilter}
+                                    options={branchLocationOptions}
+                                    onChange={(e: any) => onLocationChange(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="w-48">
+                                <SelectInput
+                                    name="branchLimitFilter"
+                                    defaultValue={limitFilter}
+                                    options={branchLimitOptions}
+                                    onChange={(e: any) => onLimitChange(e.target.value)}
+                                />
+                            </div>
+                        </>
+                    }
+                    actions={
+                        <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
+                            + Add Branch
+                        </Button>
+                    }
+                />
             </Card.Body>
 
             <Card.Body className="flex flex-col gap-4 pb-6 px-10">
@@ -283,7 +289,7 @@ function BranchManagersSection({
     onSearchChange,
     locationFilter,
     onLocationChange,
-    uniqueLocations,
+    managerLocationOptions,
     filteredManagers,
     handleAdd,
     handleView,
@@ -297,35 +303,28 @@ function BranchManagersSection({
                 </Text>
             </Card.Body>
 
-            <Card.Body className="flex flex-wrap items-center justify-between gap-6 py-6 px-10 overflow-visible!">
-                <div className="flex-1 min-w-[300px]">
-                    <SearchInput
-                        placeholder="Search Name, ID, or Email"
-                        value={search}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        className="w-full!"
-                    />
-                </div>
-                <div className="flex flex-wrap items-center gap-4">
-                    <div className="w-48">
-                        <SelectInput
-                            name="managerLocationFilter"
-                            defaultValue={locationFilter}
-                            className="py-1!"
-                            onChange={(e: any) => onLocationChange(e.target.value)}
-                        >
-                            <SelectInput.Option value="All Locations">All Locations</SelectInput.Option>
-                            {uniqueLocations.map((loc: string) => (
-                                <SelectInput.Option key={loc} value={loc}>
-                                    {loc}
-                                </SelectInput.Option>
-                            ))}
-                        </SelectInput>
-                    </div>
-                    <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
-                        + Register Manager
-                    </Button>
-                </div>
+            <Card.Body className="py-6 px-10 overflow-visible!">
+                <TableFilterBar
+                    isComplex={false}
+                    searchValue={search}
+                    onSearchChange={(e) => onSearchChange(e.target.value)}
+                    searchPlaceholder="Search Name, ID, or Email"
+                    filters={
+                        <div className="w-48">
+                            <SelectInput
+                                name="managerLocationFilter"
+                                defaultValue={locationFilter}
+                                options={managerLocationOptions}
+                                onChange={(e: any) => onLocationChange(e.target.value)}
+                            />
+                        </div>
+                    }
+                    actions={
+                        <Button variant="main" size="medium" className="whitespace-nowrap" onClick={handleAdd}>
+                            + Register Manager
+                        </Button>
+                    }
+                />
             </Card.Body>
 
             <Card.Body className="flex flex-col gap-4 pb-6 px-10">

@@ -1,4 +1,5 @@
 // General Imports
+import { useState } from "react";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import Table from "../../components/Table";
@@ -21,15 +22,29 @@ import {
     PerformanceCard,
     SalesOverviewCard,
 } from "../../components/partials/DashboardPartials";
-import { useFormSearchParams } from "../../hooks/useFormSearchParams";
-import { Outlet } from "react-router";
+import { Outlet, useSearchParams } from "react-router";
+import { TableFilterBar } from "../../components/TableFilterBar";
 
 export function NumberFormat(value: number, symbol?: string) {
     return `${symbol ?? ""} ${value.toLocaleString()}`;
 }
 
 export function HQ_Dashboard() {
-    const { values, handleChange } = useFormSearchParams({ timeframe: "Today" });
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const timeframe = searchParams.get("timeframe") ?? "today";
+
+    const handleTimeframeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSearchParams((prev) => {
+            const newParams = new URLSearchParams(prev);
+            newParams.set("timeframe", e.target.value);
+            return newParams;
+        });
+    };
+
+    const [searchBranch, setSearchBranch] = useState("");
+    const [locationFilter, setLocationFilter] = useState("All Locations");
+    const [employeeFilter, setEmployeeFilter] = useState("All Employees");
 
     const salesDataLabels = SALES_OVERVIEW_LABELS;
     const salesData = TABLE_BRANCHES.map((branch) => branch.totalSales);
@@ -47,6 +62,26 @@ export function HQ_Dashboard() {
     const interBranchLabels = INTER_BRANCH_PERFORMANCE_LABELS;
     const interBranchData = INTER_BRANCH_PERFORMANCE_DATA;
 
+    const uniqueLocations = Array.from(new Set(TABLE_BRANCHES.map((branch) => branch.location)));
+
+    const filteredBranches = TABLE_BRANCHES.filter((branch) => {
+        const matchesSearch = `${branch.branchId} ${branch.location} ${branch.subLocation}`
+            .toLowerCase()
+            .includes(searchBranch.toLowerCase());
+
+        const matchesLocation = locationFilter === "All Locations" || branch.location === locationFilter;
+
+        const matchesEmployees =
+            employeeFilter === "All Employees" ||
+            (employeeFilter === "1-10" && branch.employees >= 1 && branch.employees <= 10) ||
+            (employeeFilter === "11-20" && branch.employees >= 11 && branch.employees <= 20) ||
+            (employeeFilter === "21-30" && branch.employees >= 21 && branch.employees <= 30) ||
+            (employeeFilter === "31-40" && branch.employees >= 31 && branch.employees <= 40) ||
+            (employeeFilter === "41+" && branch.employees >= 41);
+
+        return matchesSearch && matchesLocation && matchesEmployees;
+    });
+
     return (
         <Card>
             <Card.Body className="py-6 px-10 overflow-scroll">
@@ -59,8 +94,8 @@ export function HQ_Dashboard() {
                         <SelectInput
                             variant="button"
                             name="timeframe"
-                            defaultValue={values.timeframe}
-                            onChange={handleChange}
+                            defaultValue={timeframe}
+                            onChange={handleTimeframeChange}
                             className="border-0! py-1.5! text-normal! w-max"
                             options={{
                                 Today: "today",
@@ -104,6 +139,51 @@ export function HQ_Dashboard() {
                         </Text>
                     </Card.Body>
 
+                    {/* TABLE FILTER */}
+                    <Card.Body>
+                        <TableFilterBar
+                            isComplex={false}
+                            searchValue={searchBranch}
+                            onSearchChange={(e) => setSearchBranch(e.target.value)}
+                            searchPlaceholder="Search branch ID or location..."
+                            filters={
+                                <>
+                                    <div className="w-48">
+                                        <SelectInput
+                                            name="locationFilter"
+                                            defaultValue={locationFilter}
+                                            onChange={(e) => setLocationFilter(e.target.value)}
+                                            className="py-1!"
+                                            options={{
+                                                "All Locations": "All Locations",
+                                                ...Object.fromEntries(
+                                                    uniqueLocations.map((location) => [location, location])
+                                                ),
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div className="w-48">
+                                        <SelectInput
+                                            name="employeeFilter"
+                                            defaultValue={employeeFilter}
+                                            onChange={(e) => setEmployeeFilter(e.target.value)}
+                                            className="py-1!"
+                                            options={{
+                                                "All Employees": "All Employees",
+                                                "1–10 Employees": "1-10",
+                                                "11–20 Employees": "11-20",
+                                                "21–30 Employees": "21-30",
+                                                "31–40 Employees": "31-40",
+                                                "41+ Employees": "41+",
+                                            }}
+                                        />
+                                    </div>
+                                </>
+                            }
+                        />
+                    </Card.Body>
+
                     <Card.Body removePadding bordered={false}>
                         <Table
                             bordered={false}
@@ -125,7 +205,7 @@ export function HQ_Dashboard() {
                                 <Table.Header text="No. of Employees" />
                                 <Table.Header text="Total Sales" />
                             </Table.Row>
-                            {TABLE_BRANCHES.map((branch, index) => (
+                            {filteredBranches.map((branch, index) => (
                                 <Table.Row key={index}>
                                     <Table.Data text={branch.branchId} />
                                     <Table.Data>

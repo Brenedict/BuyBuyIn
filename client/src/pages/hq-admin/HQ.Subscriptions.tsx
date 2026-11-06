@@ -1,17 +1,17 @@
-// General Import
-import { useMemo } from "react";
-import { Form } from "react-router";
+// General Imports
+import { useMemo, useState } from "react";
+import { Outlet } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-import SearchInput from "../../components/inputs/SearchInput";
+import SelectInput from "../../components/inputs/SelectInput";
+import { TableFilterBar } from "../../components/TableFilterBar";
 
 // Material UI Icons
 import AddIcon from "@mui/icons-material/Add";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -22,10 +22,6 @@ import { formatFullDate } from "../../utils/dateUtils";
 // Test Data
 import { HQ_SUBSCRIPTION, HQ_BRANCH_SUBSCRIPTIONS } from "../../TESTINGDATA/subscriptionsData";
 import type { BranchSubscription } from "../../TESTINGDATA/subscriptionsData";
-import { Outlet } from "react-router";
-
-// Hooks
-import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 
 interface BranchStatusProps {
     status: "active" | "inactive";
@@ -121,15 +117,20 @@ function CurrentPlanSection() {
 }
 
 function BranchSubscriptionSection() {
-    const { values, submit } = useFormSearchParams({ search: "" });
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("All Statuses");
 
-    // Filters the branch list based on the search param
+    // Filters
     const filteredBranches = useMemo(
         () =>
-            HQ_BRANCH_SUBSCRIPTIONS.filter((branch: BranchSubscription) =>
-                branch.branchName.toLowerCase().includes(values.search.toLowerCase())
-            ),
-        [values.search]
+            HQ_BRANCH_SUBSCRIPTIONS.filter((branch: BranchSubscription) => {
+                const matchesSearch = branch.branchName.toLowerCase().includes(search.toLowerCase());
+
+                const matchesStatus = statusFilter === "All Statuses" || branch.status === statusFilter.toLowerCase();
+
+                return matchesSearch && matchesStatus;
+            }),
+        [search, statusFilter]
     );
 
     return (
@@ -148,28 +149,28 @@ function BranchSubscriptionSection() {
                 </Text>
             </Card.Header>
 
-            <Card.Body className="flex gap-4">
-                <Form onSubmit={submit()} className="grow">
-                    <SearchInput
-                        disabled={false}
-                        hidden={false}
-                        id="hq_brName_search"
-                        label=""
-                        name="search"
-                        defaultValue={values.search}
-                        onChange={() => {}}
-                        placeholder="Search Branch Name"
-                    />
-                </Form>
-
-                <Button
-                    variant="grey"
-                    leftIcon={FilterListIcon}
-                    className="h-full border-none shadow-none"
-                    size="normal"
-                >
-                    Filter Status
-                </Button>
+            <Card.Body className="py-6 px-4">
+                <TableFilterBar
+                    isComplex={false}
+                    searchValue={search}
+                    onSearchChange={(e) => setSearch(e.target.value)}
+                    searchPlaceholder="Search Branch Name"
+                    filters={
+                        <div className="w-48">
+                            <SelectInput
+                                name="statusFilter"
+                                defaultValue={statusFilter}
+                                onChange={(e: any) => setStatusFilter(e.target.value)}
+                                className="py-1!"
+                                options={{
+                                    "All Statuses": "All Statuses",
+                                    Active: "active",
+                                    Inactive: "inactive",
+                                }}
+                            />
+                        </div>
+                    }
+                />
             </Card.Body>
 
             <Table
@@ -194,9 +195,9 @@ function BranchSubscriptionSection() {
 
                 {filteredBranches.map((branch: BranchSubscription) => (
                     <Table.Row key={branch.id}>
-                        <Table.Data text={branch.branchName} className="w-[25%]"></Table.Data>
+                        <Table.Data text={branch.branchName} className="w-[25%]" />
 
-                        <Table.Data text={branch.branchAddress} className="w-[50%]"></Table.Data>
+                        <Table.Data text={branch.branchAddress} className="w-[50%]" />
 
                         <Table.Data className="w-[25%]">
                             <div className="flex justify-center">
@@ -206,6 +207,7 @@ function BranchSubscriptionSection() {
                     </Table.Row>
                 ))}
             </Table>
+
             {
                 // Displays all global and page popups
                 <Outlet />

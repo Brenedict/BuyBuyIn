@@ -4,12 +4,12 @@ import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
-import SearchInput from "../../components/inputs/SearchInput";
 import { EditDeleteButtons, PrimarySecondaryText } from "../../components/partials/TablePartials";
 import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import { NumberFormat } from "../../utils/chartConfigs";
 import { ROUTES } from "../../routes/Routes";
+import { TableFilterBar } from "../../components/TableFilterBar";
 
 // BuyBuyIn Shared Imports
 import type { CatalogueProduct } from "@buybuyin/shared/schema/product";
@@ -103,28 +103,29 @@ export function HQ_Catalogue() {
         <Card>
             <Card.Body className="flex flex-col gap-8 py-6 px-10 overflow-scroll">
                 {/* Header */}
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                        <Text variant="crimson" size="large" weight="extraBold">
-                            CATALOGUE
-                        </Text>
-                        <Text variant="brown" size="normal" weight="light">
-                            Define the products your branches can sell
-                        </Text>
-                    </div>
-
-                    <Form onChange={handleChange} className="flex items-center gap-3">
-                        <SearchInput
-                            name="search"
-                            placeholder="Search products, category & suppliers..."
-                            defaultValue={values.search}
-                            className="w-100"
-                        />
-                        <Button type="button" leftIcon={AddIcon} onClick={handleAddProduct}>
-                            Add Product
-                        </Button>
-                    </Form>
+                <div>
+                    <Text variant="crimson" size="large" weight="extraBold">
+                        CATALOGUE
+                    </Text>
+                    <Text variant="brown" size="normal" weight="light">
+                        Define the products your branches can sell
+                    </Text>
                 </div>
+
+                {/* TABLE FILTER */}
+                <Form onChange={handleChange}>
+                    <TableFilterBar
+                        isComplex={false}
+                        searchValue={values.search ?? ""}
+                        onSearchChange={() => {}}
+                        searchPlaceholder="Search products, category & suppliers..."
+                        actions={
+                            <Button type="button" leftIcon={AddIcon} onClick={handleAddProduct}>
+                                Add Product
+                            </Button>
+                        }
+                    />
+                </Form>
 
                 {/* Stat Cards */}
                 <div className="flex flex-wrap gap-5">

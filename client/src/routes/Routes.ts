@@ -34,6 +34,7 @@ export const ROUTES = {
             manageUsersAddCashier: `${base}/manage-users/cashier/add`,
             manageUsersEditCashier: (id?: string) => `${base}/manage-users/cashier/${id}/edit`,
             manageUsersManageCashier: (id?: string) => `${base}/manage-users/cashier/${id}/manage`,
+            manageUsersResendCashier: (id?: string) => `${base}/manage-users/cashier/${id}/resend`,
             manageUsersDeleteCashier: (id?: string) => `${base}/manage-users/cashier/${id}/delete`,
             branchOffers: `${base}/branch-offers`,
             transactions: `${base}/transactions`,
@@ -60,6 +61,7 @@ export const ROUTES = {
             manageUsersManagerAdd: `${base}/manage-users/manager/add`,
             manageUsersManagerEdit: (id?: string) => `${base}/manage-users/manager/${id}/edit`,
             manageUsersManagerManage: (id?: string) => `${base}/manage-users/manager/${id}/manage`,
+            manageUsersManagerResend: (id?: string) => `${base}/manage-users/manager/${id}/resend`,
             manageUsersManagerDelete: (id?: string) => `${base}/manage-users/manager/${id}/delete`,
             subscriptions: `${base}/subscriptions`,
             branchOffers: `${base}/branch-offers`,
@@ -91,6 +93,7 @@ export const ROUTES = {
             subscriberAccountsEdit: (id: string) => `${base}/subscriber-accounts/${id}/edit`,
             subscriberAccountsManage: (id: string) => `${base}/subscriber-accounts/${id}/manage`,
             subscriberAccountsDelete: (id: string) => `${base}/subscriber-accounts/${id}/delete`,
+            subscriberAccountsResend: (id: string) => `${base}/subscriber-accounts/${id}/resend`,
         };
     })(),
 } as const;

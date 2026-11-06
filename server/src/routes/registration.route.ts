@@ -71,4 +71,7 @@ router.delete("/cashiers/:userId", controller.cashierDelete);
 // --------------------- ACCOUNT STATUS MANAGE (deactivate / reactivate) ------------------
 router.patch("/account/:userId/status", controller.accountStatusPatch);
 
+// Resend email verification link for an unverified account with an expired (or cleared) token.
+router.post("/account/:userId/resend-verification", controller.resendVerificationEmailPost);
+
 export default router;

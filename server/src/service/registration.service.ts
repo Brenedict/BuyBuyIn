@@ -26,6 +26,9 @@ import BusinessModel from "../models/business.model";
 import UserModel from "../models/user.model";
 import BranchModel from "../models/branch.model";
 
+// Services
+import EmailService, { type AssignableRole } from "./email.service";
+
 // Utils
 import HashUtil from "../utils/hash.util";
 import DateUtil from "../utils/date.util";
@@ -35,6 +38,8 @@ const ACCOUNT_STATUS_UPDATE = {
     deactivate: "DEACTIVATED",
     reactivate: "ACTIVE",
 } as const;
+
+const FALLBACK_REGISTRATION_TOKEN_EXPIRATION = "1d";
 
 export default {
     createNewBusinessEntity(business: BusinessEntityRegistrationSchemaType) {
@@ -80,7 +85,48 @@ export default {
             resetTokenExpiresAt: resetTokenExpires,
         } as User;
 
+        // NOTE: This is for testing only, to be removed in actuality
+        console.log(
+            "\n\n========================================== THIS IS FOR TESTING PURPOSES ONLY =========================================="
+        );
+        console.log("Email Verification Link: ", `${process.env.FRONTEND_URL}/verify-email?token=${hashedToken}`);
+        console.log(
+            "======================================================================================================================\n\n"
+        );
+
         return await UserModel.updateUser(userId, updatedUser);
+    },
+
+    // Resends the email verification link to an unverified account. Generates a new token,
+    // sends the confirmation email, and stores the new token + expiry on the user row.
+    async resendVerificationEmail(userId: number) {
+        const existing = await UserModel.getById(userId);
+        if (!existing) throw new HttpError(404, "Account not found");
+
+        if (existing.accountStatus !== "UNVERIFIED") {
+            throw new HttpError(400, "Account is already verified");
+        }
+
+        // Generates hashed token for reset password URL query (e.g. /reset-password?token=209NF903H)
+        const hashedToken = HashUtil.generateRandomHashedToken();
+
+        const emailSent = await EmailService.sendRegistrationConfirmationEmal(
+            existing.role as AssignableRole,
+            hashedToken,
+            existing.fullName as string,
+            existing.email
+        );
+
+        // Only registers a reset token when the email has been sent successfully
+        if (!emailSent) {
+            throw new HttpError(500, "Failed to send verification email");
+        }
+
+        return await this.registerResetToken(
+            userId,
+            hashedToken,
+            process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
+        );
     },
 
     // Completes the account setup: sets the user's real password, marks the account active, and clears the reset token.
@@ -165,7 +211,7 @@ export default {
 
         if (branchId !== undefined) {
             data.branchId = branchId;
-            data.businessId = branchId === null ? null : (await this.resolveBranchBusiness(branchId)) ?? null;
+            data.businessId = branchId === null ? null : ((await this.resolveBranchBusiness(branchId)) ?? null);
         }
 
         return UserModel.updateUser(userId, { ...fields, ...data });
@@ -182,7 +228,7 @@ export default {
 
         if (branchId !== undefined) {
             data.branchId = branchId;
-            data.businessId = branchId === null ? null : (await this.resolveBranchBusiness(branchId)) ?? null;
+            data.businessId = branchId === null ? null : ((await this.resolveBranchBusiness(branchId)) ?? null);
         }
 
         return UserModel.updateUser(userId, { ...fields, ...data });

@@ -160,8 +160,6 @@ export default {
         requireAccessLevel("SUPERADMIN", "exclusive"),
         validateSchema("body", AccountRegistrationSchema),
         async (req: Request, res: Response) => {
-            console.log("=========================================> REACHED");
-
             // Payload from the request
             const accountDataPayload: AccountRegistrationSchemaType = req.body;
 
@@ -185,14 +183,11 @@ export default {
                     user.email
                 );
 
-                // Only registers a reset token when the email has been sent sucessfully
-                if (emailSent) {
-                    const result = await RegistrationService.registerResetToken(
-                        user.id,
-                        hashedToken,
-                        process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
-                    );
-                }
+                const result = await RegistrationService.registerResetToken(
+                    user.id,
+                    hashedToken,
+                    process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
+                );
 
                 return res.status(201).end();
             }
@@ -230,14 +225,11 @@ export default {
                     user.email
                 );
 
-                // Only registers a reset token when the email has been sent sucessfully
-                if (emailSent) {
-                    const result = await RegistrationService.registerResetToken(
-                        user.id,
-                        hashedToken,
-                        process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
-                    );
-                }
+                const result = await RegistrationService.registerResetToken(
+                    user.id,
+                    hashedToken,
+                    process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
+                );
 
                 return res.status(201).end();
             }
@@ -275,14 +267,11 @@ export default {
                     user.email
                 );
 
-                // Only registers a reset token when the email has been sent sucessfully
-                if (emailSent) {
-                    const result = await RegistrationService.registerResetToken(
-                        user.id,
-                        hashedToken,
-                        process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
-                    );
-                }
+                const result = await RegistrationService.registerResetToken(
+                    user.id,
+                    hashedToken,
+                    process.env.SMTP_ACCOUNT_REGISTRATION_EXPIRATION || FALLBACK_REGISTRATION_TOKEN_EXPIRATION
+                );
 
                 return res.status(201).end();
             }
@@ -636,10 +625,57 @@ export default {
 
             await RegistrationService.manageAccountStatus(userId, action);
 
-            const resultMessage =
-                action === "deactivate" ? "Account deactivated" : "Account reactivated";
+            const resultMessage = action === "deactivate" ? "Account deactivated" : "Account reactivated";
 
             return res.json({ message: resultMessage });
+        },
+    ],
+
+    // Resends the email verification link to an unverified account whose verification
+    // token has expired (or was cleared after an expired link was opened).
+    resendVerificationEmailPost: [
+        jwtAccessAuth,
+        requireAccessLevel("BRANCHMANAGER", "minimum"),
+        async (req: Request, res: Response) => {
+            const requestor = req.user as User;
+            const userId = parseEntityId(req.params.userId, "Account not found");
+
+            const target = await RegistrationService.getUserById(userId);
+            if (!target) return res.status(404).json({ message: "Account not found" });
+
+            if (target.id === requestor.id) {
+                return res.status(400).json({ message: "You cannot resend verification to your own account" });
+            }
+
+            const manageableRole =
+                requestor.role === RoleType.SUPERADMIN
+                    ? RoleType.HQADMIN
+                    : requestor.role === RoleType.HQADMIN
+                      ? RoleType.BRANCHMANAGER
+                      : RoleType.CASHIER;
+
+            if (target.role !== manageableRole) {
+                return res.status(403).json({ message: "Forbidden: You cannot manage this account" });
+            }
+
+            if (target.accountStatus !== "UNVERIFIED") {
+                return res.status(400).json({ message: "Account is already verified" });
+            }
+
+            if (target.resetToken) {
+                const expiresAt = target.resetTokenExpiresAt
+                    ? new Date(target.resetTokenExpiresAt).getTime()
+                    : Infinity;
+                if (expiresAt >= Date.now()) {
+                    return res.status(400).json({ message: "A verification link is already active for this account" });
+                }
+            }
+
+            RegistrationService.assertSameBusiness(target.businessId, requestor.businessId);
+
+            await RegistrationService.resendVerificationEmail(userId);
+
+            return res.json({ message: "Verification email resent" });
         },
     ],
 };

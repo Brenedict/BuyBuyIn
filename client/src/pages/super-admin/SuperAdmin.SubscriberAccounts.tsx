@@ -13,10 +13,23 @@ import { ROUTES } from "../../routes/Routes";
 
 // API Services
 import type { RegistrationUserEntry } from "@buybuyin/shared/schema/registration";
+import { AccountStatusType } from "@buybuyin/shared/prisma/enums";
+
+// Components
+import { EditManageButtons } from "../../components/partials/TablePartials";
 
 // Icons
-import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
-import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+
+// Returns true only when the account is unverified and its verification token has actually expired.
+// Brand-new accounts (with a live token) and accounts without a token do not get a resend option.
+const canResendVerification = (user: RegistrationUserEntry) => {
+    if (user.accountStatus !== AccountStatusType.UNVERIFIED) return false;
+
+    if (!user.resetToken || !user.resetTokenExpiresAt) return false;
+
+    return new Date(user.resetTokenExpiresAt) < new Date();
+};
 
 export function SuperAdmin_SubscriberAccounts() {
     const navigate = useNavigatePage();
@@ -28,6 +41,8 @@ export function SuperAdmin_SubscriberAccounts() {
         navigate(ROUTES.SUPER_ADMIN.subscriberAccountsEdit(String(id)), true);
     const handleManage = (id: string | number) => () =>
         navigate(ROUTES.SUPER_ADMIN.subscriberAccountsManage(String(id)), true);
+    const handleResend = (id: string | number) => () =>
+        navigate(ROUTES.SUPER_ADMIN.subscriberAccountsResend(String(id)), true);
 
     return (
         <Card className="w-full">
@@ -77,24 +92,22 @@ export function SuperAdmin_SubscriberAccounts() {
                                     <Table.Data size="normal" text={sub.accountStatus} />
                                     <Table.Data>
                                         <div className="flex justify-center gap-2">
-                                            <Button
-                                                variant="secondary"
-                                                size="smallest"
-                                                leftIcon={DriveFileRenameOutlineOutlinedIcon}
-                                                className="rounded-3xl! px-4!"
-                                                onClick={handleEdit(sub.id)}
-                                            >
-                                                Edit
-                                            </Button>
-                                            <Button
-                                                variant="secondary"
-                                                size="smallest"
-                                                leftIcon={ManageAccountsOutlinedIcon}
-                                                className="rounded-3xl! px-4!"
-                                                onClick={handleManage(sub.id)}
-                                            >
-                                                Manage
-                                            </Button>
+                                            <EditManageButtons
+                                                id={sub.id}
+                                                handleEdit={handleEdit}
+                                                handleManage={handleManage}
+                                            />
+                                            {canResendVerification(sub) && (
+                                                <Button
+                                                    variant="main"
+                                                    size="smallest"
+                                                    leftIcon={SendOutlinedIcon}
+                                                    className="rounded-3xl! px-4!"
+                                                    onClick={handleResend(sub.id)}
+                                                >
+                                                    Resend
+                                                </Button>
+                                            )}
                                         </div>
                                     </Table.Data>
                                 </Table.Row>

@@ -246,7 +246,7 @@ describe("Registration routes", () => {
             expect(await prisma.user.count({ where: { email: payload.email } })).toBe(1);
         });
 
-        it("does not register a reset token when the email fails to send", async () => {
+        it("registers a reset token even when the email fails to send", async () => {
             const payload = subscriberAccountPayload();
 
             emailServiceMock.sendRegistrationConfirmationEmal.mockResolvedValueOnce(false);
@@ -257,8 +257,8 @@ describe("Registration routes", () => {
             const stored = await prisma.user.findUniqueOrThrow({ where: { email: payload.email } });
 
             expect(stored.role).toBe(RoleType.HQADMIN);
-            expect(stored.resetToken).toBeNull();
-            expect(stored.resetTokenExpiresAt).toBeNull();
+            expect(stored.resetToken).not.toBeNull();
+            expect(stored.resetTokenExpiresAt).not.toBeNull();
         });
 
         it("only allows super admins", async () => {
@@ -533,7 +533,7 @@ describe("Registration routes", () => {
             expect(res.body).toEqual({ message: "Invalid link." });
         });
 
-        it("rejects an expired token and clears it", async () => {
+        it("rejects an expired token and keeps it for resend detection", async () => {
             await seedResetTokenUser(new Date(Date.now() - 60 * 1000));
 
             const res = await request(app).get("/registration/verify-email").query({ token: RESET_TOKEN }).expect(401);
@@ -542,8 +542,8 @@ describe("Registration routes", () => {
 
             const stored = await prisma.user.findFirstOrThrow({ where: { email: "reset.user@gmail.com" } });
 
-            expect(stored.resetToken).toBeNull();
-            expect(stored.resetTokenExpiresAt).toBeNull();
+            expect(stored.resetToken).toBe(RESET_TOKEN);
+            expect(stored.resetTokenExpiresAt).not.toBeNull();
         });
     });
 
@@ -605,7 +605,7 @@ describe("Registration routes", () => {
             expect(res.body).toEqual({ message: "Invalid link." });
         });
 
-        it("rejects an expired token and clears it", async () => {
+        it("rejects an expired token and keeps it for resend detection", async () => {
             const user = await seedResetTokenUser(new Date(Date.now() - 60 * 1000));
 
             const res = await request(app)
@@ -618,8 +618,8 @@ describe("Registration routes", () => {
 
             const stored = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
 
-            expect(stored.resetToken).toBeNull();
-            expect(stored.resetTokenExpiresAt).toBeNull();
+            expect(stored.resetToken).toBe(RESET_TOKEN);
+            expect(stored.resetTokenExpiresAt).not.toBeNull();
             expect(stored.accountStatus).toBe("UNVERIFIED");
         });
     });
@@ -886,6 +886,55 @@ describe("Registration routes", () => {
                 .expect(403);
 
             expect(res.body).toEqual({ message: "Forbidden: You cannot manage this account" });
+        });
+    });
+
+    describe("POST /registration/account/:userId/resend-verification", () => {
+        let target: User;
+
+        beforeEach(async () => {
+            target = await prisma.user.create({
+                data: {
+                    email: "resend.target@gmail.com",
+                    password: passwordHash,
+                    firstName: "Resend",
+                    lastName: "Target",
+                    role: RoleType.HQADMIN,
+                    businessId: business.id,
+                    accountStatus: "UNVERIFIED",
+                    resetToken: "active-reset-token",
+                    resetTokenExpiresAt: new Date(Date.now() + 60 * 60 * 1000),
+                },
+            });
+        });
+
+        it("rejects resend when a non-expired verification token is already active", async () => {
+            setCurrentAuthUser(roles[RoleType.SUPERADMIN]);
+
+            const res = await request(app)
+                .post(`/registration/account/${target.id}/resend-verification`)
+                .expect(400);
+
+            expect(res.body).toEqual({ message: "A verification link is already active for this account" });
+        });
+
+        it("allows resend when the existing token has expired", async () => {
+            await prisma.user.update({
+                where: { id: target.id },
+                data: { resetTokenExpiresAt: new Date(Date.now() - 60 * 1000) },
+            });
+
+            setCurrentAuthUser(roles[RoleType.SUPERADMIN]);
+
+            const res = await request(app)
+                .post(`/registration/account/${target.id}/resend-verification`)
+                .expect(200);
+
+            expect(res.body).toEqual({ message: "Verification email resent" });
+
+            const stored = await prisma.user.findUniqueOrThrow({ where: { id: target.id } });
+            expect(stored.resetToken).not.toBe("active-reset-token");
+            expect(stored.resetTokenExpiresAt).not.toBeNull();
         });
     });
 

@@ -551,14 +551,53 @@ export const deleteCashier = async ({ params, request }: ActionFunctionArgs) => 
     }
 };
 
+// POST: Resends the email verification link to an unverified account with an expired (or cleared) token.
+export const resendVerificationEmail = async (userId: number) => {
+    const res = await apiJson(`/registration/account/${userId}/resend-verification`, {
+        method: "POST",
+    });
+
+    if (!res.ok) {
+        const apiError = await res.json().catch(() => null);
+        const message = apiError?.message ?? apiError?.error ?? FALLBACK_ERROR;
+        throw new Error(typeof message === "string" ? message : FALLBACK_ERROR);
+    }
+
+    return res.json();
+};
+
+// POST: Resends the verification email (Route action for the resend-confirmation popup).
+export const resendVerification = async ({ params, request }: ActionFunctionArgs) => {
+    const userId = parseRegistrationId(params.id);
+
+    try {
+        const formData = await request.formData();
+        const returnTo = formData.get("redirectTo")?.toString() ?? ROUTES.HQ_ADMIN.manageUsers;
+        if (userId === null) throw redirect(returnTo);
+
+        await resendVerificationEmail(userId);
+
+        return redirectWithQuery(request, returnTo, "NOTIF=Verification email resent successfully");
+    } catch (err) {
+        const returnTo =
+            (await request.formData().then((f) => f.get("redirectTo")?.toString()).catch(() => null)) ??
+            ROUTES.HQ_ADMIN.manageUsers;
+
+        const message = err instanceof Error ? err.message : FALLBACK_ERROR;
+
+        return redirectWithQuery(request, returnTo, `ERROR=${encodeURIComponent(message)}`);
+    }
+};
+
 // PATCH: Deactivates / reactivates an account (Shared Manage radio popup action)
 export const manageAccountStatus = async ({ params, request }: ActionFunctionArgs) => {
+    const formData = await request.formData();
+    const redirectTo = formData.get("redirectTo")?.toString() ?? ROUTES.HQ_ADMIN.manageUsers;
+
     try {
         const userId = parseRegistrationId(params.id);
-        const redirectTo = (await request.formData()).get("redirectTo")?.toString() ?? ROUTES.HQ_ADMIN.manageUsers;
         if (userId === null) throw redirect(redirectTo);
 
-        const formData = await request.formData();
         const payload = validateForm(formData, ManageAccountStatusSchema, "Invalid account action");
 
         const res = await apiJson(`/registration/account/${userId}/status`, { method: "PATCH", body: JSON.stringify(payload) });
@@ -567,10 +606,7 @@ export const manageAccountStatus = async ({ params, request }: ActionFunctionArg
 
         return redirectWithQuery(request, redirectTo, "NOTIF=Account status updated");
     } catch (err) {
-        const redirectTo = await request.formData().then((f) => f.get("redirectTo")?.toString())
-            ?? ROUTES.HQ_ADMIN.manageUsers;
-
-        return handleErrRedirect(err, request, String(redirectTo));
+        return handleErrRedirect(err, request, redirectTo);
     }
 };
 

@@ -20,6 +20,7 @@ import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 // Hooks & Routes
 import useNavigatePage from "../../hooks/useNavigatePage";
@@ -27,6 +28,7 @@ import { ROUTES } from "../../routes/Routes";
 
 // API Services
 import type { RegistrationUserEntry } from "@buybuyin/shared/schema/registration";
+import { AccountStatusType } from "@buybuyin/shared/prisma/enums";
 
 // SUB COMPONENTS
 
@@ -127,15 +129,27 @@ function ControlsSection({ searchQuery, setSearchQuery, setStatusFilter, uniqueS
     );
 }
 
+// Returns true only when the account is unverified and its verification token has actually expired.
+// Brand-new accounts (with a live token) and accounts without a token do not get a resend option.
+const canResendVerification = (user: RegistrationUserEntry) => {
+    if (user.accountStatus !== AccountStatusType.UNVERIFIED) return false;
+
+    if (!user.resetToken || !user.resetTokenExpiresAt) return false;
+
+    return new Date(user.resetTokenExpiresAt) < new Date();
+};
+
 // Employee List
 function EmployeeListSection({
     users,
     handleEdit,
     handleManage,
+    handleResendVerification,
 }: {
     users: RegistrationUserEntry[];
     handleEdit: (id: number) => () => void;
     handleManage: (id: number) => () => void;
+    handleResendVerification: (id: number) => () => void;
 }) {
     return (
         <Card isGlass={false}>
@@ -181,6 +195,17 @@ function EmployeeListSection({
                                     >
                                         Manage
                                     </Button>
+                                    {canResendVerification(user) && (
+                                        <Button
+                                            variant="main"
+                                            size="small"
+                                            leftIcon={SendOutlinedIcon}
+                                            className="rounded-3xl! px-4!"
+                                            onClick={handleResendVerification(user.id)}
+                                        >
+                                            Resend Verification
+                                        </Button>
+                                    )}
                                 </div>
                             </Table.Data>
                         </Table.Row>
@@ -204,6 +229,8 @@ export default function BranchManager_ManageUsers() {
     const handleEditUser = (id: number) => () => navigate(ROUTES.BRANCH_MANAGER.manageUsersEditCashier(String(id)), true);
     const handleManageUser = (id: number) => () =>
         navigate(ROUTES.BRANCH_MANAGER.manageUsersManageCashier(String(id)), true);
+    const handleResendVerificationUser = (id: number) => () =>
+        navigate(ROUTES.BRANCH_MANAGER.manageUsersResendCashier(String(id)), true);
 
     const uniqueStatuses = Array.from(new Set(cashiers.map((user) => user.accountStatus)));
 
@@ -236,7 +263,12 @@ export default function BranchManager_ManageUsers() {
                         onAddUser={handleAddUser}
                     />
 
-                    <EmployeeListSection users={filteredUsers} handleEdit={handleEditUser} handleManage={handleManageUser} />
+                    <EmployeeListSection
+                        users={filteredUsers}
+                        handleEdit={handleEditUser}
+                        handleManage={handleManageUser}
+                        handleResendVerification={handleResendVerificationUser}
+                    />
                 </Card.Body>
             </Card>
 

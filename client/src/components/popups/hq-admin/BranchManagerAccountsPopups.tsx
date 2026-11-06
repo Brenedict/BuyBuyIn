@@ -167,6 +167,7 @@ export function BranchManagerFormPopup({ mode }: { mode: "add" | "edit" }) {
         return (
             <PopUp title="Add Manager" handleCloseProp={handleClose}>
                 <Form method="post" className="flex flex-col gap-4">
+                    <GeneralInput id="email" name="email" type="email" label="Email" labelVariant="small" required />
                     <div className="flex gap-3">
                         <GeneralInput
                             id="firstName"
@@ -185,15 +186,6 @@ export function BranchManagerFormPopup({ mode }: { mode: "add" | "edit" }) {
                             required
                         />
                     </div>
-
-                    <GeneralInput
-                        id="email"
-                        name="email"
-                        type="email"
-                        label="Email"
-                        labelVariant="small"
-                        required
-                    />
 
                     <BranchAssignmentSelect branches={branches} />
 
@@ -319,8 +311,8 @@ export function ManagerDeletePopup() {
                 {remainingCount > 0 ? (
                     <div className="flex items-start gap-3 rounded-2xl bg-off-white p-3">
                         <Text size="description" weight="medium" variant="brown">
-                            After deletion, <span className="font-bold">{remainingCount}</span> other manager
-                            account(s) will remain linked to <span className="font-bold">{branchLocation}</span>.
+                            After deletion, <span className="font-bold">{remainingCount}</span> other manager account(s)
+                            will remain linked to <span className="font-bold">{branchLocation}</span>.
                         </Text>
                     </div>
                 ) : (

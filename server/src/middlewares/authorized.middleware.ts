@@ -44,14 +44,6 @@ export async function requireValidResetToken(req: Request, res: Response, next: 
         const currentTimestampTz = new Date();
 
         if (requestor.resetTokenExpiresAt && currentTimestampTz >= requestor.resetTokenExpiresAt) {
-            // Clears Reset Token to prevent stale data
-            const clearedUser = {
-                resetToken: null,
-                resetTokenExpiresAt: null,
-            } as User;
-
-            await UserModel.updateUser(requestor.id, clearedUser);
-
             return res.status(401).json({ message: "Expired link." });
         }
 

@@ -119,6 +119,9 @@ export type RegistrationUserEntry = {
     accountStatus: string;
     businessId: number | null;
     branchId: number | null;
+    // Email verification token state (used to determine if a resend action is available).
+    resetToken: string | null;
+    resetTokenExpiresAt: Date | null;
     business?: { id: number; name: string; location: string } | null;
     branch?: { id: number; location: string } | null;
 };

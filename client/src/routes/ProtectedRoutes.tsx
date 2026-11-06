@@ -58,6 +58,7 @@ import {
     getSubscriberForm,
     getSubscribers,
     manageAccountStatus,
+    resendVerification,
     updateBranch,
     updateBusiness,
     updateCashier,
@@ -105,6 +106,7 @@ import {
 import { ProductFormPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
 import { SupplierFormPopup, SupplierDeletePopup } from "../components/popups/hq-admin/SupplierPopups";
 import { ManageAccountPopup } from "../components/popups/shared/ManageAccountPopup";
+import { ResendVerificationPopup } from "../components/popups/shared/ResendVerificationPopup";
 
 // Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -222,6 +224,14 @@ export const protectedRoutes: RouteObject[] = [
                                         element: <CashierDeletePopup />,
                                         loader: getCashier,
                                         action: deleteCashier,
+                                    },
+                                    {
+                                        path: "cashier/:id/resend",
+                                        element: (
+                                            <ResendVerificationPopup returnTo={ROUTES.BRANCH_MANAGER.manageUsers} />
+                                        ),
+                                        loader: getCashier,
+                                        action: resendVerification,
                                     },
                                     ...globalPopups,
                                 ],
@@ -381,6 +391,12 @@ export const protectedRoutes: RouteObject[] = [
                                         loader: getManagerDeleteContext,
                                         action: deleteManager,
                                     },
+                                    {
+                                        path: "manager/:id/resend",
+                                        element: <ResendVerificationPopup returnTo={ROUTES.HQ_ADMIN.manageUsers} />,
+                                        loader: getManager,
+                                        action: resendVerification,
+                                    },
                                 ],
                             },
                             {
@@ -519,6 +535,14 @@ export const protectedRoutes: RouteObject[] = [
                                         element: <SubscriberDeletePopup />,
                                         loader: getSubscriberDeleteContext,
                                         action: deleteSubscriber,
+                                    },
+                                    {
+                                        path: ":id/resend",
+                                        element: (
+                                            <ResendVerificationPopup returnTo={ROUTES.SUPER_ADMIN.subscriberAccounts} />
+                                        ),
+                                        loader: getSubscriber,
+                                        action: resendVerification,
                                     },
                                     ...globalPopups,
                                 ],

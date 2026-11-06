@@ -18,6 +18,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 // Hooks
 import useNavigatePage from "../../hooks/useNavigatePage";
@@ -25,6 +26,7 @@ import { ROUTES } from "../../routes/Routes";
 
 // API Services
 import type { ManageUsersPageData } from "../../api/registrationService";
+import { AccountStatusType } from "@buybuyin/shared/prisma/enums";
 
 /* MAIN COMPONENT */
 export default function HQAdmin_ManageUsers() {
@@ -75,10 +77,13 @@ export default function HQAdmin_ManageUsers() {
     const handleAddManager = () => navigate(ROUTES.HQ_ADMIN.manageUsersManagerAdd, true);
     const handleEditManager = (id: string) => () => navigate(ROUTES.HQ_ADMIN.manageUsersManagerEdit(id), true);
     const handleManageManager = (id: string) => () => navigate(ROUTES.HQ_ADMIN.manageUsersManagerManage(id), true);
+    const handleResendManager = (id: string | number) => () =>
+        navigate(ROUTES.HQ_ADMIN.manageUsersManagerResend(String(id)), true);
 
     return (
         <main className="flex flex-col w-full gap-6 pb-10">
             <PageHeaderSection />
+
             <StatCardsSection branches={branches} managers={managers} />
             <BranchesSection
                 search={branchSearch}
@@ -103,6 +108,7 @@ export default function HQAdmin_ManageUsers() {
                 handleAdd={handleAddManager}
                 handleEdit={handleEditManager}
                 handleManage={handleManageManager}
+                handleResendVerification={handleResendManager}
             />
             <Outlet />
         </main>
@@ -173,6 +179,16 @@ function StatCardsSection({
         </div>
     );
 }
+
+// Returns true only when the account is unverified and its verification token has actually expired.
+// Brand-new accounts (with a live token) and accounts without a token do not get a resend option.
+const canResendVerification = (user: { accountStatus: string; resetToken: string | null; resetTokenExpiresAt: string | null }) => {
+    if (user.accountStatus !== AccountStatusType.UNVERIFIED) return false;
+
+    if (!user.resetToken || !user.resetTokenExpiresAt) return false;
+
+    return new Date(user.resetTokenExpiresAt) < new Date();
+};
 
 function BranchesSection({
     search,
@@ -276,6 +292,7 @@ function BranchManagersSection({
     handleAdd,
     handleEdit,
     handleManage,
+    handleResendVerification,
 }: any) {
     return (
         <Card className="overflow-visible! z-10 relative">
@@ -351,6 +368,17 @@ function BranchManagersSection({
                                         >
                                             Manage
                                         </Button>
+                                        {canResendVerification(manager) && (
+                                            <Button
+                                                variant="main"
+                                                size="small"
+                                                leftIcon={SendOutlinedIcon}
+                                                className="rounded-3xl! px-4!"
+                                                onClick={handleResendVerification(manager.id)}
+                                            >
+                                                Resend Verification
+                                            </Button>
+                                        )}
                                     </div>
                                 </Table.Data>
                             </Table.Row>

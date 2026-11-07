@@ -28,6 +28,14 @@ import {
     getBranchInventoryOptions,
     restockBranchInventoryItem,
 } from "../api/branchInventoryService";
+import {
+    createHQBranchWideOffer,
+    deleteHQBranchWideOffer,
+    getHQBranchWideOffer,
+    getHQBranchWideOfferEditPage,
+    getHQBranchWideOffersPage,
+    updateHQBranchWideOffer,
+} from "../api/branchWideOfferService";
 
 // Global Pages and Popups
 import { globalPopups } from "./GlobalPopupRoutes";
@@ -58,7 +66,7 @@ import HQ_Catalogue from "../pages/hq-admin/HQ.Catalogue";
 import HQ_ManageUsers from "../pages/hq-admin/HQ.ManageUsers";
 import HQ_Subscriptions from "../pages/hq-admin/HQ.Subscriptions";
 
-import { SaveConfirmationPopup } from "../components/popups/hq-admin/BranchOffersPopups";
+import { BranchOfferDeletePopup } from "../components/popups/hq-admin/BranchOffersPopups";
 import {
     BranchFormPopup,
     DeleteBranchPopup,
@@ -265,10 +273,17 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.branchOffers,
                                 element: <HQ_BranchWideOffers />,
+                                loader: getHQBranchWideOffersPage,
                                 children: [
                                     {
                                         path: "save",
-                                        element: <SaveConfirmationPopup />,
+                                        action: createHQBranchWideOffer,
+                                    },
+                                    {
+                                        path: ":id/delete",
+                                        element: <BranchOfferDeletePopup />,
+                                        loader: getHQBranchWideOffer,
+                                        action: deleteHQBranchWideOffer,
                                     },
                                     ...globalPopups,
                                 ],
@@ -276,10 +291,11 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.branchOffers + "/:id/edit",
                                 element: <HQ_BranchWideOffers />,
+                                loader: getHQBranchWideOfferEditPage,
                                 children: [
                                     {
                                         path: "save",
-                                        element: <SaveConfirmationPopup />,
+                                        action: updateHQBranchWideOffer,
                                     },
                                     ...globalPopups,
                                 ],

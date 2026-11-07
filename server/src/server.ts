@@ -11,6 +11,7 @@ import userRoutes from "./routes/user.routes";
 import productRoutes from "./routes/product.route";
 import supplierRoutes from "./routes/supplier.route";
 import branchInventoryRoutes from "./routes/branchInventory.route";
+import branchWideOfferRoutes from "./routes/branchWideOffer.route";
 
 // Middlewares
 import handleShutdown from "./middlewares/shutdown.middleware";
@@ -67,6 +68,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/supplier", supplierRoutes);
 app.use("/api/v1/branch-inventory", branchInventoryRoutes);
+app.use("/api/v1/branch-wide-offers", branchWideOfferRoutes);
 
 app.use(errorMiddleware.notFoundError);
 app.use(errorMiddleware.internalError);

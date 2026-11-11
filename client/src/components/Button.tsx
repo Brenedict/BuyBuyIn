@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 // General Imports
 import React from "react";
+import { UNSAFE_DataRouterStateContext } from "react-router";
 // Components
 import Icon from "./Icon";
 import type { MaterialIcon } from "../types/common";
@@ -75,6 +76,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     transition?: boolean;
 }
 
+// Ignores duplicate clicks that happen within this window. This stops a
+// double-click from firing a popup action (e.g. submitting a create-user form)
+// twice before the first request resolves.
+const DOUBLE_CLICK_GUARD_MS = 500;
+
 export function Button({
     variant = "main",
     size = "medium",
@@ -84,8 +90,40 @@ export function Button({
     iconExtraClass = "",
     className = "",
     transition = true,
+    onClick,
+    type = "submit",
+    disabled,
     ...props
 }: ButtonProps) {
+    const lastClickRef = React.useRef(0);
+
+    // Stays true for the whole duration of a form submission (which can be slow,
+    // e.g. while the confirmation email is being sent), not just for the double-click
+    // window. Reading the context directly keeps the Button usable outside a data
+    // router (Storybook) where useNavigation would throw.
+    const routerState = React.useContext(UNSAFE_DataRouterStateContext);
+    const isSubmitting = routerState?.navigation.state === "submitting";
+    const isDisabled = Boolean(disabled) || (isSubmitting && type === "submit");
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (isDisabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        const now = Date.now();
+
+        if (now - lastClickRef.current < DOUBLE_CLICK_GUARD_MS) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        lastClickRef.current = now;
+        onClick?.(e);
+    };
+
     const transitionClass = transition ? "hover:scale-102 active:scale-100 transition-transform transition-color" : "";
 
     let buttonClass: string;
@@ -96,7 +134,7 @@ export function Button({
     }
 
     return (
-        <button className={buttonClass} {...props}>
+        <button className={buttonClass} type={type} disabled={isDisabled} onClick={handleClick} {...props}>
             {leftIcon && (
                 <Icon
                     icon={leftIcon}

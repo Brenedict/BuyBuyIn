@@ -144,8 +144,11 @@ export const ensureOkOrRedirect = async (res: Response, message: string, request
         try {
             const body = await res.json();
 
-            if (body?.error) {
-                detail = typeof body.error === "string" ? body.error : JSON.stringify(body.error);
+            // Some controllers respond with { error }, others with { message }.
+            const bodyError = body?.error ?? body?.message;
+
+            if (bodyError) {
+                detail = typeof bodyError === "string" ? bodyError : JSON.stringify(bodyError);
             }
         } catch {
             // Skip if response is not a json

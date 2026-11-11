@@ -9,28 +9,32 @@ import { Button } from "../../components/Button";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
+import useNavigatePage from "../../hooks/useNavigatePage";
 
 // Material UI Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/icons-material";
 
 function SideBar() {
+    const navigate = useNavigatePage();
+    const [isRetail, setIsRetail] = useState(true);
+
     return (
         <nav className="flex flex-col justify-center p-[1.25rem] gap-[1.5rem] rounded-[10px] bg-cream/40 card-glass-effect card-drop-shadow">
-            <Button variant="grey" size="medium">
+            <Button variant="grey" size="medium" onClick={() => navigate("quantity")}>
                 QTY
             </Button>
-            <Button variant="grey" size="medium">
-                ADD PRDCT
+            <Button variant="grey" size="medium" onClick={() => navigate("item")}>
+                ADD ITEM
             </Button>
-            <Button variant="grey" size="medium">
+            <Button variant="grey" size="medium" onClick={() => navigate("discount")}>
                 DISC
             </Button>
-            <Button variant="grey" size="medium">
+            <Button variant="grey" size="medium" onClick={() => navigate("checkprice")}>
                 CHK PRC
             </Button>
-            <Button variant="grey" size="medium">
-                RETAIL
+            <Button variant={isRetail ? "main" : "secondary"} size="medium" onClick={() => setIsRetail(!isRetail)}>
+                {isRetail ? "Retail" : "Wholesale"}
             </Button>
             <Button variant="grey" size="medium">
                 REPRINT

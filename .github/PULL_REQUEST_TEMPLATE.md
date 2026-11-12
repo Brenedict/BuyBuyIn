@@ -39,20 +39,22 @@ git fetch --all
 3. Switch to this branch:
 
 ```bash
+# THIS IS REQUIRED ADD YOUR BRANCH NAME HERE
 git checkout <your-branch-name>
 ```
 
-3. Pull the latest changes in case there were late pushes:
+1. Pull the latest changes in case there were late pushes:
 
 ```bash
+# THIS IS REQUIRED ADD YOUR BRANCH NAME HERE
 git pull origin <your-branch-name>
 ```
 
-4. Wait for the dependencies to install first
+4. Run the clean build script
 
 ```bash
 # You should be in the root branch: /BuyBuyIn
-npm install
+npm run cbi
 ```
 
 ## Test Cases Checklist

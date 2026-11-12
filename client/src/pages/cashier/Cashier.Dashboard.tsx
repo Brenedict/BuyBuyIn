@@ -15,7 +15,7 @@ import { useGlobalContext } from "../shared/AccessValidator";
 export function Cashier_Dashboard() {
     const { user } = useGlobalContext();
 
-    const cashierName = `${user?.username}`;
+    const cashierName = `${user?.firstName}`;
     const syncTime = "67";
     const totalSales = "8500";
     const todayTransactions = "18";

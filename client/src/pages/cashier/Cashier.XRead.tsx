@@ -3,7 +3,7 @@ import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import { Outlet } from "react-router";
-import { SearchInput } from "../../components/Input";
+import SearchInput from "../../components/inputs/SearchInput";
 import SelectInput from "../../components/inputs/SelectInput";
 import Table from "../../components/Table";
 

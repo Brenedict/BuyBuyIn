@@ -46,15 +46,6 @@ export function LoginNotifPopup({ description, handleClose }: { description: str
                 <Text variant="black" size="mediumBig" weight="medium">
                     {description}
                 </Text>
-                <div>
-                    <Text variant="black" size="mediumBig" weight="medium">
-                        Use these instead (all have "password123")
-                    </Text>
-                    <Text>- cashier@gmail.com</Text>
-                    <Text>- branchmanager@gmail.com</Text>
-                    <Text>- hqadmin@gmail.com</Text>
-                    <Text>- superadmin@gmail.com</Text>
-                </div>
 
                 <Button onClick={handleClose} className="flex-1" size="normal">
                     Okay

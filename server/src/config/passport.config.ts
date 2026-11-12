@@ -13,6 +13,12 @@ const verifyLocal: VerifyFunction = async (email, password, done) => {
 
         if (!user) return done(null, false, { message: "Invalid email or password" });
 
+        // Checks if account is already verified via SMTP registration link
+        if (user.accountStatus === "UNVERIFIED") return done(null, false, { message: "The email is unverified" });
+
+        // Deactivated accounts (via the Manage action) are barred from logging back in
+        if (user.accountStatus === "DEACTIVATED") return done(null, false, { message: "The account is deactivated" });
+
         const passwordMatches = await HashUtil.comparePassword(password, user.password);
         if (!passwordMatches) return done(null, false, { message: "Invalid email or password" });
 

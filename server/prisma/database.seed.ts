@@ -1,4 +1,5 @@
 // BuyBuyin Shared Imports
+import { AccountStatusType } from "@buybuyin/shared/prisma/enums";
 import prisma from "../src/config/prisma.config";
 import HashUtil from "../src/utils/hash.util";
 
@@ -29,6 +30,7 @@ type UserSeed = {
     role: "SUPERADMIN" | "HQADMIN" | "BRANCHMANAGER" | "CASHIER";
     businessId: number | null;
     branchId: number | null;
+    accountStatus: AccountStatusType;
 };
 
 // Supplier Data
@@ -282,24 +284,28 @@ async function main() {
             role: "SUPERADMIN",
             businessId: null,
             branchId: null,
+            accountStatus: "ACTIVE",
         },
         {
             email: "hqadmin@gmail.com",
             role: "HQADMIN",
             businessId: business.id,
             branchId: null,
+            accountStatus: "ACTIVE",
         },
         {
             email: "branchmanager@gmail.com",
             role: "BRANCHMANAGER",
             businessId: business.id,
             branchId: branch.id,
+            accountStatus: "ACTIVE",
         },
         {
             email: "cashier@gmail.com",
             role: "CASHIER",
             businessId: business.id,
             branchId: branch.id,
+            accountStatus: "ACTIVE",
         },
     ];
 
@@ -312,6 +318,7 @@ async function main() {
             role: user.role,
             businessId: user.businessId,
             branchId: user.branchId,
+            accountStatus: user.accountStatus,
         })),
     });
 

@@ -151,11 +151,11 @@ function OfferCard({ offer }: { offer: BranchWideOfferEntry }) {
 }
 
 function OffersListSection({ list }: { list: BranchWideOfferListResponse }) {
-    const { values, submit } = useFormSearchParams({ search: "" });
+    const { values, handleChange } = useFormSearchParams({ search: "" });
 
     return (
         <div className="w-[25%] flex flex-col gap-4 h-full min-h-0">
-            <Form onSubmit={submit()}>
+            <Form onChange={handleChange}>
                 <SearchInput name="search" placeholder="Search Offers" defaultValue={values.search} />
             </Form>
             <section className="flex flex-col gap-6 pr-3 grow overflow-y-auto min-h-0 *:shrink-0">

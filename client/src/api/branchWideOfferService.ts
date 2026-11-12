@@ -34,12 +34,13 @@ const parseOfferId = (id?: string) => {
 
 const fetchBranchWideOffers = async (
     { request }: LoaderFunctionArgs,
-    redirectPath: string
+    redirectPath: string,
+    limit = "100"
 ): Promise<BranchWideOfferListResponse> => {
     try {
         const { query } = extractQueryToObject(request);
 
-        const queryString = buildQueryString({ ...query, limit: "100" });
+        const queryString = buildQueryString({ ...query, limit });
 
         // Main Fetch Request
         const res = await apiJson(`/branch-wide-offers${queryString ? `?${queryString}` : ""}`, { method: "GET" });
@@ -185,6 +186,40 @@ export const updateBranchWideOffer = (args: ActionFunctionArgs) =>
 // DELETE: Removes a branch-wide offer
 export const deleteBranchWideOffer = (args: ActionFunctionArgs) =>
     deleteOfferAction(args, ROUTES.BRANCH_MANAGER.branchOffers);
+
+export type BranchWideOffersPageData = {
+    list: BranchWideOfferListResponse;
+    options: BranchWideOfferOptionsResponse;
+};
+
+// GET: Fetches the list and options for the branch manager branch-wide offers page
+export const getBranchWideOffersPage = async (args: LoaderFunctionArgs): Promise<BranchWideOffersPageData> => {
+    const [list, options] = await Promise.all([
+        fetchBranchWideOffers(args, ROUTES.BRANCH_MANAGER.branchOffers, "8"),
+        fetchBranchWideOfferOptions(args, ROUTES.BRANCH_MANAGER.branchOffers),
+    ]);
+
+    return { list, options };
+};
+
+export type BranchWideOfferFormPageData = {
+    options: BranchWideOfferOptionsResponse;
+    offer: BranchWideOfferEntry | null;
+};
+
+// GET: Fetches the options for the branch manager add offer popup
+export const getBranchWideOfferFormOptions = (args: LoaderFunctionArgs): Promise<BranchWideOfferOptionsResponse> =>
+    fetchBranchWideOfferOptions(args, ROUTES.BRANCH_MANAGER.branchOffers);
+
+// GET: Fetches the options and offer for the branch manager edit offer popup
+export const getBranchWideOfferFormPage = async (args: LoaderFunctionArgs): Promise<BranchWideOfferFormPageData> => {
+    const [options, offer] = await Promise.all([
+        fetchBranchWideOfferOptions(args, ROUTES.BRANCH_MANAGER.branchOffers),
+        fetchBranchWideOffer(args, ROUTES.BRANCH_MANAGER.branchOffers),
+    ]);
+
+    return { options, offer };
+};
 
 // ----------------------------- HQ ADMIN EXPORTS ------------------------------------------
 

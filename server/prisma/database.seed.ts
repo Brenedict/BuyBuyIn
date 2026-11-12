@@ -228,7 +228,7 @@ async function main() {
 
     const branch = await prisma.branch.create({
         data: {
-            location: "Main Branch — Quezon City",
+            location: "Main Branch - Quezon City",
             accountLimit: 20,
             businessId: business.id,
         },

@@ -24,7 +24,7 @@ import BranchInventoryService from "../service/branchInventory.service";
 export default {
     getItems: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER),
+        requireAccessLevel(RoleType.CASHIER, "minimum"),
         validateSchema("query", BranchInventoryQuerySchema),
         async (req: Request, res: Response) => {
             const query = req.query as unknown as BranchInventoryQueryType;

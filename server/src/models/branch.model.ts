@@ -43,7 +43,7 @@ export default {
     async deleteBranchCascade(id: number): Promise<Branch> {
         return prisma.$transaction(async (tx) => {
             await tx.branchInventoryItem.deleteMany({ where: { branchId: id } });
-            await tx.branchWideOfferBranches.deleteMany({ where: { branchId: id } });
+            await tx.branchWideOfferBranch.deleteMany({ where: { branchId: id } });
             await tx.transaction.updateMany({ where: { branchId: id }, data: { branchId: null } });
             await tx.user.updateMany({ where: { branchId: id }, data: { branchId: null } });
 

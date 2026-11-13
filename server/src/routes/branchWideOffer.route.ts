@@ -15,6 +15,7 @@ router.get("/", controller.getOffers);
 router.post("/", controller.createOffer);
 
 // PATCH
+router.patch("/:offerId/status", controller.updateOfferStatus);
 router.patch("/:offerId", controller.updateOffer);
 
 // DELETE

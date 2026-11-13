@@ -7,8 +7,10 @@ import type { User } from "@buybuyin/shared/prisma/browser";
 import {
     BranchWideOfferFormSchema,
     BranchWideOfferQuerySchema,
+    BranchWideOfferStatusUpdateSchema,
     type BranchWideOfferFormType,
     type BranchWideOfferQueryType,
+    type BranchWideOfferStatusUpdateType,
 } from "@buybuyin/shared/schema/branchWideOffer";
 
 // Middlewares
@@ -57,7 +59,7 @@ export default {
 
     createOffer: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
+        requireAccessLevel(RoleType.HQADMIN, "minimum"),
         validateSchema("body", BranchWideOfferFormSchema),
         async (req: Request, res: Response) => {
             const input = req.body as unknown as BranchWideOfferFormType;
@@ -69,7 +71,7 @@ export default {
 
     updateOffer: [
         jwtAccessAuth,
-        requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
+        requireAccessLevel(RoleType.HQADMIN, "minimum"),
         validateSchema("body", BranchWideOfferFormSchema),
         async (req: Request, res: Response) => {
             const offerId = BranchWideOfferService.parseOfferId(req, res);
@@ -82,9 +84,24 @@ export default {
         },
     ],
 
-    deleteOffer: [
+    updateOfferStatus: [
         jwtAccessAuth,
         requireAccessLevel(RoleType.BRANCHMANAGER, "minimum"),
+        validateSchema("body", BranchWideOfferStatusUpdateSchema),
+        async (req: Request, res: Response) => {
+            const offerId = BranchWideOfferService.parseOfferId(req, res);
+            if (offerId === null) return;
+
+            const { offerStatus } = req.body as BranchWideOfferStatusUpdateType;
+            const offer = await BranchWideOfferService.updateOfferStatus(req.user as User, offerId, offerStatus);
+
+            return res.json({ offer, message: "Offer status updated" });
+        },
+    ],
+
+    deleteOffer: [
+        jwtAccessAuth,
+        requireAccessLevel(RoleType.HQADMIN, "minimum"),
         async (req: Request, res: Response) => {
             const offerId = BranchWideOfferService.parseOfferId(req, res);
             if (offerId === null) return;

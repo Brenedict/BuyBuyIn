@@ -123,6 +123,12 @@ export const BranchWideOfferFormSchema = zfd
         });
     });
 
+export const BranchWideOfferStatusUpdateSchema = z.object({
+    offerStatus: BranchWideOfferStatusSchema,
+});
+
+export type BranchWideOfferStatusUpdateType = z.infer<typeof BranchWideOfferStatusUpdateSchema>;
+
 // ----------------------------- TYPES -----------------------------------------------------
 
 export type BranchWideOfferQueryType = z.infer<typeof BranchWideOfferQuerySchema>;

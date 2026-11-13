@@ -33,18 +33,14 @@ import {
 } from "../api/branchInventoryService";
 
 import {
-    createBranchWideOffer,
     createHQBranchWideOffer,
-    deleteBranchWideOffer,
     deleteHQBranchWideOffer,
     getBranchWideOffer,
-    getBranchWideOfferFormOptions,
-    getBranchWideOfferFormPage,
     getBranchWideOffersPage,
     getHQBranchWideOffer,
     getHQBranchWideOfferEditPage,
     getHQBranchWideOffersPage,
-    updateBranchWideOffer,
+    updateBranchWideOfferStatus,
     updateHQBranchWideOffer,
 } from "../api/branchWideOfferService";
 
@@ -99,11 +95,7 @@ import {
     InventoryItemAddPopup,
 } from "../components/popups/branch-manager/InventoryPopups";
 import { CashierAddEditPopup, CashierDeletePopup } from "../components/popups/branch-manager/CashierAccountsPopups";
-import {
-    BranchOfferDeletePopup as BranchManagerBranchOfferDeletePopup,
-    BranchOfferFormPopup,
-    BranchOfferViewPopup,
-} from "../components/popups/branch-manager/BranchOffersPopups";
+import { BranchOfferViewPopup } from "../components/popups/branch-manager/BranchOffersPopups";
 
 // Cashier Pages
 import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
@@ -264,27 +256,13 @@ export const protectedRoutes: RouteObject[] = [
                                 loader: getBranchWideOffersPage,
                                 children: [
                                     {
-                                        path: "add",
-                                        element: <BranchOfferFormPopup mode="add" />,
-                                        loader: getBranchWideOfferFormOptions,
-                                        action: createBranchWideOffer,
-                                    },
-                                    {
-                                        path: ":id/edit",
-                                        element: <BranchOfferFormPopup mode="edit" />,
-                                        loader: getBranchWideOfferFormPage,
-                                        action: updateBranchWideOffer,
-                                    },
-                                    {
                                         path: ":id/view",
                                         element: <BranchOfferViewPopup />,
                                         loader: getBranchWideOffer,
                                     },
                                     {
-                                        path: ":id/delete",
-                                        element: <BranchManagerBranchOfferDeletePopup />,
-                                        loader: getBranchWideOffer,
-                                        action: deleteBranchWideOffer,
+                                        path: ":id/status",
+                                        action: updateBranchWideOfferStatus,
                                     },
                                     ...globalPopups,
                                 ],

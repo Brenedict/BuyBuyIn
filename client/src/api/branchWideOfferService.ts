@@ -161,6 +161,28 @@ const deleteOfferAction = async ({ params, request }: ActionFunctionArgs, redire
     }
 };
 
+const updateOfferStatusAction = async ({ params, request }: ActionFunctionArgs, redirectPath: string) => {
+    try {
+        const offerId = parseOfferId(params.id);
+
+        if (offerId === null) {
+            throw redirect(redirectPath);
+        }
+
+        const formData = await request.formData();
+        const res = await apiJson(`/branch-wide-offers/${offerId}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ offerStatus: formData.get("offerStatus") }),
+        });
+
+        await ensureOkOrRedirect(res, "Failed to update offer status", request, redirectPath);
+
+        return redirectWithQuery(request, redirectPath, "NOTIF=Offer status updated");
+    } catch (err) {
+        return handleErrRedirect(err, request, redirectPath);
+    }
+};
+
 // ----------------------------- BRANCH MANAGER EXPORTS ------------------------------------
 
 // GET: Fetches the branch-wide offers
@@ -171,21 +193,9 @@ export const getBranchWideOffers = (args: LoaderFunctionArgs): Promise<BranchWid
 export const getBranchWideOffer = (args: LoaderFunctionArgs): Promise<BranchWideOfferEntry | null> =>
     fetchBranchWideOffer(args, ROUTES.BRANCH_MANAGER.branchOffers);
 
-// GET: Fetches the options for the branch-wide offer forms
-export const getBranchWideOfferOptions = (args: LoaderFunctionArgs): Promise<BranchWideOfferOptionsResponse> =>
-    fetchBranchWideOfferOptions(args, ROUTES.BRANCH_MANAGER.branchOffers);
-
-// POST: Creates a branch-wide offer
-export const createBranchWideOffer = (args: ActionFunctionArgs) =>
-    createOfferAction(args, ROUTES.BRANCH_MANAGER.branchOffers);
-
-// PATCH: Updates an existing branch-wide offer
-export const updateBranchWideOffer = (args: ActionFunctionArgs) =>
-    updateOfferAction(args, ROUTES.BRANCH_MANAGER.branchOffers);
-
-// DELETE: Removes a branch-wide offer
-export const deleteBranchWideOffer = (args: ActionFunctionArgs) =>
-    deleteOfferAction(args, ROUTES.BRANCH_MANAGER.branchOffers);
+// PATCH: Updates the status of a branch-exclusive offer
+export const updateBranchWideOfferStatus = (args: ActionFunctionArgs) =>
+    updateOfferStatusAction(args, ROUTES.BRANCH_MANAGER.branchOffers);
 
 export type BranchWideOffersPageData = {
     list: BranchWideOfferListResponse;
@@ -200,25 +210,6 @@ export const getBranchWideOffersPage = async (args: LoaderFunctionArgs): Promise
     ]);
 
     return { list, options };
-};
-
-export type BranchWideOfferFormPageData = {
-    options: BranchWideOfferOptionsResponse;
-    offer: BranchWideOfferEntry | null;
-};
-
-// GET: Fetches the options for the branch manager add offer popup
-export const getBranchWideOfferFormOptions = (args: LoaderFunctionArgs): Promise<BranchWideOfferOptionsResponse> =>
-    fetchBranchWideOfferOptions(args, ROUTES.BRANCH_MANAGER.branchOffers);
-
-// GET: Fetches the options and offer for the branch manager edit offer popup
-export const getBranchWideOfferFormPage = async (args: LoaderFunctionArgs): Promise<BranchWideOfferFormPageData> => {
-    const [options, offer] = await Promise.all([
-        fetchBranchWideOfferOptions(args, ROUTES.BRANCH_MANAGER.branchOffers),
-        fetchBranchWideOffer(args, ROUTES.BRANCH_MANAGER.branchOffers),
-    ]);
-
-    return { options, offer };
 };
 
 // ----------------------------- HQ ADMIN EXPORTS ------------------------------------------

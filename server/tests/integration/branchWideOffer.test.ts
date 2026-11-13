@@ -438,6 +438,26 @@ describe("Branch wide offer routes", () => {
                 await prisma.branchWideOfferBranch.count({ where: { branchWideOfferId: offers.branchOneExclusive.id } })
             ).toBe(0);
         });
+
+        it("updates the status of any offer in the business", async () => {
+            setCurrentAuthUser(users.hqAdmin);
+
+            const res = await request(app)
+                .patch(`/branch-wide-offers/${offers.allBranch.id}/status`)
+                .send({ offerStatus: "DISABLED" })
+                .expect(200);
+
+            expect(res.body.message).toBe("Offer status updated");
+
+            const offer = res.body.offer as BranchWideOfferEntry;
+
+            expect(offer.id).toBe(offers.allBranch.id);
+            expect(offer.offerStatus).toBe("DISABLED");
+
+            const stored = await prisma.branchWideOffer.findUnique({ where: { id: offers.allBranch.id } });
+
+            expect(stored?.offerStatus).toBe("DISABLED");
+        });
     });
 
     // ----------------------------- BRANCH MANAGER SCOPE --------------------------------------
@@ -488,138 +508,110 @@ describe("Branch wide offer routes", () => {
             expect(body.products.map((product) => product.id)).not.toContain(foreignProduct.id);
         });
 
-        it("always creates a branch-exclusive offer for the requestor's branch", async () => {
+        it("forbids creating an offer and keeps the offer count unchanged", async () => {
+            const before = await prisma.branchWideOffer.count();
+
             setCurrentAuthUser(users.branchManager);
 
             const res = await request(app)
                 .post("/branch-wide-offers")
                 .send(
                     buildOverallPayload({
-                        isExclusive: false,
-                        branchIds: [secondBranch.id, catalogue.branch.id],
+                        isExclusive: true,
+                        branchIds: [catalogue.branch.id],
                     })
                 )
-                .expect(201);
+                .expect(403);
 
-            const offer = res.body.offer as BranchWideOfferEntry;
-
-            expect(offer.isExclusive).toBe(true);
-            expect(offer.branches.map((branch) => branch.branchId)).toEqual([catalogue.branch.id]);
-            expect(await prisma.branchWideOfferBranch.count({ where: { branchWideOfferId: offer.id } })).toBe(1);
+            expect(res.body).toEqual({ message: "Forbidden: Insufficient access level" });
+            expect(await prisma.branchWideOffer.count()).toBe(before);
         });
 
-        it("rejects a product from another business", async () => {
-            setCurrentAuthUser(users.branchManager);
-
-            const res = await request(app)
-                .post("/branch-wide-offers")
-                .send(buildIndividualPayload([offerProduct(foreignProduct.id)]))
-                .expect(400);
-
-            expect(res.body).toEqual({ error: "Product not found in your business" });
-        });
-
-        it("updates their own exclusive offer and keeps the branch association", async () => {
-            const beta = findProduct("Beta Mug");
+        it("forbids updating their own exclusive offer and leaves it unchanged", async () => {
+            const alpha = findProduct("Alpha Shirt");
 
             setCurrentAuthUser(users.branchManager);
 
             const res = await request(app)
                 .patch(`/branch-wide-offers/${offers.branchOneExclusive.id}`)
                 .send(
-                    buildIndividualPayload([offerProduct(beta.id)], {
+                    buildIndividualPayload([offerProduct(alpha.id)], {
                         offerName: "Updated Branch One Exclusive",
                         description: "Updated description",
-                        startDate: "2026-11-02",
-                        endDate: "2026-11-29",
-                        isExclusive: true,
-                        branchIds: [secondBranch.id],
                     })
                 )
-                .expect(200);
+                .expect(403);
 
-            const offer = res.body.offer as BranchWideOfferEntry;
+            expect(res.body).toEqual({ message: "Forbidden: Insufficient access level" });
 
-            expect(offer.offerName).toBe("Updated Branch One Exclusive");
-            expect(offer.description).toBe("Updated description");
-            expect(offer.startDate).toBe("2026-11-02");
-            expect(offer.endDate).toBe("2026-11-29");
-            expect(offer.products.map((product) => product.productId)).toEqual([beta.id]);
-            expect(offer.branches.map((branch) => branch.branchId)).toEqual([catalogue.branch.id]);
-            expect(
-                await prisma.branchWideOfferBranch.count({ where: { branchWideOfferId: offers.branchOneExclusive.id } })
-            ).toBe(1);
+            const stored = await prisma.branchWideOffer.findUnique({ where: { id: offers.branchOneExclusive.id } });
+
+            expect(stored?.offerName).toBe("Branch One Exclusive");
+            expect(stored?.description).toBe("Manager special");
         });
 
-        it("rejects updating an all-branch offer", async () => {
+        it("forbids deleting their own exclusive offer and keeps it", async () => {
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app).delete(`/branch-wide-offers/${offers.branchOneExclusive.id}`).expect(403);
+
+            expect(res.body).toEqual({ message: "Forbidden: Insufficient access level" });
+            expect(
+                await prisma.branchWideOffer.findUnique({ where: { id: offers.branchOneExclusive.id } })
+            ).not.toBeNull();
+        });
+
+        it("updates the status of their own exclusive offer", async () => {
             setCurrentAuthUser(users.branchManager);
 
             const res = await request(app)
-                .patch(`/branch-wide-offers/${offers.allBranch.id}`)
-                .send(buildOverallPayload({ isExclusive: true, branchIds: [catalogue.branch.id] }))
+                .patch(`/branch-wide-offers/${offers.branchOneExclusive.id}/status`)
+                .send({ offerStatus: "DISABLED" })
+                .expect(200);
+
+            expect(res.body.message).toBe("Offer status updated");
+
+            const offer = res.body.offer as BranchWideOfferEntry;
+
+            expect(offer.id).toBe(offers.branchOneExclusive.id);
+            expect(offer.offerStatus).toBe("DISABLED");
+
+            const stored = await prisma.branchWideOffer.findUnique({ where: { id: offers.branchOneExclusive.id } });
+
+            expect(stored?.offerStatus).toBe("DISABLED");
+        });
+
+        it("forbids updating the status of an all-branch offer", async () => {
+            setCurrentAuthUser(users.branchManager);
+
+            const res = await request(app)
+                .patch(`/branch-wide-offers/${offers.allBranch.id}/status`)
+                .send({ offerStatus: "DISABLED" })
                 .expect(403);
 
             expect(res.body).toEqual({ error: "You can only update offers exclusive to your branch" });
         });
 
-        it("hides another branch's exclusive offer when updating", async () => {
+        it("hides another branch's exclusive offer when updating its status", async () => {
             setCurrentAuthUser(users.branchManager);
 
             const res = await request(app)
-                .patch(`/branch-wide-offers/${offers.branchTwoExclusive.id}`)
-                .send(buildOverallPayload({ isExclusive: true, branchIds: [secondBranch.id] }))
+                .patch(`/branch-wide-offers/${offers.branchTwoExclusive.id}/status`)
+                .send({ offerStatus: "DISABLED" })
                 .expect(404);
 
             expect(res.body).toEqual({ error: "Offer not found" });
         });
 
-        it("hard-deletes their own exclusive offer when it is the only branch", async () => {
+        it("rejects an invalid offer status", async () => {
             setCurrentAuthUser(users.branchManager);
 
-            const res = await request(app).delete(`/branch-wide-offers/${offers.branchOneExclusive.id}`).expect(200);
+            const res = await request(app)
+                .patch(`/branch-wide-offers/${offers.branchOneExclusive.id}/status`)
+                .send({ offerStatus: "ARCHIVED" })
+                .expect(400);
 
-            expect(res.body).toEqual({ message: "Offer deleted", deleted: true, archived: false });
-            expect(await prisma.branchWideOffer.findUnique({ where: { id: offers.branchOneExclusive.id } })).toBeNull();
-        });
-
-        it("detaches their branch from an exclusive offer shared with another branch", async () => {
-            const shared = await prisma.branchWideOffer.create({
-                data: buildMockOffer({
-                    offerName: "Shared Exclusive",
-                    description: "Shared exclusive",
-                    businessId: catalogue.business.id,
-                    isExclusive: true,
-                    branchWideOfferBranches: {
-                        create: [{ branchId: catalogue.branch.id }, { branchId: secondBranch.id }],
-                    },
-                }),
-            });
-
-            setCurrentAuthUser(users.branchManager);
-
-            const res = await request(app).delete(`/branch-wide-offers/${shared.id}`).expect(200);
-
-            expect(res.body).toEqual({
-                message: "Offer removed from this branch",
-                deleted: false,
-                archived: false,
-            });
-            expect(await prisma.branchWideOffer.findUnique({ where: { id: shared.id } })).not.toBeNull();
-
-            const remainingBranches = await prisma.branchWideOfferBranch.findMany({
-                where: { branchWideOfferId: shared.id },
-                select: { branchId: true },
-            });
-
-            expect(remainingBranches).toEqual([{ branchId: secondBranch.id }]);
-        });
-
-        it("rejects deleting an all-branch offer from a branch", async () => {
-            setCurrentAuthUser(users.branchManager);
-
-            const res = await request(app).delete(`/branch-wide-offers/${offers.allBranch.id}`).expect(403);
-
-            expect(res.body).toEqual({ error: "All-branch offers cannot be modified from a branch" });
+            expect(res.body).toHaveProperty("error");
         });
     });
 
@@ -680,6 +672,22 @@ describe("Branch wide offer routes", () => {
             setCurrentAuthUser(null);
 
             await request(app).get("/branch-wide-offers").expect(401);
+        });
+
+        it("forbids cashiers and anonymous requests from updating an offer status", async () => {
+            setCurrentAuthUser(users.cashier);
+
+            await request(app)
+                .patch(`/branch-wide-offers/${offers.branchOneExclusive.id}/status`)
+                .send({ offerStatus: "DISABLED" })
+                .expect(403);
+
+            setCurrentAuthUser(null);
+
+            await request(app)
+                .patch(`/branch-wide-offers/${offers.branchOneExclusive.id}/status`)
+                .send({ offerStatus: "DISABLED" })
+                .expect(401);
         });
 
         it("rejects an HQ admin without a business", async () => {

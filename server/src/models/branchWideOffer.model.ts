@@ -7,6 +7,7 @@ import type {
     BranchWideOfferUncheckedUpdateInput,
     BranchWideOfferWhereInput,
 } from "@buybuyin/shared/prisma/models";
+import type { BranchWideOfferStatusType } from "@buybuyin/shared/schema/branchWideOffer";
 
 // Prisma.config
 import prisma from "../config/prisma.config";
@@ -113,36 +114,12 @@ export default {
         });
     },
 
-    async updateOfferWithProducts(
-        id: number,
-        data: BranchWideOfferUncheckedUpdateInput,
-        products: Omit<BranchWideOfferProductCreateManyInput, "branchWideOfferId">[]
-    ) {
-        return prisma.$transaction(async (tx) => {
-            await tx.branchWideOffer.update({ where: { id }, data });
-
-            await tx.branchWideOfferProduct.deleteMany({ where: { branchWideOfferId: id } });
-
-            if (products.length > 0) {
-                await tx.branchWideOfferProduct.createMany({
-                    data: products.map((product) => ({ ...product, branchWideOfferId: id })),
-                });
-            }
-
-            return tx.branchWideOffer.findUniqueOrThrow({ where: { id }, select: OFFER_SELECT });
-        });
-    },
-
     async countTransactionItems(offerId: number) {
         return prisma.transactionItem.count({ where: { branchWideOfferId: offerId } });
     },
 
-    async countOfferBranches(offerId: number) {
-        return prisma.branchWideOfferBranch.count({ where: { branchWideOfferId: offerId } });
-    },
-
-    async detachBranch(offerId: number, branchId: number) {
-        return prisma.branchWideOfferBranch.deleteMany({ where: { branchWideOfferId: offerId, branchId } });
+    async updateOfferStatus(id: number, offerStatus: BranchWideOfferStatusType) {
+        return prisma.branchWideOffer.update({ where: { id }, data: { offerStatus }, select: OFFER_SELECT });
     },
 
     async detachAllBranches(offerId: number) {

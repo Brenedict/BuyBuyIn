@@ -2,6 +2,9 @@
 import { Outlet } from "react-router";
 import { useState, useEffect } from "react";
 
+// BuyBuyIn Shared Imports
+import { PaymentMethodType } from "@buybuyin/shared/prisma/enums";
+
 // Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
@@ -10,13 +13,36 @@ import { Calculator } from "../../components/Calculator";
 import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
+import { type PaymentOutletContext } from "../../components/popups/cashier/ModesOfPayment";
+
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
+
+// Routes & Utils
+import { ROUTES } from "../../routes/Routes";
 
 // Material UI Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AccessTime, Add, ArrowLeftRounded, CalendarMonth, Remove } from "@mui/icons-material";
 
+// Payment popup (child route) that each mode of payment opens
+const PAYMENT_POPUP_ROUTES: Record<PaymentMethodType, string> = {
+    [PaymentMethodType.CASH]: ROUTES.CASHIER.pointOfSalePayCash,
+    [PaymentMethodType.ECASH]: ROUTES.CASHIER.pointOfSalePayECash,
+    [PaymentMethodType.CARD]: ROUTES.CASHIER.pointOfSalePayCard,
+};
+
+const PAYMENT_METHODS: Array<{ type: PaymentMethodType; label: string }> = [
+    { type: PaymentMethodType.CASH, label: "Cash" },
+    { type: PaymentMethodType.ECASH, label: "E-Cash" },
+    { type: PaymentMethodType.CARD, label: "Card" },
+];
+
 export function Cashier_PointOfSale() {
+    const navigate = useNavigatePage();
+
     const [isCalculatorToggled, setIsCalculatorToggled] = useState<boolean>(true);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>(PaymentMethodType.CASH);
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
     useEffect(() => {
@@ -47,6 +73,12 @@ export function Cashier_PointOfSale() {
         [2, "Kalamansi", 5.0],
         [6, "Kalamatis", 15.0],
     ];
+
+    // Handed to the payment popups through <Outlet context>
+    // TODO: Use the real transaction total once the cart is connected
+    const paymentContext: PaymentOutletContext = { amountDue: amount, transactionNumber: transNum };
+
+    const handlePay = () => navigate(PAYMENT_POPUP_ROUTES[paymentMethod], true);
 
     const buttonSize = "min-w-[125px] flex-1";
     const spacing = "p-2 gap-3 m-2";
@@ -160,15 +192,19 @@ export function Cashier_PointOfSale() {
                                         </div>
 
                                         <div className="flex flex-row gap-3 items-center  w-full">
-                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
-                                                Cash
-                                            </Button>
-                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
-                                                E-Cash
-                                            </Button>
-                                            <Button className={`${buttonSize}`} variant="transparent" size="medium">
-                                                Card
-                                            </Button>
+                                            {PAYMENT_METHODS.map(({ type, label }) => (
+                                                <Button
+                                                    key={type}
+                                                    type="button"
+                                                    className={`${buttonSize}`}
+                                                    variant={paymentMethod === type ? "main" : "transparent"}
+                                                    size="medium"
+                                                    aria-pressed={paymentMethod === type}
+                                                    onClick={() => setPaymentMethod(type)}
+                                                >
+                                                    {label}
+                                                </Button>
+                                            ))}
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center justify-center w-[45%] gap-2 ">
@@ -194,7 +230,13 @@ export function Cashier_PointOfSale() {
                                 </Card.Body>
                                 <Card.Body></Card.Body>
                                 <div className="w-full mb-3">
-                                    <Button className="w-full!" variant="main" size="medium">
+                                    <Button
+                                        type="button"
+                                        className="w-full!"
+                                        variant="main"
+                                        size="medium"
+                                        onClick={handlePay}
+                                    >
                                         Pay
                                     </Button>
                                 </div>
@@ -220,7 +262,7 @@ export function Cashier_PointOfSale() {
 
             {
                 // Displays all global and page popups
-                <Outlet />
+                <Outlet context={paymentContext} />
             }
         </div>
     );

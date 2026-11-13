@@ -258,6 +258,19 @@ describe("Branch inventory routes", () => {
             expect(body.pagination.total).toBe(1);
         });
 
+        it("filters by numeric product ID and generated SKU", async () => {
+            setCurrentAuthUser(users.branchManager);
+            const alphaId = findProduct("Alpha Shirt").id;
+
+            const byId = await request(app).get(`/branch-inventory?search=${alphaId}`).expect(200);
+            const bySku = await request(app)
+                .get(`/branch-inventory?search=SKU-${String(alphaId).padStart(4, "0")}`)
+                .expect(200);
+
+            expect((byId.body as BranchInventoryListResponse).items.map((item) => item.product.id)).toEqual([alphaId]);
+            expect((bySku.body as BranchInventoryListResponse).items.map((item) => item.product.id)).toEqual([alphaId]);
+        });
+
         it("filters by category and by supplier", async () => {
             setCurrentAuthUser(users.branchManager);
 
@@ -551,14 +564,17 @@ describe("Branch inventory routes", () => {
     // ----------------------------- ROLE GATES ------------------------------------------------
 
     describe("Role gates", () => {
-        it("forbids HQ admins, cashiers and anonymous requests from reading inventory", async () => {
+        it("allows cashiers to read branch inventory but forbids HQ admins and anonymous requests", async () => {
             setCurrentAuthUser(users.hqAdmin);
 
             await request(app).get("/branch-inventory").expect(403);
 
             setCurrentAuthUser(users.cashier);
 
-            await request(app).get("/branch-inventory").expect(403);
+            const cashierResponse = await request(app).get("/branch-inventory").expect(200);
+            expect(cashierResponse.body.items).toEqual(
+                expect.arrayContaining([expect.objectContaining({ product: expect.objectContaining({ id: expect.any(Number) }) })])
+            );
 
             setCurrentAuthUser(null);
 

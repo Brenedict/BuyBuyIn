@@ -88,6 +88,20 @@ import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
 import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
 import Cashier_Transactions from "../pages/cashier/Cashier.Transactions";
 import Cashier_XRead from "../pages/cashier/Cashier.XRead";
+import {
+    QtyPopUp,
+    DiscountPopUp,
+    CashPaymentPopup,
+    ECashPaymentPopup,
+    CardPaymentPopup,
+} from "../components/popups/cashier/POSPopUps";
+import {
+    SearchItemPopup,
+    CheckPricePopup,
+    ResumeTransactionsPopup,
+    ReprintTransactionsPopup,
+    VoidCurrentSalePopup,
+} from "../components/popups/cashier/TransactionPopups";
 
 // HQ Admin Pages and Popups
 import HQ_BranchWideOffers from "../pages/hq-admin/HQ.BranchWideOffers";
@@ -271,7 +285,20 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.CASHIER.pointOfSale,
                                 element: <Cashier_PointOfSale />,
-                                children: [...globalPopups],
+                                children: [
+                                    ...globalPopups,
+                                    { path: "quantity", element: <QtyPopUp /> },
+                                    { path: "item", element: <SearchItemPopup /> },
+                                    { path: "search", element: <SearchItemPopup /> },
+                                    { path: "discount", element: <DiscountPopUp /> },
+                                    { path: "checkprice", element: <CheckPricePopup /> },
+                                    { path: "suspended", element: <ResumeTransactionsPopup /> },
+                                    { path: "reprint", element: <ReprintTransactionsPopup /> },
+                                    { path: "void", element: <VoidCurrentSalePopup /> },
+                                    { path: "payment/cash", element: <CashPaymentPopup /> },
+                                    { path: "payment/ecash", element: <ECashPaymentPopup /> },
+                                    { path: "payment/card", element: <CardPaymentPopup /> },
+                                ],
                             },
                             {
                                 path: ROUTES.CASHIER.xRead,

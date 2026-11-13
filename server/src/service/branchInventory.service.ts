@@ -141,23 +141,28 @@ export default {
     ): Promise<BranchInventoryListResponse> {
         const branchId = resolveBranchId(requestor);
         const { search, categoryId, supplierId, status, page, limit } = query;
+        const productIdMatch = search?.match(/^(?:SKU-)?(\d+)$/i);
+        const productId = productIdMatch ? Number(productIdMatch[1]) : null;
 
         const productWhere: ProductWhereInput = {
-            ...(search && {
-                OR: [
-                    { productName: { contains: search, mode: "insensitive" } },
-                    {
-                        productCategories: {
-                            some: { category: { categoryName: { contains: search, mode: "insensitive" } } },
-                        },
-                    },
-                    {
-                        supplier: {
-                            supplierName: { contains: search, mode: "insensitive" },
-                        },
-                    },
-                ],
-            }),
+            ...(search &&
+                (productId && Number.isSafeInteger(productId)
+                    ? { id: productId }
+                    : {
+                          OR: [
+                              { productName: { contains: search, mode: "insensitive" } },
+                              {
+                                  productCategories: {
+                                      some: { category: { categoryName: { contains: search, mode: "insensitive" } } },
+                                  },
+                              },
+                              {
+                                  supplier: {
+                                      supplierName: { contains: search, mode: "insensitive" },
+                                  },
+                              },
+                          ],
+                      })),
             ...(supplierId && { supplierId }),
             ...(categoryId && { productCategories: { some: { categoryId } } }),
         };

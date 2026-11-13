@@ -1,6 +1,9 @@
 // General Imports
 import { Navigate, type RouteObject } from "react-router";
 
+// BuyBuyIn Shared Imports
+import { RoleType } from "@buybuyin/shared/prisma/enums";
+
 // Static Layout Page
 import StaticLayout from "../pages/shared/StaticLayout";
 
@@ -8,9 +11,9 @@ import StaticLayout from "../pages/shared/StaticLayout";
 import { AccessValidator } from "../pages/shared/AccessValidator";
 import { RoleBoundary } from "../pages/shared/RoleBoundary";
 import Forbidden from "../pages/shared/Forbidden";
-import { primaryAuthLoader, homeRedirectLoader } from "../api/authService";
 
 // API Services
+import { primaryAuthLoader, homeRedirectLoader } from "../api/authService";
 import {
     createProduct,
     deleteProduct,
@@ -28,6 +31,40 @@ import {
     getBranchInventoryOptions,
     restockBranchInventoryItem,
 } from "../api/branchInventoryService";
+import {
+    createBranchEntity,
+    createBranchManagerAccount,
+    createBusinessEntity,
+    createCashierAccount,
+    createUserHqAdmin,
+    deleteBranch,
+    deleteBusiness,
+    deleteCashier,
+    deleteManager,
+    deleteSubscriber,
+    getBranch,
+    getBranches,
+    getBusiness,
+    getBusinesses,
+    getCashier,
+    getCashierForm,
+    getCashiers,
+    getManageUsersPage,
+    getManager,
+    getManagerDeleteContext,
+    getManagerForm,
+    getSubscriber,
+    getSubscriberDeleteContext,
+    getSubscriberForm,
+    getSubscribers,
+    manageAccountStatus,
+    resendVerification,
+    updateBranch,
+    updateBusiness,
+    updateCashier,
+    updateManager,
+    updateSubscriber,
+} from "../api/registrationService";
 
 // Global Pages and Popups
 import { globalPopups } from "./GlobalPopupRoutes";
@@ -44,6 +81,7 @@ import {
     InventoryItemDeletePopup,
     InventoryItemAddPopup,
 } from "../components/popups/branch-manager/InventoryPopups";
+import { CashierAddEditPopup, CashierDeletePopup } from "../components/popups/branch-manager/CashierAccountsPopups";
 
 // Cashier Pages
 import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
@@ -72,9 +110,12 @@ import {
     BranchFormPopup,
     DeleteBranchPopup,
     BranchManagerFormPopup,
-} from "../components/popups/hq-admin/ManageUserPopups";
+    ManagerDeletePopup,
+} from "../components/popups/hq-admin/BranchManagerAccountsPopups";
 import { ProductFormPopup, ProductDeletePopup } from "../components/popups/hq-admin/CataloguePopups";
 import { SupplierFormPopup, SupplierDeletePopup } from "../components/popups/hq-admin/SupplierPopups";
+import { ManageAccountPopup } from "../components/popups/shared/ManageAccountPopup";
+import { ResendVerificationPopup } from "../components/popups/shared/ResendVerificationPopup";
 
 // Super Admin Pages and Popups
 import SuperAdmin_Plans from "../pages/super-admin/SuperAdmin.Plans";
@@ -83,11 +124,15 @@ import SuperAdmin_Subscriptions from "../pages/super-admin/SuperAdmin.Subscripti
 import SuperAdmin_SubscriberAccounts from "../pages/super-admin/SuperAdmin.SubscriberAccounts";
 
 import { DeleteSubscriptionPopup, SubscriptionFormPopup } from "../components/popups/super-admin/SubscriptionsPopups";
+import { BusinessFormPopup, BusinessDeletePopup } from "../components/popups/super-admin/BusinessesPopups";
+import { PlansAddEditPopup, PlansDeletePopup } from "../components/popups/super-admin/PlansPopups";
+import {
+    SubscriberAddEditPopup,
+    SubscriberDeletePopup,
+} from "../components/popups/super-admin/SubscriberAccountsPopups";
 
 // Predefined Routes
 import { ROLE_HOME, ROUTES } from "./Routes";
-import { RoleType } from "@buybuyin/shared/prisma/enums";
-import { PlansAddEditPopup, PlansDeletePopup } from "../components/popups/super-admin/PlansPopups";
 
 export const protectedRoutes: RouteObject[] = [
     {
@@ -113,7 +158,7 @@ export const protectedRoutes: RouteObject[] = [
                         children: [...globalPopups],
                     },
 
-                    // Branch Manager Routes: /branch-manager
+                    // ============= Branch Manager Routes: /branch-manager =============
                     {
                         element: <RoleBoundary />,
                         handle: { accessLevel: RoleType.BRANCHMANAGER },
@@ -157,7 +202,48 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.BRANCH_MANAGER.manageUsers,
                                 element: <BranchManager_ManageUsers />,
-                                children: [...globalPopups],
+                                loader: getCashiers,
+                                children: [
+                                    {
+                                        path: "cashier/add",
+                                        element: <CashierAddEditPopup mode="add" />,
+                                        loader: getBranches,
+                                        action: createCashierAccount,
+                                    },
+                                    {
+                                        path: "cashier/:id/edit",
+                                        element: <CashierAddEditPopup mode="edit" />,
+                                        loader: getCashierForm,
+                                        action: updateCashier,
+                                    },
+                                    {
+                                        path: "cashier/:id/manage",
+                                        element: (
+                                            <ManageAccountPopup
+                                                accountLabel="Cashier"
+                                                returnTo={ROUTES.BRANCH_MANAGER.manageUsers}
+                                                deleteTo={(id) => ROUTES.BRANCH_MANAGER.manageUsersDeleteCashier(id)}
+                                            />
+                                        ),
+                                        loader: getCashier,
+                                        action: manageAccountStatus,
+                                    },
+                                    {
+                                        path: "cashier/:id/delete",
+                                        element: <CashierDeletePopup />,
+                                        loader: getCashier,
+                                        action: deleteCashier,
+                                    },
+                                    {
+                                        path: "cashier/:id/resend",
+                                        element: (
+                                            <ResendVerificationPopup returnTo={ROUTES.BRANCH_MANAGER.manageUsers} />
+                                        ),
+                                        loader: getCashier,
+                                        action: resendVerification,
+                                    },
+                                    ...globalPopups,
+                                ],
                             },
                             {
                                 path: ROUTES.BRANCH_MANAGER.branchOffers,
@@ -172,7 +258,7 @@ export const protectedRoutes: RouteObject[] = [
                         ],
                     },
 
-                    // Cashier Routes: /cashier
+                    // ============= Cashier Routes: /cashier =============
                     {
                         element: <RoleBoundary />,
                         handle: { accessLevel: RoleType.CASHIER },
@@ -205,11 +291,15 @@ export const protectedRoutes: RouteObject[] = [
                                     { path: "payment/card", element: <CardPaymentPopup /> },
                                 ],
                             },
-                            { path: ROUTES.CASHIER.xRead, element: <Cashier_XRead />, children: [...globalPopups] },
+                            {
+                                path: ROUTES.CASHIER.xRead,
+                                element: <Cashier_XRead />,
+                                children: [...globalPopups],
+                            },
                         ],
                     },
 
-                    // HQ Admin Routes: /hq-admin
+                    // ============= HQ Admin Routes: /hq-admin =============
                     {
                         element: <RoleBoundary />,
                         handle: { accessLevel: RoleType.HQADMIN },
@@ -218,7 +308,11 @@ export const protectedRoutes: RouteObject[] = [
                                 path: ROUTES.HQ_ADMIN.root,
                                 element: <Navigate to={ROLE_HOME[RoleType.HQADMIN]} replace />,
                             },
-                            { path: ROUTES.HQ_ADMIN.dashboard, element: <HQ_Dashboard />, children: [...globalPopups] },
+                            {
+                                path: ROUTES.HQ_ADMIN.dashboard,
+                                element: <HQ_Dashboard />,
+                                children: [...globalPopups],
+                            },
                             {
                                 path: ROUTES.HQ_ADMIN.catalogue,
                                 element: <HQ_Catalogue />,
@@ -265,14 +359,62 @@ export const protectedRoutes: RouteObject[] = [
                             {
                                 path: ROUTES.HQ_ADMIN.manageUsers,
                                 element: <HQ_ManageUsers />,
+                                loader: getManageUsersPage,
                                 children: [
                                     ...globalPopups,
-                                    { path: "branch/add", element: <BranchFormPopup mode="add" /> },
-                                    { path: "branch/edit/:id", element: <BranchFormPopup mode="edit" /> },
-                                    { path: "branch/delete/:id", element: <DeleteBranchPopup /> },
-                                    { path: "manager/add", element: <BranchManagerFormPopup mode="add" /> },
-                                    { path: "manager/edit/:id", element: <BranchManagerFormPopup mode="edit" /> },
-                                    { path: "manager/view/:id", element: <BranchManagerFormPopup mode="view" /> },
+                                    {
+                                        path: "branch/add",
+                                        element: <BranchFormPopup mode="add" />,
+                                        action: createBranchEntity,
+                                    },
+                                    {
+                                        path: "branch/edit/:id",
+                                        element: <BranchFormPopup mode="edit" />,
+                                        loader: getBranch,
+                                        action: updateBranch,
+                                    },
+                                    {
+                                        path: "branch/delete/:id",
+                                        element: <DeleteBranchPopup />,
+                                        loader: getBranch,
+                                        action: deleteBranch,
+                                    },
+                                    {
+                                        path: "manager/add",
+                                        element: <BranchManagerFormPopup mode="add" />,
+                                        loader: getBranches,
+                                        action: createBranchManagerAccount,
+                                    },
+                                    {
+                                        path: "manager/:id/edit",
+                                        element: <BranchManagerFormPopup mode="edit" />,
+                                        loader: getManagerForm,
+                                        action: updateManager,
+                                    },
+                                    {
+                                        path: "manager/:id/manage",
+                                        element: (
+                                            <ManageAccountPopup
+                                                accountLabel="Branch Manager"
+                                                returnTo={ROUTES.HQ_ADMIN.manageUsers}
+                                                deleteTo={(id) => ROUTES.HQ_ADMIN.manageUsersManagerDelete(id)}
+                                            />
+                                        ),
+                                        loader: getManager,
+                                        action: manageAccountStatus,
+                                    },
+                                    {
+                                        path: "manager/:id/delete",
+                                        element: <ManagerDeletePopup />,
+                                        loader: getManagerDeleteContext,
+                                        action: deleteManager,
+                                    },
+                                    {
+                                        path: "manager/:id/resend",
+                                        element: <ResendVerificationPopup returnTo={ROUTES.HQ_ADMIN.manageUsers} />,
+                                        loader: getManager,
+                                        action: resendVerification,
+                                    },
                                 ],
                             },
                             {
@@ -305,7 +447,7 @@ export const protectedRoutes: RouteObject[] = [
                         ],
                     },
 
-                    // Super Admin Routes: /super-admin
+                    // ============= Super Admin Routes: /super-admin =============
                     {
                         element: <RoleBoundary />,
                         handle: { accessLevel: RoleType.SUPERADMIN },
@@ -318,31 +460,110 @@ export const protectedRoutes: RouteObject[] = [
                                 path: ROUTES.SUPER_ADMIN.plans,
                                 element: <SuperAdmin_Plans />,
                                 children: [
-                                    { path: "add", element: <PlansAddEditPopup mode="add" /> },
-                                    { path: ":id/edit", element: <PlansAddEditPopup mode="edit" /> },
-                                    { path: ":id/delete", element: <PlansDeletePopup /> },
+                                    {
+                                        path: "add",
+                                        element: <PlansAddEditPopup mode="add" />,
+                                    },
+                                    {
+                                        path: ":id/edit",
+                                        element: <PlansAddEditPopup mode="edit" />,
+                                    },
+                                    {
+                                        path: ":id/delete",
+                                        element: <PlansDeletePopup />,
+                                    },
                                     ...globalPopups,
                                 ],
                             },
                             {
                                 path: ROUTES.SUPER_ADMIN.businesses,
                                 element: <SuperAdmin_Businesses />,
-                                children: [...globalPopups],
+                                loader: getBusinesses,
+                                children: [
+                                    {
+                                        path: "add",
+                                        element: <BusinessFormPopup mode="add" />,
+                                        action: createBusinessEntity,
+                                    },
+                                    {
+                                        path: ":id/edit",
+                                        element: <BusinessFormPopup mode="edit" />,
+                                        loader: getBusiness,
+                                        action: updateBusiness,
+                                    },
+                                    {
+                                        path: ":id/delete",
+                                        element: <BusinessDeletePopup />,
+                                        loader: getBusiness,
+                                        action: deleteBusiness,
+                                    },
+                                    ...globalPopups,
+                                ],
                             },
                             {
                                 path: ROUTES.SUPER_ADMIN.subscriptions,
                                 element: <SuperAdmin_Subscriptions />,
                                 children: [
-                                    { path: "add", element: <SubscriptionFormPopup mode="add" /> },
-                                    { path: ":id/edit", element: <SubscriptionFormPopup mode="edit" /> },
-                                    { path: ":id/delete", element: <DeleteSubscriptionPopup /> },
+                                    {
+                                        path: "add",
+                                        element: <SubscriptionFormPopup mode="add" />,
+                                    },
+                                    {
+                                        path: ":id/edit",
+                                        element: <SubscriptionFormPopup mode="edit" />,
+                                    },
+                                    {
+                                        path: ":id/delete",
+                                        element: <DeleteSubscriptionPopup />,
+                                    },
                                     ...globalPopups,
                                 ],
                             },
                             {
                                 path: ROUTES.SUPER_ADMIN.subscriberAccounts,
                                 element: <SuperAdmin_SubscriberAccounts />,
-                                children: [...globalPopups],
+                                loader: getSubscribers,
+                                children: [
+                                    {
+                                        path: "add",
+                                        element: <SubscriberAddEditPopup mode="add" />,
+                                        loader: getBusinesses,
+                                        action: createUserHqAdmin,
+                                    },
+                                    {
+                                        path: ":id/edit",
+                                        element: <SubscriberAddEditPopup mode="edit" />,
+                                        loader: getSubscriberForm,
+                                        action: updateSubscriber,
+                                    },
+                                    {
+                                        path: ":id/manage",
+                                        element: (
+                                            <ManageAccountPopup
+                                                accountLabel="Subscriber"
+                                                returnTo={ROUTES.SUPER_ADMIN.subscriberAccounts}
+                                                deleteTo={(id) => ROUTES.SUPER_ADMIN.subscriberAccountsDelete(id)}
+                                            />
+                                        ),
+                                        loader: getSubscriber,
+                                        action: manageAccountStatus,
+                                    },
+                                    {
+                                        path: ":id/delete",
+                                        element: <SubscriberDeletePopup />,
+                                        loader: getSubscriberDeleteContext,
+                                        action: deleteSubscriber,
+                                    },
+                                    {
+                                        path: ":id/resend",
+                                        element: (
+                                            <ResendVerificationPopup returnTo={ROUTES.SUPER_ADMIN.subscriberAccounts} />
+                                        ),
+                                        loader: getSubscriber,
+                                        action: resendVerification,
+                                    },
+                                    ...globalPopups,
+                                ],
                             },
                         ],
                     },

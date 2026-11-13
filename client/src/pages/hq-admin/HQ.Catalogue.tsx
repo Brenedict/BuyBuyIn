@@ -116,8 +116,8 @@ export function HQ_Catalogue() {
                 <Form onChange={handleChange}>
                     <TableFilterBar
                         isComplex={false}
-                        searchValue={values.search ?? ""}
-                        onSearchChange={() => {}}
+                        searchName="search"
+                        searchDefaultValue={values.search}
                         searchPlaceholder="Search products, category & suppliers..."
                         actions={
                             <Button type="button" leftIcon={AddIcon} onClick={handleAddProduct}>

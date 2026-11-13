@@ -19,7 +19,10 @@ import SearchInput from "./inputs/SearchInput";
  */
 
 interface TableFilterBarProps {
+    showSearch?: boolean;
+    searchName?: string;
     searchValue?: string;
+    searchDefaultValue?: string;
     onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     searchPlaceholder?: string;
     searchClassName?: string;
@@ -31,7 +34,10 @@ interface TableFilterBarProps {
 }
 
 export function TableFilterBar({
-    searchValue = "",
+    showSearch,
+    searchName = "table-search",
+    searchValue,
+    searchDefaultValue,
     onSearchChange,
     searchPlaceholder = "Search...",
     searchClassName = "",
@@ -41,6 +47,20 @@ export function TableFilterBar({
     isComplex = false,
     children,
 }: TableFilterBarProps) {
+    const shouldShowSearch =
+        showSearch ?? (onSearchChange !== undefined || searchValue !== undefined || searchDefaultValue !== undefined);
+
+    const searchInput = shouldShowSearch ? (
+        <SearchInput
+            id={searchName}
+            name={searchName}
+            {...(searchValue !== undefined ? { value: searchValue } : { defaultValue: searchDefaultValue })}
+            onChange={onSearchChange}
+            placeholder={searchPlaceholder}
+            className={`w-full! ${searchClassName}`}
+        />
+    ) : null;
+
     // COMPLEX MODE: Container-Based Responsive Layout or Custom Children
     if (isComplex) {
         return (
@@ -51,25 +71,16 @@ export function TableFilterBar({
                     <div className="flex flex-col @min-[47rem]:flex-row items-stretch gap-6 w-full min-w-0">
                         {/* LEFT SECTION: Search & Date Range */}
                         <div className="flex flex-col justify-between gap-5 flex-1 min-w-0 @min-[47rem]:min-w-[320px]">
-                            {onSearchChange && (
+                            {searchInput && (
                                 <div className="flex flex-col gap-1.5 min-w-0">
                                     <label className="text-crimson font-bold text-sm">Search</label>
-
-                                    <SearchInput
-                                        id="table-search"
-                                        name="table-search"
-                                        value={searchValue}
-                                        onChange={onSearchChange}
-                                        placeholder={searchPlaceholder}
-                                        className={`w-full! ${searchClassName}`}
-                                    />
+                                    {searchInput}
                                 </div>
                             )}
 
                             {dateRange && (
                                 <div className="flex flex-col gap-1.5 min-w-0">
                                     <label className="text-crimson font-bold text-sm">Date Range</label>
-
                                     <div className="flex flex-wrap items-center gap-3">{dateRange}</div>
                                 </div>
                             )}
@@ -77,7 +88,6 @@ export function TableFilterBar({
 
                         {/* CENTER DIVIDER LINE */}
                         <div className="hidden @min-[47rem]:block w-px bg-slate-dark/30 my-1 self-stretch" />
-
                         <div className="@min-[47rem]:hidden h-px w-full bg-slate-dark/30" />
 
                         {/* RIGHT SECTION: Responsive Filters Grid & Action Buttons */}
@@ -99,18 +109,7 @@ export function TableFilterBar({
     // SINGLE ROW MODE
     return (
         <div className="flex flex-wrap items-center justify-between gap-6 w-full mb-4">
-            {onSearchChange && (
-                <div className="flex-1 min-w-[300px]">
-                    <SearchInput
-                        id="table-search"
-                        name="table-search"
-                        value={searchValue}
-                        onChange={onSearchChange}
-                        placeholder={searchPlaceholder}
-                        className={`w-full! ${searchClassName}`}
-                    />
-                </div>
-            )}
+            {searchInput && <div className="flex-1 min-w-[300px]">{searchInput}</div>}
 
             {(filters || actions) && (
                 <div className="flex flex-wrap items-center gap-4">

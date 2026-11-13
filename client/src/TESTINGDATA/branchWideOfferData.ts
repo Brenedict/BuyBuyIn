@@ -406,5 +406,54 @@ export const SAMPLE_OFFERS = [
         overallDiscountValue: 50,
         branchWideOfferBranches: [],
         branchWideOfferProduct: [],
+
+    
+    },
+
+        // Example 13: All Branches, Overall Percentage (matches the View Offer design in issue #86)
+    {
+        id: 13,
+        offerName: "Independence Day Sale",
+        description:
+            "Celebrate Philippine Independence Day with a store-wide clearance markdown. Apply a flat 12% discount on all graphic t-shirts, locally inspired polo shirts, accessories, and seasonal activewear ensembles.",
+        startDate: "2026-06-12",
+        endDate: "2026-06-15",
+        offerStatus: "enabled",
+        offerType: "OVERALL",
+        discountType: "PERCENTAGE",
+        overallDiscountValue: 12,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
+    },
+    // Example 14: Selected Branches (2 of 5), Overall Percentage
+    {
+        id: 14,
+        offerName: "Black Friday",
+        description: "Biggest markdowns of the season in selected branches",
+        startDate: "2026-11-24",
+        endDate: "2026-11-30",
+        offerStatus: "draft",
+        offerType: "OVERALL",
+        discountType: "PERCENTAGE",
+        overallDiscountValue: 30,
+        branchWideOfferBranches: [
+            { branchWideOfferId: 14, branchId: 1 },
+            { branchWideOfferId: 14, branchId: 2 },
+        ],
+        branchWideOfferProduct: [],
+    },
+    // Example 15: All Branches, Overall Fixed Value
+    {
+        id: 15,
+        offerName: "Christmas Sale",
+        description: "Holiday markdown across every branch",
+        startDate: "2026-12-25",
+        endDate: "2026-12-30",
+        offerStatus: "draft",
+        offerType: "OVERALL",
+        discountType: "FIXED_VALUE",
+        overallDiscountValue: 20,
+        branchWideOfferBranches: [],
+        branchWideOfferProduct: [],
     },
 ];

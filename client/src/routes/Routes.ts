@@ -38,6 +38,7 @@ export const ROUTES = {
             manageUsersDeleteCashier: (id?: string) => `${base}/manage-users/cashier/${id}/delete`,
             branchOffers: `${base}/branch-offers`,
             transactions: `${base}/transactions`,
+            branchOffersView: (id?: string) => `${base}/branch-offers/${id}/view`,
         };
     })(),
 

@@ -79,7 +79,11 @@ export function ViewOfferPopup() {
     );
 
     return (
-        <PopUp title="View Offer" handleCloseProp={handleClose}>
+        <PopUp
+            title="View Offer"
+            subtitle={canChangeStatus ? "Only the status can be edited" : "Read only"}
+            handleCloseProp={handleClose}
+        >
             <section className="flex flex-col gap-4">
                 <GeneralInput
                     id="offerName"

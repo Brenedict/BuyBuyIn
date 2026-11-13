@@ -24,16 +24,27 @@ import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import type { BranchWideOffersPageData } from "../../api/branchWideOfferService";
 
 // BuyBuyIn Shared Imports
-import type { BranchWideOfferEntry } from "@buybuyin/shared/schema/branchWideOffer";
+import type { BranchWideOfferEntry, BranchWideOfferStatusType } from "@buybuyin/shared/schema/branchWideOffer";
 
 // Routes & Utils
 import { ROUTES } from "../../routes/Routes";
-import { formatFullDate } from "../../utils/dateUtils";
+import { formatMonthDay } from "../../utils/dateUtils";
+
+type StatusVariant = "enabled" | "disabled" | "draft";
+
+const STATUS_CLASSES: Record<StatusVariant, string> = {
+    enabled: "bg-crimson text-cream font-bold",
+    disabled: "bg-slate-light text-cream font-bold",
+    draft: "bg-slate-medium/90 text-cream font-bold",
+};
+
+const getStatusVariant = (status: BranchWideOfferStatusType): StatusVariant => status.toLowerCase() as StatusVariant;
 
 function OfferCard({ offer }: { offer: BranchWideOfferEntry }) {
     const navigate = useNavigatePage();
 
     const viewPath = ROUTES.BRANCH_MANAGER.branchOffersView(String(offer.id));
+    const status = getStatusVariant(offer.offerStatus);
 
     // Opens the View Offer popup for the chosen offer
     const handleView = (event: MouseEvent<HTMLButtonElement>) => {
@@ -44,14 +55,26 @@ function OfferCard({ offer }: { offer: BranchWideOfferEntry }) {
     return (
         <Card dropShadow={true} className="bg-off-white rounded-2xl h-full">
             <Card.Body className="flex flex-col justify-between h-full min-h-40 gap-4">
-                <Text weight="extraBold" size="big" variant="crimson" className="leading-tight">
-                    {offer.offerName}
-                </Text>
+                <div className="flex justify-between items-start gap-2">
+                    <Text weight="extraBold" size="big" variant="crimson" className="leading-tight">
+                        {offer.offerName}
+                    </Text>
+
+                    <Text size="description" weight="medium" variant="crimson" className="shrink-0">
+                        {offer.isExclusive ? "Exclusive" : "All Branches"}
+                    </Text>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                    <Text weight="bold" size="description" variant="maroon">
+                        {formatMonthDay(new Date(offer.startDate))} - {formatMonthDay(new Date(offer.endDate))}
+                    </Text>
+                </div>
 
                 <div className="flex flex-row justify-between items-center mt-auto pt-2">
-                    <Text weight="bold" size="description" variant="maroon">
-                        {formatFullDate(new Date(offer.startDate))} - {formatFullDate(new Date(offer.endDate))}
-                    </Text>
+                    <div className={`w-fit px-3 py-1 rounded-xl text-normal ${STATUS_CLASSES[status]}`}>
+                        {offer.offerStatus.toLowerCase()}
+                    </div>
 
                     <Button
                         type="button"
@@ -124,7 +147,7 @@ export function BranchManager_BranchWideOffers() {
     const { list, options } = useLoaderData<BranchWideOffersPageData>();
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const { values, submit } = useFormSearchParams({ search: "", page: "" });
+    const { values, handleChange } = useFormSearchParams({ search: "", page: "" });
 
     const branch = options.branches[0];
     const branchDetails = branch ? `Branch #${branch.branchId}` : "No branch assigned";
@@ -179,7 +202,7 @@ export function BranchManager_BranchWideOffers() {
                     </Text>
 
                     <div className="flex flex-row gap-6 items-center">
-                        <Form onSubmit={submit()}>
+                        <Form onChange={handleChange}>
                             <SearchInput
                                 name="search"
                                 placeholder="Search Offers"

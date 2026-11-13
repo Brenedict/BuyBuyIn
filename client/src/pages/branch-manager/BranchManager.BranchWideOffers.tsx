@@ -8,6 +8,12 @@ import { Button } from "../../components/Button";
 import SearchInput from "../../components/inputs/SearchInput";
 import Icon from "../../components/Icon";
 
+// Hooks
+import useNavigatePage from "../../hooks/useNavigatePage";
+
+// Routes & Utils
+import { ROUTES } from "../../routes/Routes";
+
 // MUI Icons
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
@@ -24,16 +30,22 @@ const STAT_CARDS = [
     { label: "Total Branches", value: "5", icon: StorefrontOutlinedIcon, iconColor: "crimson" },
 ];
 
+// The id matches an offer in TESTINGDATA/branchWideOfferData.ts, used by the View popup
 const OFFERS = [
-    { title: "Summer Sale 2026", date: "May 1 - June 30" },
-    { title: "Independence Day", date: "June 12 - June 15" },
-    { title: "Black Friday", date: "Nov 24 - Nov 30" },
-    { title: "Christmas Sale", date: "Dec 25 - Dec 30" },
+    { id: 1, title: "Summer Sale 2026", date: "May 1 - June 30" },
+    { id: 13, title: "Independence Day Sale", date: "June 12 - June 15" },
+    { id: 14, title: "Black Friday", date: "Nov 24 - Nov 30" },
+    { id: 15, title: "Christmas Sale", date: "Dec 25 - Dec 30" },
 ];
 
 export function BranchManager_BranchWideOffers() {
     const [searchQuery, setSearchQuery] = useState("");
 
+    // Used for redirecting
+    const navigate = useNavigatePage();
+
+    // Opens the View Offer popup for the chosen offer
+    const handleView = (id: number) => () => navigate(ROUTES.BRANCH_MANAGER.branchOffersView(String(id)), true);
     return (
         <Card>
             <Card.Body className="py-6 px-10 flex flex-col gap-8 overflow-scroll">
@@ -105,8 +117,8 @@ export function BranchManager_BranchWideOffers() {
                     <Card.Body className="px-8 pb-4">
                         <div className="border border-gray-400 rounded-3xl p-6">
                             <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
-                                {OFFERS.map((offer, idx) => (
-                                    <Card key={idx} dropShadow={true} className="bg-[#FEFCED] rounded-2xl h-full">
+                                {OFFERS.map((offer) => (
+                                    <Card key={offer.id} dropShadow={true} className="bg-[#FEFCED] rounded-2xl h-full">
                                         <Card.Body className="flex flex-col justify-between h-full min-h-[160px] gap-4">
                                             <Text
                                                 weight="extraBold"
@@ -131,6 +143,7 @@ export function BranchManager_BranchWideOffers() {
                                                         variant="main"
                                                         leftIcon={VisibilityOutlinedIcon}
                                                         className="rounded-full px-6"
+                                                        onClick={handleView(offer.id)}
                                                     >
                                                         View
                                                     </Button>

@@ -57,6 +57,7 @@ function SideBar({ isRetail, onToggleRetail }: { isRetail: boolean; onToggleReta
 }
 export function Cashier_PointOfSale() {
     //TODO: Temporary search workaround to be changed once pop ups are approved
+    const navigate = useNavigatePage();
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
     const [isRetail, setIsRetail] = useState(true);
     const [cart, setCart] = useState<PosCartLine[]>([]);
@@ -156,14 +157,14 @@ export function Cashier_PointOfSale() {
         });
         setLastTransactionId(null);
     };
-    const handleCheckout = async () => {
-        if (!cart.length || isSubmitting) return;
+    const completePayment = async (method: PaymentMethod): Promise<number> => {
+        if (!cart.length || isSubmitting) throw new Error("There are no items to pay for.");
 
         setIsSubmitting(true);
         setCheckoutError("");
         try {
             const result = await createPosTransaction({
-                paymentMethod,
+                paymentMethod: method,
                 discount: appliedDiscount,
                 items: cart.map((line) => ({
                     productId: line.product.id,
@@ -175,11 +176,18 @@ export function Cashier_PointOfSale() {
             setLastTransactionId(result.transaction.id);
             setCart([]);
             setSeniorDiscountCustomer(null);
+            return result.transaction.id;
         } catch (error) {
             setCheckoutError(error instanceof Error ? error.message : "Unable to complete this transaction.");
+            throw error;
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const openPaymentPopup = () => {
+        if (!cart.length || isSubmitting) return;
+        navigate(`payment/${paymentMethod.toLowerCase()}`);
     };
 
     const buttonSize = "min-w-[125px] flex-1";
@@ -432,7 +440,7 @@ export function Cashier_PointOfSale() {
                                             className="w-full!"
                                             variant="main"
                                             size="medium"
-                                            onClick={handleCheckout}
+                                            onClick={openPaymentPopup}
                                             disabled={!cart.length || isSubmitting}
                                         >
                                             {isSubmitting ? "Processing..." : "Pay"}
@@ -447,7 +455,13 @@ export function Cashier_PointOfSale() {
 
                 {
                     // Displays all global and page popups
-                    <Outlet />
+                    <Outlet
+                        context={{
+                            amountDue: total,
+                            transactionNumber: lastTransactionId ?? 0,
+                            completePayment,
+                        }}
+                    />
                 }
             </div>
         </PosProvider>

@@ -6,6 +6,9 @@ export const ROUTES = {
     FORBIDDEN: "/forbidden",
 
     // ALL CASHIER ROUTES: Define all actions here for popup URL's
+
+    //from romir 11-13-26: Popup actions in the POS page has been limited to the POS page only and it would not need global calls.
+    //                     I could still add them for consistency but it would not change how it would work currently
     CASHIER: (() => {
         const base = "/cashier";
         return {

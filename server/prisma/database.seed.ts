@@ -206,7 +206,7 @@ async function main() {
     await prisma.transaction.deleteMany();
     await prisma.branchInventoryItem.deleteMany();
     await prisma.branchWideOfferProduct.deleteMany();
-    await prisma.branchWideOfferBranches.deleteMany();
+    await prisma.branchWideOfferBranch.deleteMany();
     await prisma.branchWideOffer.deleteMany();
     await prisma.productCategory.deleteMany();
     await prisma.product.deleteMany();
@@ -228,7 +228,7 @@ async function main() {
 
     const branch = await prisma.branch.create({
         data: {
-            location: "Main Branch — Quezon City",
+            location: "Main Branch - Quezon City",
             accountLimit: 20,
             businessId: business.id,
         },

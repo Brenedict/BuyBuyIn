@@ -10,6 +10,23 @@ export type PosTransactionResponse = {
     message: string;
 };
 
+export type PosTransactionListItem = {
+    id: number;
+    totalPrice: number;
+    dateofTransaction: string;
+    paymentMethod: "CASH" | "ECASH" | "CARD";
+    status: "VOID" | "COMPLETE" | "REFUNDED";
+    discount: number;
+    user: { firstName: string; lastName: string };
+    transactionItems: Array<{
+        id: number;
+        quantity: number;
+        currentPrice: number;
+        productId: number | null;
+        branchWideOfferId: number | null;
+    }>;
+};
+
 const readError = async (response: Response, fallback: string): Promise<Error> => {
     try {
         const body = await response.json();
@@ -44,4 +61,14 @@ export const createPosTransaction = async (
     }
 
     return response.json();
+};
+
+export const getPosTransactions = async (): Promise<PosTransactionListItem[]> => {
+    const response = await apiJson("/transaction?page=1&limit=100", { method: "GET" });
+    if (!response.ok) {
+        throw await readError(response, "Unable to load transaction history.");
+    }
+
+    const result: { transactions: PosTransactionListItem[] } = await response.json();
+    return result.transactions;
 };

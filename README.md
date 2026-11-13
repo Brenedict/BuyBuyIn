@@ -255,6 +255,7 @@ By default, the backend listens on `http://localhost:3000` (configurable via `PO
 - `npm run mig:prisma`: Runs Prisma migrations (`prisma migrate dev`).
 - `npm run res:prisma`: Resets the database (`prisma migrate reset`).
 - `npm run seed:prisma`: Seeds the database.
+- `npm run seed:pos -w server/`: Adds or refreshes four POS test products in the seeded main branch without deleting other data.
 - `npm run gensql:prisma`: Generates typed SQL (`prisma generate --sql`).
 - `npm run create:prisma`: Creates a migration without applying it.
 - `npm run studio:prisma`: Opens Prisma Studio.

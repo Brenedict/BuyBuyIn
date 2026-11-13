@@ -6,19 +6,84 @@ import { useState, useEffect } from "react";
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
-import SearchInput from "../../components/inputs/SearchInput";
 import Table from "../../components/Table";
 import Icon from "../../components/Icon";
 import useNavigatePage from "../../hooks/useNavigatePage";
 import type { BranchInventoryProduct } from "@buybuyin/shared/schema/branchInventory";
 import { createPosTransaction, searchPosInventory } from "../../api/posService";
-import { PosProvider, type PosCartLine, type SeniorDiscountCustomer } from "../../context/PosContext";
+import {
+    PosProvider,
+    type PosCartLine,
+    type SeniorDiscountCustomer,
+    type SuspendedPosSale,
+} from "../../context/PosContext";
 
 // Material UI Icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { AccessTime, Add, CalendarMonth, Remove } from "@mui/icons-material";
 
 type PaymentMethod = "CASH" | "ECASH" | "CARD";
+
+const SUSPENDED_SALES_STORAGE_KEY = "buybuyin.cashier.suspended-sales";
+
+const isStoredProduct = (value: unknown): value is BranchInventoryProduct => {
+    if (!value || typeof value !== "object") return false;
+    const product = value as Partial<BranchInventoryProduct>;
+    return (
+        Number.isInteger(product.id) &&
+        typeof product.productName === "string" &&
+        typeof product.basePrice === "number" &&
+        Number.isFinite(product.basePrice) &&
+        typeof product.shelfPrice === "number" &&
+        Number.isFinite(product.shelfPrice) &&
+        typeof product.sku === "string"
+    );
+};
+
+const readSuspendedSales = (): SuspendedPosSale[] => {
+    try {
+        const stored = window.localStorage.getItem(SUSPENDED_SALES_STORAGE_KEY);
+        if (!stored) return [];
+
+        const parsed: unknown = JSON.parse(stored);
+        if (!Array.isArray(parsed)) return [];
+
+        return parsed.filter((sale): sale is SuspendedPosSale => {
+            if (!sale || typeof sale !== "object") return false;
+            const candidate = sale as Partial<SuspendedPosSale>;
+            const customer = candidate.seniorDiscountCustomer;
+            const validCustomer =
+                customer === null ||
+                (typeof customer === "object" && typeof customer.id === "string" && typeof customer.name === "string");
+
+            return (
+                typeof candidate.id === "string" &&
+                typeof candidate.createdAt === "string" &&
+                typeof candidate.amountDue === "number" &&
+                Number.isFinite(candidate.amountDue) &&
+                candidate.amountDue >= 0 &&
+                validCustomer &&
+                Array.isArray(candidate.cart) &&
+                candidate.cart.length > 0 &&
+                candidate.cart.every(
+                    (line) =>
+                        line && Number.isInteger(line.quantity) && line.quantity > 0 && isStoredProduct(line.product)
+                )
+            );
+        });
+    } catch {
+        return [];
+    }
+};
+
+const saveSuspendedSales = (sales: SuspendedPosSale[]): boolean => {
+    try {
+        window.localStorage.setItem(SUSPENDED_SALES_STORAGE_KEY, JSON.stringify(sales));
+        return true;
+    } catch {
+        return false;
+    }
+};
 
 const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(amount);
@@ -28,11 +93,12 @@ function SideBar({ isRetail, onToggleRetail }: { isRetail: boolean; onToggleReta
 
     return (
         <nav className="flex flex-col justify-center p-[1.25rem] gap-[1.5rem] rounded-[10px] bg-cream/40 card-glass-effect card-drop-shadow">
+            {/*TODO: Remove this button I think because its redundant*/}
             <Button variant="grey" size="medium" onClick={() => navigate("quantity")}>
                 QTY
             </Button>
-            <Button variant="grey" size="medium" onClick={() => navigate("item")}>
-                ADD ITEM
+            <Button variant="grey" size="medium" onClick={() => navigate("search")}>
+                SEARCH ITEM
             </Button>
             <Button variant="grey" size="medium" onClick={() => navigate("discount")}>
                 DISC
@@ -43,8 +109,12 @@ function SideBar({ isRetail, onToggleRetail }: { isRetail: boolean; onToggleReta
             <Button variant={isRetail ? "main" : "secondary"} size="medium" onClick={onToggleRetail}>
                 {isRetail ? "Retail" : "Wholesale"}
             </Button>
-            <Button variant="grey" size="medium">
+            <Button variant="grey" size="medium" onClick={() => navigate("reprint")}>
                 REPRINT
+            </Button>
+            {/*TODO: Remove this button I think because its redundant*/}
+            <Button variant="grey" size="medium" onClick={() => navigate("suspended")}>
+                SUSPENDED
             </Button>
             <Button variant="grey" size="medium">
                 CASHOUT
@@ -61,10 +131,8 @@ export function Cashier_PointOfSale() {
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
     const [isRetail, setIsRetail] = useState(true);
     const [cart, setCart] = useState<PosCartLine[]>([]);
-    const [productSearch, setProductSearch] = useState("");
-    const [searchResults, setSearchResults] = useState<BranchInventoryProduct[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [searchError, setSearchError] = useState("");
+    const [quantityProduct, setQuantityProduct] = useState<BranchInventoryProduct | null>(null);
+    const [suspendedSales, setSuspendedSales] = useState<SuspendedPosSale[]>(readSuspendedSales);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [checkoutError, setCheckoutError] = useState("");
@@ -78,30 +146,6 @@ export function Cashier_PointOfSale() {
         // Clean up the timer when the component unmounts
         return () => clearInterval(timer);
     }, []);
-
-    useEffect(() => {
-        const search = productSearch.trim();
-        if (!search) return;
-
-        let active = true;
-        const timer = window.setTimeout(async () => {
-            setIsSearching(true);
-            setSearchError("");
-            try {
-                const products = await searchPosInventory(search);
-                if (active) setSearchResults(products);
-            } catch (error) {
-                if (active) setSearchError(error instanceof Error ? error.message : "Unable to search inventory.");
-            } finally {
-                if (active) setIsSearching(false);
-            }
-        }, 250);
-
-        return () => {
-            active = false;
-            window.clearTimeout(timer);
-        };
-    }, [productSearch]);
 
     const date = new Date();
     const current = date.toDateString();
@@ -127,10 +171,6 @@ export function Cashier_PointOfSale() {
 
             return [...currentCart, { product, quantity: 1 }];
         });
-        setProductSearch("");
-        setSearchResults([]);
-        setSearchError("");
-        setIsSearching(false);
         setLastTransactionId(null);
         setCheckoutError("");
     };
@@ -157,6 +197,74 @@ export function Cashier_PointOfSale() {
         });
         setLastTransactionId(null);
     };
+
+    const openQuantityPopup = (product: BranchInventoryProduct) => {
+        setQuantityProduct(product);
+        navigate("quantity");
+    };
+
+    const suspendCurrentSale = () => {
+        if (!cart.length) return;
+        const sale: SuspendedPosSale = {
+            id: `S-${Date.now()}`,
+            cart: cart.map((line) => ({ ...line })),
+            seniorDiscountCustomer,
+            createdAt: new Date().toISOString(),
+            amountDue: total,
+        };
+        const nextSuspendedSales = [sale, ...suspendedSales];
+        setSuspendedSales(nextSuspendedSales);
+        if (!saveSuspendedSales(nextSuspendedSales)) {
+            setCheckoutError("Suspended sale is temporary because browser storage is unavailable.");
+        }
+        setCart([]);
+        setSeniorDiscountCustomer(null);
+    };
+
+    const resumeSuspendedSale = (saleId: string) => {
+        const sale = suspendedSales.find((candidate) => candidate.id === saleId);
+        if (!sale) return;
+
+        let nextSuspendedSales: SuspendedPosSale[];
+        if (cart.length) {
+            const currentSale: SuspendedPosSale = {
+                id: `S-${Date.now()}`,
+                cart: cart.map((line) => ({ ...line })),
+                seniorDiscountCustomer,
+                createdAt: new Date().toISOString(),
+                amountDue: total,
+            };
+            nextSuspendedSales = [currentSale, ...suspendedSales.filter((candidate) => candidate.id !== saleId)];
+        } else {
+            nextSuspendedSales = suspendedSales.filter((candidate) => candidate.id !== saleId);
+        }
+
+        setSuspendedSales(nextSuspendedSales);
+        if (!saveSuspendedSales(nextSuspendedSales)) {
+            setCheckoutError("Suspended sales could not be updated in browser storage.");
+        }
+
+        setCart(sale.cart);
+        setSeniorDiscountCustomer(sale.seniorDiscountCustomer);
+        setLastTransactionId(null);
+    };
+
+    const voidCurrentSale = () => {
+        setCart([]);
+        setSeniorDiscountCustomer(null);
+        setCheckoutError("");
+        setLastTransactionId(null);
+    };
+
+    const voidProduct = (productId: number) => {
+        setCart((currentCart) => currentCart.filter((line) => line.product.id !== productId));
+        if (cart.length === 1 && cart[0]?.product.id === productId) {
+            setSeniorDiscountCustomer(null);
+        }
+        setCheckoutError("");
+        setLastTransactionId(null);
+    };
+
     const completePayment = async (method: PaymentMethod): Promise<number> => {
         if (!cart.length || isSubmitting) throw new Error("There are no items to pay for.");
 
@@ -197,67 +305,26 @@ export function Cashier_PointOfSale() {
         <PosProvider
             value={{
                 cart,
+                quantityProduct,
                 subtotal,
                 discount: appliedDiscount,
                 seniorDiscountCustomer,
                 searchInventory: searchPosInventory,
+                addProduct,
+                setQuantityProduct,
                 setProductQuantity,
                 setSeniorDiscountCustomer,
+                suspendedSales,
+                suspendCurrentSale,
+                resumeSuspendedSale,
+                voidProduct,
+                voidCurrentSale,
             }}
         >
             <div className="flex flex-col h-full">
                 <section className={`flex flex-col h-full ${spacing}`}>
                     {/* top section */}
-                    <div className="flex flex-row gap-2 w-full">
-                        <form
-                            className="relative flex-1"
-                            onSubmit={(event) => {
-                                event.preventDefault();
-                                if (searchResults[0]) addProduct(searchResults[0]);
-                            }}
-                        >
-                            <SearchInput
-                                className="w-full"
-                                value={productSearch}
-                                onChange={(event) => {
-                                    const value = event.target.value;
-                                    setProductSearch(value);
-                                    if (!value.trim()) {
-                                        setSearchResults([]);
-                                        setSearchError("");
-                                        setIsSearching(false);
-                                    }
-                                }}
-                                placeholder="Search in-stock products"
-                                aria-label="Search in-stock products"
-                                autoComplete="off"
-                            />
-                            {productSearch.trim() && (
-                                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-auto rounded-md border border-brown bg-off-white shadow-lg">
-                                    {isSearching ? (
-                                        <p className="p-3 text-brown">Searching inventory...</p>
-                                    ) : searchError ? (
-                                        <p className="p-3 text-crimson">{searchError}</p>
-                                    ) : searchResults.length ? (
-                                        searchResults.map((product) => (
-                                            <button
-                                                key={product.id}
-                                                type="button"
-                                                className="flex w-full items-center justify-between border-b border-brown/20 px-3 py-2 text-left text-brown hover:bg-cream"
-                                                onClick={() => addProduct(product)}
-                                            >
-                                                <span>{product.productName}</span>
-                                                <span>
-                                                    {formatCurrency(isRetail ? product.shelfPrice : product.basePrice)}
-                                                </span>
-                                            </button>
-                                        ))
-                                    ) : (
-                                        <p className="p-3 text-brown">No in-stock products found.</p>
-                                    )}
-                                </div>
-                            )}
-                        </form>
+                    <div className="flex flex-row justify-end w-full">
                         <div className="flex flex-row">
                             <Icon icon={AccountCircleIcon} size="large" variant="cream" />
                             <Text size="bigger" variant="cream" weight="extraBold">
@@ -334,6 +401,7 @@ export function Cashier_PointOfSale() {
                                             <Table.Row key={line.product.id}>
                                                 <Table.Data>
                                                     <div className="flex flex-row justify-center gap-[10%] items-center">
+                                                        {/*TODO: Change the quantity buttons and add yung basta pwede maedit yung number yeah*/}
                                                         <Button
                                                             size="smallest"
                                                             leftIcon={Add}
@@ -350,10 +418,24 @@ export function Cashier_PointOfSale() {
                                                         />
                                                     </div>
                                                 </Table.Data>
-                                                <Table.Data text={line.product.productName} />
-                                                <Table.Data text={formatCurrency(getPrice(line.product))} />
+                                                <Table.Data>
+                                                    <button
+                                                        type="button"
+                                                        className="text-brown underline-offset-2 hover:underline"
+                                                        onClick={() => openQuantityPopup(line.product)}
+                                                    >
+                                                        {line.product.productName}
+                                                    </button>
+                                                </Table.Data>
+                                                <Table.Data
+                                                    text={formatCurrency(getPrice(line.product))}
+                                                    className="cursor-pointer"
+                                                    onClick={() => openQuantityPopup(line.product)}
+                                                />
                                                 <Table.Data
                                                     text={formatCurrency(line.quantity * getPrice(line.product))}
+                                                    className="cursor-pointer"
+                                                    onClick={() => openQuantityPopup(line.product)}
                                                 />
                                             </Table.Row>
                                         ))}
@@ -417,13 +499,30 @@ export function Cashier_PointOfSale() {
                                                 <div className="bg-brown h-[2px] w-full flex-1"></div>
                                             </div>
                                             <div className="flex flex-row gap-3 items-center w-full">
-                                                <Button className={`${buttonSize}`} variant="transparent" size="medium">
+                                                <Button
+                                                    className={`${buttonSize}`}
+                                                    variant="transparent"
+                                                    size="medium"
+                                                    onClick={suspendCurrentSale}
+                                                    disabled={!cart.length}
+                                                >
                                                     Suspend
                                                 </Button>
-                                                <Button className={`${buttonSize}`} variant="transparent" size="medium">
+                                                <Button
+                                                    className={`${buttonSize}`}
+                                                    variant="transparent"
+                                                    size="medium"
+                                                    onClick={() => navigate("suspended")}
+                                                >
                                                     Resume
                                                 </Button>
-                                                <Button className={`${buttonSize}`} variant="transparent" size="medium">
+                                                <Button
+                                                    className={`${buttonSize}`}
+                                                    variant="transparent"
+                                                    size="medium"
+                                                    onClick={() => navigate("void")}
+                                                    disabled={!cart.length}
+                                                >
                                                     Void
                                                 </Button>
                                             </div>

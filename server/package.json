@@ -11,6 +11,7 @@
         "mig:prisma": "prisma migrate dev",
         "res:prisma": "prisma migrate reset",
         "gen:prisma": "prisma generate",
+        "seed:pos": "tsx --env-file=.env ./prisma/pos-test.seed.ts",
         "seed:prisma": "tsx ./prisma/database.seed.ts",
         "gensql:prisma": "prisma generate --sql",
         "create:prisma": "prisma migrate dev --create-only",

@@ -22,13 +22,17 @@ import { MOCK_E_CASH_REFERENCE_NO, MOCK_CARD } from "../../../TESTINGDATA/paymen
 
 export function QtyPopUp() {
     const navigate = useNavigatePage();
-    const { cart, searchInventory, setProductQuantity } = usePos();
+    const { cart, quantityProduct, searchInventory, setProductQuantity } = usePos();
     const [search, setSearch] = useState("");
     const [results, setResults] = useState<BranchInventoryProduct[]>([]);
-    const [selectedProduct, setSelectedProduct] = useState<BranchInventoryProduct | null>(cart[0]?.product ?? null);
+    const [selectedProduct, setSelectedProduct] = useState<BranchInventoryProduct | null>(
+        quantityProduct ?? cart[0]?.product ?? null
+    );
     const [isSearching, setIsSearching] = useState(false);
     const [searchError, setSearchError] = useState("");
-    const [quantity, setQuantity] = useState(String(cart[0]?.quantity ?? 1));
+    const [quantity, setQuantity] = useState(
+        String(cart.find((line) => line.product.id === (quantityProduct ?? cart[0]?.product)?.id)?.quantity ?? 1)
+    );
     const selectedLine = cart.find((line) => line.product.id === selectedProduct?.id);
 
     const handleSearch = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -235,31 +239,31 @@ export function DiscountPopUp() {
     );
 }
 
-export function CheckPricePopUp() {
-    //TODO:change the value to the standardized format
-    const gap = "gap-[1rem]";
-    return (
-        <PopUp title="Check Price">
-            <form className={`flex flex-col ${gap}`}>
-                <Text size="mediumBig" weight="medium">
-                    Product Name/ID
-                </Text>
-                <GeneralInput placeholder="e.g. Tomato sauce" type="text"></GeneralInput>
-                <Text size="mediumBig" weight="medium">
-                    Price
-                </Text>
-                <GeneralInput placeholder="..." disabled type="text"></GeneralInput>
-                {/*<KeyboardOverlay></KeyboardOverlay>*/}
-                <div className="flex flex-row gap-[2rem] justify-center">
-                    <Button size="medium">Apply</Button>
-                    <Button size="medium" variant="grey">
-                        Cancel
-                    </Button>
-                </div>
-            </form>
-        </PopUp>
-    );
-}
+//export function CheckPricePopUp() {
+//    //TODO:change the value to the standardized format
+//    const gap = "gap-[1rem]";
+//    return (
+//        <PopUp title="Check Price">
+//            <form className={`flex flex-col ${gap}`}>
+//                <Text size="mediumBig" weight="medium">
+//                    Product Name/ID
+//                </Text>
+//                <GeneralInput placeholder="e.g. Tomato sauce" type="text"></GeneralInput>
+//                <Text size="mediumBig" weight="medium">
+//                    Price
+//                </Text>
+//                <GeneralInput placeholder="..." disabled type="text"></GeneralInput>
+//                {/*<KeyboardOverlay></KeyboardOverlay>*/}
+//                <div className="flex flex-row gap-[2rem] justify-center">
+//                    <Button size="medium">Apply</Button>
+//                    <Button size="medium" variant="grey">
+//                        Cancel
+//                    </Button>
+//                </div>
+//            </form>
+//        </PopUp>
+//    );
+//}
 
 export type PaymentOutletContext = {
     amountDue: number;

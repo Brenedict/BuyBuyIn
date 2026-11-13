@@ -161,14 +161,17 @@ const deleteOfferAction = async ({ params, request }: ActionFunctionArgs, redire
     }
 };
 
-const updateOfferStatusAction = async ({ params, request }: ActionFunctionArgs, redirectPath: string) => {
+const updateOfferStatusAction = async ({ params, request }: ActionFunctionArgs) => {
+    const offerId = parseOfferId(params.id);
+
+    // Without a valid offer id there is no popup to return to
+    if (offerId === null) {
+        return redirect(ROUTES.BRANCH_MANAGER.branchOffers);
+    }
+
+    const redirectPath = ROUTES.BRANCH_MANAGER.branchOffersView(String(offerId));
+
     try {
-        const offerId = parseOfferId(params.id);
-
-        if (offerId === null) {
-            throw redirect(redirectPath);
-        }
-
         const formData = await request.formData();
         const res = await apiJson(`/branch-wide-offers/${offerId}/status`, {
             method: "PATCH",
@@ -194,8 +197,7 @@ export const getBranchWideOffer = (args: LoaderFunctionArgs): Promise<BranchWide
     fetchBranchWideOffer(args, ROUTES.BRANCH_MANAGER.branchOffers);
 
 // PATCH: Updates the status of a branch-exclusive offer
-export const updateBranchWideOfferStatus = (args: ActionFunctionArgs) =>
-    updateOfferStatusAction(args, ROUTES.BRANCH_MANAGER.branchOffers);
+export const updateBranchWideOfferStatus = (args: ActionFunctionArgs) => updateOfferStatusAction(args);
 
 export type BranchWideOffersPageData = {
     list: BranchWideOfferListResponse;

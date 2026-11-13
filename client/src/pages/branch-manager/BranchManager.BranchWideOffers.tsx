@@ -1,12 +1,12 @@
 // General Imports
 import { Form, Outlet, useLoaderData, useSearchParams } from "react-router";
+import type { MouseEvent } from "react";
 
 // Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import SearchInput from "../../components/inputs/SearchInput";
-import SelectInput from "../../components/inputs/SelectInput";
 import Icon from "../../components/Icon";
 
 // MUI Icons
@@ -14,6 +14,7 @@ import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 // Hooks
 import useNavigatePage from "../../hooks/useNavigatePage";
@@ -23,63 +24,45 @@ import { useFormSearchParams } from "../../hooks/useFormSearchParams";
 import type { BranchWideOffersPageData } from "../../api/branchWideOfferService";
 
 // BuyBuyIn Shared Imports
-import type { BranchWideOfferEntry, BranchWideOfferStatusType } from "@buybuyin/shared/schema/branchWideOffer";
+import type { BranchWideOfferEntry } from "@buybuyin/shared/schema/branchWideOffer";
 
 // Routes & Utils
 import { ROUTES } from "../../routes/Routes";
 import { formatFullDate } from "../../utils/dateUtils";
 
-type StatusVariant = "enabled" | "disabled" | "draft";
-
-const STATUS_CLASSES: Record<StatusVariant, string> = {
-    enabled: "bg-crimson text-cream font-bold",
-    disabled: "bg-slate-light text-cream font-bold",
-    draft: "bg-slate-medium/90 text-cream font-bold",
-};
-
-const getStatusVariant = (status: BranchWideOfferStatusType): StatusVariant => status.toLowerCase() as StatusVariant;
-
-function OfferCard({ offer, branchId }: { offer: BranchWideOfferEntry; branchId?: number }) {
+function OfferCard({ offer }: { offer: BranchWideOfferEntry }) {
     const navigate = useNavigatePage();
 
-    const isExclusive = offer.isExclusive;
     const viewPath = ROUTES.BRANCH_MANAGER.branchOffersView(String(offer.id));
 
-    // The backend only allows status changes on an offer tied exclusively to the manager's own branch
-    const canChangeStatus = isExclusive && offer.branches.length === 1 && offer.branches[0]?.branchId === branchId;
-
-    const status = getStatusVariant(offer.offerStatus);
-    const shortenedTitle = offer.offerName.length > 20 ? `${offer.offerName.substring(0, 20)}...` : offer.offerName;
+    // Opens the View Offer popup for the chosen offer
+    const handleView = (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        navigate(viewPath, true);
+    };
 
     return (
-        <Card
-            className="bg-off-white rounded-2xl h-full hover:opacity-80 active:opacity-100 hover:cursor-pointer hover:scale-99 transition-transform"
-            onClick={() => navigate(viewPath, true)}
-        >
+        <Card dropShadow={true} className="bg-off-white rounded-2xl h-full">
             <Card.Body className="flex flex-col justify-between h-full min-h-40 gap-4">
-                <div className="flex flex-col gap-3">
-                    <div className="flex justify-between">
-                        <Text weight="extraBold" size="big" variant="crimson" className="leading-tight">
-                            {shortenedTitle}
-                        </Text>
-                        {isExclusive && (
-                            <Text size="description" weight="medium" variant="crimson">
-                                Exclusive
-                            </Text>
-                        )}
-                    </div>
+                <Text weight="extraBold" size="big" variant="crimson" className="leading-tight">
+                    {offer.offerName}
+                </Text>
 
-                    <Text variant="slate-light">
+                <div className="flex flex-row justify-between items-center mt-auto pt-2">
+                    <Text weight="bold" size="description" variant="maroon">
                         {formatFullDate(new Date(offer.startDate))} - {formatFullDate(new Date(offer.endDate))}
                     </Text>
 
-                    {!canChangeStatus && (
-                        <div
-                            className={`w-fit px-3 py-1 rounded-xl lg:text-normal md:text-small-description ${STATUS_CLASSES[status]}`}
-                        >
-                            {status}
-                        </div>
-                    )}
+                    <Button
+                        type="button"
+                        size="small"
+                        variant="main"
+                        leftIcon={VisibilityOutlinedIcon}
+                        className="rounded-full px-6"
+                        onClick={handleView}
+                    >
+                        View
+                    </Button>
                 </div>
             </Card.Body>
         </Card>
@@ -141,7 +124,7 @@ export function BranchManager_BranchWideOffers() {
     const { list, options } = useLoaderData<BranchWideOffersPageData>();
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const { values, handleChange } = useFormSearchParams({ search: "", page: "" });
+    const { values, submit } = useFormSearchParams({ search: "", page: "" });
 
     const branch = options.branches[0];
     const branchDetails = branch ? `Branch #${branch.branchId}` : "No branch assigned";
@@ -196,7 +179,7 @@ export function BranchManager_BranchWideOffers() {
                     </Text>
 
                     <div className="flex flex-row gap-6 items-center">
-                        <Form onChange={handleChange}>
+                        <Form onSubmit={submit()}>
                             <SearchInput
                                 name="search"
                                 placeholder="Search Offers"
@@ -253,7 +236,7 @@ export function BranchManager_BranchWideOffers() {
                             ) : (
                                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-6">
                                     {list.items.map((offer) => (
-                                        <OfferCard key={offer.id} offer={offer} branchId={branch?.branchId} />
+                                        <OfferCard key={offer.id} offer={offer} />
                                     ))}
                                 </div>
                             )}

@@ -1,10 +1,14 @@
 // General Imports
-import { useLoaderData } from "react-router";
+import { Form, useLoaderData } from "react-router";
+import type { ChangeEvent } from "react";
 
 // Components
 import { PopUp } from "../../PopUp";
-import { Button } from "../../Button";
 import { Text } from "../../Text";
+import { Card } from "../../Card";
+import GeneralInput from "../../inputs/GeneralInput";
+import TextAreaInput from "../../inputs/TextAreaInput";
+import ChoiceInput from "../../inputs/ChoiceInput";
 
 // Hooks
 import useNavigatePage from "../../../hooks/useNavigatePage";
@@ -14,135 +18,143 @@ import type { BranchWideOfferEntry, BranchWideOfferStatusType } from "@buybuyin/
 
 // Routes & Utils
 import { ROUTES } from "../../../routes/Routes";
-import { formatDiscountValue } from "../../../utils/offersUtils";
 import { formatFullDate } from "../../../utils/dateUtils";
 
-type StatusVariant = "enabled" | "disabled" | "draft";
+// Status options shown in the popup. Values follow the offer status enum (ENABLED / DRAFT / DISABLED).
+const STATUS_OPTIONS: { value: BranchWideOfferStatusType; label: string }[] = [
+    { value: "ENABLED", label: "Enabled" },
+    { value: "DRAFT", label: "Draft" },
+    { value: "DISABLED", label: "Disabled" },
+];
 
-const STATUS_CLASSES: Record<StatusVariant, string> = {
-    enabled: "bg-crimson text-cream font-bold",
-    disabled: "bg-slate-light text-cream font-bold",
-    draft: "bg-slate-medium/90 text-cream font-bold",
-};
-
-const getStatusVariant = (status: BranchWideOfferStatusType): StatusVariant => status.toLowerCase() as StatusVariant;
-
-export function BranchOfferViewPopup() {
+// Popup showing the details of a single branch-wide offer
+export function ViewOfferPopup() {
     const navigate = useNavigatePage();
     const offer = useLoaderData<BranchWideOfferEntry | null>();
 
+    // Closing the popup returns to the offers page
     const handleClose = () => navigate(ROUTES.BRANCH_MANAGER.branchOffers, true);
 
+    // Branch choices are display-only, so changes are ignored
+    // (using `disabled` would grey them out and the design keeps them crimson)
+    const handleReadOnly = () => {};
+
+    // Submits the form as soon as a different status is picked
+    const handleStatusChange = (event: ChangeEvent<HTMLInputElement>) => {
+        event.currentTarget.form?.requestSubmit();
+    };
+
+    // Covers opening the URL directly with an id that does not exist
     if (!offer) {
         return (
-            <PopUp title="Offer Not Found" size="md" handleCloseProp={handleClose}>
-                <Text>The offer you are looking for no longer exists.</Text>
-                <div className="flex w-full gap-2">
-                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
-                        Close
-                    </Button>
-                </div>
+            <PopUp title="View Offer" handleCloseProp={handleClose}>
+                <Text variant="brown">This offer could not be found.</Text>
             </PopUp>
         );
     }
 
-    const status = getStatusVariant(offer.offerStatus);
-    const appliesTo = offer.isExclusive ? offer.branches.map((branch) => branch.location).join(", ") : "All branches";
+    // The backend only allows status changes on an offer tied exclusively to the manager's own branch
+    const canChangeStatus = offer.isExclusive && offer.branches.length === 1;
+
+    // An offer that is not exclusive applies to every branch
+    const isForAllBranches = !offer.isExclusive;
+
+    const statusChoices = (
+        <div className="flex gap-6">
+            {STATUS_OPTIONS.map((status) => (
+                <ChoiceInput
+                    key={status.value}
+                    id={`status-${status.value}`}
+                    name={canChangeStatus ? "offerStatus" : undefined}
+                    value={canChangeStatus ? status.value : undefined}
+                    inputVariant="radio"
+                    className="w-fit!"
+                    checked={offer.offerStatus === status.value}
+                    onChange={canChangeStatus ? handleStatusChange : handleReadOnly}
+                >
+                    {status.label}
+                </ChoiceInput>
+            ))}
+        </div>
+    );
 
     return (
-        <PopUp title="Offer Details" subtitle={offer.offerName} size="lg" handleCloseProp={handleClose}>
+        <PopUp title="View Offer" handleCloseProp={handleClose}>
             <section className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1 rounded-2xl bg-cream p-4">
-                    <Text size="description" weight="bold" variant="slate-medium" className="uppercase">
-                        Description
+                <GeneralInput
+                    id="offerName"
+                    name="offerName"
+                    type="text"
+                    label="Offer name"
+                    disabled
+                    readOnly
+                    value={offer.offerName}
+                />
+
+                <TextAreaInput
+                    id="description"
+                    name="description"
+                    label="Description"
+                    disabled
+                    readOnly
+                    value={offer.description}
+                />
+
+                {/* Date Range */}
+                <div className="flex gap-3 items-end">
+                    <GeneralInput
+                        id="startDate"
+                        name="startDate"
+                        type="text"
+                        label="Date Range"
+                        disabled
+                        readOnly
+                        value={formatFullDate(new Date(offer.startDate))}
+                    />
+                    <Text variant="brown" className="pb-3">
+                        to
                     </Text>
-                    <Text weight="medium" variant="brown">
-                        {offer.description}
-                    </Text>
+                    <GeneralInput
+                        id="endDate"
+                        name="endDate"
+                        type="text"
+                        disabled
+                        readOnly
+                        value={formatFullDate(new Date(offer.endDate))}
+                    />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1">
-                        <Text size="description" weight="bold" variant="slate-medium" className="uppercase">
-                            Date Range
-                        </Text>
-                        <Text weight="medium" variant="brown">
-                            {formatFullDate(new Date(offer.startDate))} - {formatFullDate(new Date(offer.endDate))}
-                        </Text>
-                    </div>
+                {/* Branches: "All Branches" is checked when the offer is not exclusive */}
+                <Card dropShadow={false}>
+                    <Card.Body className="flex flex-col gap-2">
+                        <ChoiceInput
+                            id="allBranches"
+                            className="w-full"
+                            checked={isForAllBranches}
+                            onChange={handleReadOnly}
+                        >
+                            All Branches
+                        </ChoiceInput>
+                        {offer.branches.map((branch) => (
+                            <ChoiceInput
+                                key={branch.branchId}
+                                id={`branch-${branch.branchId}`}
+                                className="w-full"
+                                checked
+                                onChange={handleReadOnly}
+                            >
+                                {branch.location}
+                            </ChoiceInput>
+                        ))}
+                    </Card.Body>
+                </Card>
 
-                    <div className="flex flex-col gap-1">
-                        <Text size="description" weight="bold" variant="slate-medium" className="uppercase">
-                            Status
-                        </Text>
-                        <div className={`w-fit px-3 py-1 rounded-xl text-normal ${STATUS_CLASSES[status]}`}>
-                            {status}
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <Text size="description" weight="bold" variant="slate-medium" className="uppercase">
-                            Offer Type
-                        </Text>
-                        <Text weight="medium" variant="brown">
-                            {offer.offerType === "OVERALL" ? "Overall" : "Included Products"}
-                        </Text>
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <Text size="description" weight="bold" variant="slate-medium" className="uppercase">
-                            Applies To
-                        </Text>
-                        <Text weight="medium" variant="brown">
-                            {appliesTo || "No branches"}
-                        </Text>
-                    </div>
-                </div>
-
-                {offer.offerType === "OVERALL" ? (
-                    <div className="flex flex-col gap-1">
-                        <Text size="description" weight="bold" variant="slate-medium" className="uppercase">
-                            Overall Discount
-                        </Text>
-                        <Text weight="medium" variant="crimson">
-                            {formatDiscountValue(offer.discountType ?? "PERCENTAGE", offer.overallDiscountValue ?? 0)}{" "}
-                            off all products
-                        </Text>
-                    </div>
-                ) : (
-                    <div className="flex flex-col gap-2">
-                        <Text size="description" weight="bold" variant="slate-medium" className="uppercase">
-                            Included Products
-                        </Text>
-                        {offer.products.length === 0 ? (
-                            <Text variant="slate-light">No products included.</Text>
-                        ) : (
-                            offer.products.map((product) => (
-                                <div
-                                    key={product.productId}
-                                    className="flex items-center justify-between rounded-xl bg-cream px-3 py-2"
-                                >
-                                    <div className="flex flex-col gap-1">
-                                        <Text size="description" weight="bold" variant="brown">
-                                            {product.productName}
-                                        </Text>
-                                        <Text size="description" variant="slate-medium">
-                                            Qty {product.requiredQuantity} · Shelf ₱{product.shelfPrice.toFixed(2)}
-                                        </Text>
-                                    </div>
-                                    <Text size="description" weight="bold" variant="crimson">
-                                        {formatDiscountValue(product.discountType, product.unitDiscountValue)}
-                                    </Text>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                )}
-
-                <div className="flex w-full gap-2 pt-4">
-                    <Button type="button" variant="secondary" size="normal" className="flex-1" onClick={handleClose}>
-                        Close
-                    </Button>
+                {/* Status: editable only for offers exclusive to the manager's own branch */}
+                <div>
+                    <Text size="big" weight="bold" variant="brown">
+                        Status
+                    </Text>
+                    {canChangeStatus ? <Form method="post">{statusChoices}</Form> : statusChoices}
                 </div>
             </section>
         </PopUp>

@@ -95,8 +95,7 @@ import {
     InventoryItemAddPopup,
 } from "../components/popups/branch-manager/InventoryPopups";
 import { CashierAddEditPopup, CashierDeletePopup } from "../components/popups/branch-manager/CashierAccountsPopups";
-import { BranchOfferViewPopup } from "../components/popups/branch-manager/BranchOffersPopups";
-
+import { ViewOfferPopup } from "../components/popups/branch-manager/BranchOffersPopups";
 // Cashier Pages
 import Cashier_Dashboard from "../pages/cashier/Cashier.Dashboard";
 import Cashier_PointOfSale from "../pages/cashier/Cashier.PointOfSale";
@@ -257,11 +256,8 @@ export const protectedRoutes: RouteObject[] = [
                                 children: [
                                     {
                                         path: ":id/view",
-                                        element: <BranchOfferViewPopup />,
+                                        element: <ViewOfferPopup />,
                                         loader: getBranchWideOffer,
-                                    },
-                                    {
-                                        path: ":id/status",
                                         action: updateBranchWideOfferStatus,
                                     },
                                     ...globalPopups,

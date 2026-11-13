@@ -1,12 +1,17 @@
 // General Import
 import { useEffect, useState } from "react";
-import { Form, Outlet, useLoaderData } from "react-router";
+import { Form, Outlet, useLoaderData, useSearchParams } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
+import {
+    BranchOfferProductAddPopup,
+    BranchOfferProductDeletePopup,
+    BranchOfferProductEditPopup,
+} from "../../components/popups/hq-admin/BranchOffersPopups";
 
 import SearchInput from "../../components/inputs/SearchInput";
 import GeneralInput from "../../components/inputs/GeneralInput";
@@ -125,7 +130,6 @@ function OfferCard({ offer }: { offer: BranchWideOfferEntry }) {
                     </div>
                 </div>
                 <div className="flex h-fit gap-1 pt-1">
-                    {/* Overwritten Buttons for customized no background buttons */}
                     <Button
                         type="button"
                         aria-label="Edit offer"
@@ -223,9 +227,14 @@ function IncludedProductsSection({
     productInputs: ProductInput[];
     setProductInputs: React.Dispatch<React.SetStateAction<ProductInput[]>>;
 }) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [isAdding, setIsAdding] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [draft, setDraft] = useState<ProductInput | null>(null);
+    const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
+
     const usedProductIds = new Set(productInputs.map((product) => product.productId));
     const firstAvailableProduct = catalogueProducts.find((product) => !usedProductIds.has(product.id));
-    const canAddProduct = catalogueProducts.length > 0 && firstAvailableProduct !== undefined;
 
     const updateProductInput = (index: number, changes: Partial<ProductInput>) => {
         setProductInputs((current) =>
@@ -236,204 +245,269 @@ function IncludedProductsSection({
     };
 
     const handleAddProduct = () => {
-        if (!firstAvailableProduct) return;
+        if (!firstAvailableProduct) {
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set("ERROR", "All products are already added");
+            setSearchParams(nextParams, { replace: true });
+            return;
+        }
 
-        setProductInputs((current) => [
-            ...current,
-            {
-                productId: firstAvailableProduct.id,
-                requiredQuantity: 1,
-                unitDiscountValue: 0,
-                discountType: "PERCENTAGE",
-            },
-        ]);
+        setIsAdding(true);
+        setDraft({
+            productId: firstAvailableProduct.id,
+            requiredQuantity: 1,
+            unitDiscountValue: 0,
+            discountType: "PERCENTAGE",
+        });
+    };
+
+    const handleCloseAdd = () => {
+        setIsAdding(false);
+        setDraft(null);
+    };
+
+    const handleSaveAdd = () => {
+        if (!draft) return;
+
+        setProductInputs((current) => [...current, draft]);
+        handleCloseAdd();
     };
 
     const handleRemoveProduct = (index: number) => {
         setProductInputs((current) => current.filter((_, productIndex) => productIndex !== index));
     };
 
+    const getSelectableProducts = (productId: number, excludeIndex: number | null) =>
+        catalogueProducts.filter(
+            (product) =>
+                product.id === productId ||
+                !productInputs.some(
+                    (otherInput, otherIndex) => otherIndex !== excludeIndex && otherInput.productId === product.id
+                )
+        );
+
+    const handleOpenEdit = (index: number) => {
+        const productInput = productInputs[index];
+
+        if (!productInput) return;
+
+        setEditingIndex(index);
+        setDraft({ ...productInput });
+    };
+
+    const handleCloseEdit = () => {
+        setEditingIndex(null);
+        setDraft(null);
+    };
+
+    const handleSaveEdit = () => {
+        if (editingIndex === null || !draft) return;
+
+        updateProductInput(editingIndex, draft);
+        handleCloseEdit();
+    };
+
+    const handleOpenDelete = (index: number) => setDeletingIndex(index);
+
+    const handleCloseDelete = () => setDeletingIndex(null);
+
+    const handleConfirmDelete = () => {
+        if (deletingIndex === null) return;
+
+        handleRemoveProduct(deletingIndex);
+        handleCloseDelete();
+    };
+
+    const draftSelectedProduct = draft
+        ? catalogueProducts.find((product) => product.id === draft.productId)
+        : undefined;
+
+    const draftProductOptions = draft
+        ? Object.fromEntries(
+              getSelectableProducts(draft.productId, isAdding ? null : editingIndex).map((product) => [
+                  product.productName,
+                  String(product.id),
+              ])
+          )
+        : {};
+
+    const deletingProduct = deletingIndex !== null ? productInputs[deletingIndex] : undefined;
+    const deletingProductName =
+        catalogueProducts.find((product) => product.id === deletingProduct?.productId)?.productName ?? "this product";
+
     return (
-        <Card dropShadow={false}>
-            <Card.Header
-                toggleRightButton
-                rightButton={
-                    <Button
-                        type="button"
-                        size="normal"
-                        variant="grey"
-                        leftIcon={AddIcon}
-                        onClick={handleAddProduct}
-                        disabled={!canAddProduct}
-                    >
-                        Add
-                    </Button>
-                }
-                bordered
-            >
-                <Text weight="bold" size="big">
-                    Included Products
-                </Text>
-            </Card.Header>
-            <Card.Body className="p-0! overflow-hidden!">
-                {catalogueProducts.length === 0 ? (
-                    <Text variant="slate-light" className="p-4">
-                        No products are available in the catalogue yet. Add a product before creating an individual
-                        offer.
+        <>
+            <Card dropShadow={false}>
+                <Card.Header
+                    toggleRightButton
+                    rightButton={
+                        <Button
+                            type="button"
+                            size="normal"
+                            variant="grey"
+                            leftIcon={AddIcon}
+                            onClick={handleAddProduct}
+                            disabled={catalogueProducts.length === 0}
+                        >
+                            Add
+                        </Button>
+                    }
+                    bordered
+                >
+                    <Text weight="bold" size="big">
+                        Included Products
                     </Text>
-                ) : (
-                    <Table className="rounded-none! border-0!">
-                        {/* Fixed table headers */}
-                        <Table.Row borderedBottom>
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Discounted Subtotal" />
-                            <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
-                        </Table.Row>
+                </Card.Header>
+                <Card.Body className="p-0! overflow-hidden!">
+                    {catalogueProducts.length === 0 ? (
+                        <Text variant="slate-light" className="p-4">
+                            No products are available in the catalogue yet. Add a product before creating an individual
+                            offer.
+                        </Text>
+                    ) : (
+                        <Table className="rounded-none! border-0!">
+                            {/* Fixed table headers */}
+                            <Table.Row borderedBottom>
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
+                                <Table.Header
+                                    isPadded={false}
+                                    size="small"
+                                    className="px-3!"
+                                    text="Discounted Subtotal"
+                                />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
+                            </Table.Row>
 
-                        {/* Dynamically maps out the editable product rows */}
-                        {productInputs.map((productInput, index) => {
-                            const selectedProduct = catalogueProducts.find(
-                                (product) => product.id === productInput.productId
-                            );
+                            {productInputs.map((productInput, index) => {
+                                const selectedProduct = catalogueProducts.find(
+                                    (product) => product.id === productInput.productId
+                                );
 
-                            // Products already used by other rows are removed from this row's options
-                            const selectableProducts = catalogueProducts.filter(
-                                (product) =>
-                                    product.id === productInput.productId ||
-                                    !productInputs.some(
-                                        (otherInput, otherIndex) =>
-                                            otherIndex !== index && otherInput.productId === product.id
-                                    )
-                            );
-
-                            const productOptions = Object.fromEntries(
-                                selectableProducts.map((product) => [product.productName, String(product.id)])
-                            );
-
-                            return (
-                                <Table.Row key={productInput.productId}>
-                                    <Table.Data isPadded={false} className="px-3!">
-                                        <GeneralInput
-                                            type="number"
-                                            name={`quantity-${index}`}
-                                            aria-label="Quantity"
-                                            min={1}
-                                            value={productInput.requiredQuantity}
-                                            className="min-w-20!"
-                                            onChange={(e) =>
-                                                updateProductInput(index, {
-                                                    requiredQuantity: Number(e.target.value),
-                                                })
+                                return (
+                                    <Table.Row key={productInput.productId}>
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            className="px-3!"
+                                            text={String(productInput.requiredQuantity)}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={String(productInput.productId)}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            className="px-3!"
+                                            text={selectedProduct?.productName ?? "—"}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={selectedProduct ? String(selectedProduct.shelfPrice) : "—"}
+                                            className="px-3!"
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            className="px-3!"
+                                            text={formatDiscountValue(
+                                                productInput.discountType,
+                                                productInput.unitDiscountValue
+                                            )}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={
+                                                selectedProduct
+                                                    ? calculateSubtotal(
+                                                          productInput.requiredQuantity,
+                                                          selectedProduct.shelfPrice
+                                                      )
+                                                    : "—"
                                             }
+                                            className="px-3!"
                                         />
-                                    </Table.Data>
-                                    <Table.Data isPadded={false} size="small" text={String(productInput.productId)} />
-                                    <Table.Data isPadded={false} className="px-3!">
-                                        <SelectInput
-                                            name={`product-${index}`}
-                                            defaultValue={String(productInput.productId)}
-                                            options={productOptions}
-                                            className="min-w-40!"
-                                            onChange={(e) =>
-                                                updateProductInput(index, {
-                                                    productId: Number(e.target.value),
-                                                })
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={
+                                                selectedProduct
+                                                    ? calculateDiscountedSubtotal(
+                                                          productInput.discountType,
+                                                          productInput.unitDiscountValue,
+                                                          productInput.requiredQuantity,
+                                                          selectedProduct.shelfPrice
+                                                      )
+                                                    : "—"
                                             }
+                                            className="px-3!"
                                         />
-                                    </Table.Data>
-                                    <Table.Data
-                                        isPadded={false}
-                                        size="small"
-                                        text={selectedProduct ? String(selectedProduct.shelfPrice) : "—"}
-                                        className="px-3!"
-                                    />
-                                    <Table.Data isPadded={false} className="px-3!">
-                                        <div className="flex flex-col gap-2 min-w-40">
-                                            <SelectInput
-                                                name={`discountType-${index}`}
-                                                defaultValue={productInput.discountType}
-                                                options={{
-                                                    Percentage: "PERCENTAGE",
-                                                    "Fixed Value": "FIXED_VALUE",
-                                                }}
-                                                className="min-w-32!"
-                                                onChange={(e) =>
-                                                    updateProductInput(index, {
-                                                        discountType: e.target.value as "PERCENTAGE" | "FIXED_VALUE",
-                                                    })
-                                                }
-                                            />
-                                            <GeneralInput
-                                                type="number"
-                                                name={`unitDiscountValue-${index}`}
-                                                aria-label="Discount value"
-                                                min={0}
-                                                value={productInput.unitDiscountValue}
-                                                className="min-w-20!"
-                                                onChange={(e) =>
-                                                    updateProductInput(index, {
-                                                        unitDiscountValue: Number(e.target.value),
-                                                    })
-                                                }
-                                            />
-                                            <Text size="description" variant="slate-light" align="center">
-                                                {formatDiscountValue(
-                                                    productInput.discountType,
-                                                    productInput.unitDiscountValue
-                                                )}
-                                            </Text>
-                                        </div>
-                                    </Table.Data>
-                                    <Table.Data
-                                        isPadded={false}
-                                        size="small"
-                                        text={
-                                            selectedProduct
-                                                ? calculateSubtotal(
-                                                      productInput.requiredQuantity,
-                                                      selectedProduct.shelfPrice
-                                                  )
-                                                : "—"
-                                        }
-                                        className="px-3!"
-                                    />
-                                    <Table.Data
-                                        isPadded={false}
-                                        size="small"
-                                        text={
-                                            selectedProduct
-                                                ? calculateDiscountedSubtotal(
-                                                      productInput.discountType,
-                                                      productInput.unitDiscountValue,
-                                                      productInput.requiredQuantity,
-                                                      selectedProduct.shelfPrice
-                                                  )
-                                                : "—"
-                                        }
-                                        className="px-3!"
-                                    />
-                                    <Table.Data isPadded={false} className="px-3!">
-                                        <Button
-                                            type="button"
-                                            aria-label="Remove product"
-                                            variant="secondary"
-                                            size="smallest"
-                                            rightIcon={DeleteOutlinedIcon}
-                                            onClick={() => handleRemoveProduct(index)}
-                                        />
-                                    </Table.Data>
-                                </Table.Row>
-                            );
-                        })}
-                    </Table>
-                )}
-            </Card.Body>
-        </Card>
+                                        <Table.Data isPadded={false} className="px-3!">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    size="small"
+                                                    onClick={() => handleOpenEdit(index)}
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="main"
+                                                    size="small"
+                                                    onClick={() => handleOpenDelete(index)}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </Table.Data>
+                                    </Table.Row>
+                                );
+                            })}
+                        </Table>
+                    )}
+                </Card.Body>
+            </Card>
+
+            {editingIndex !== null && draft && (
+                <BranchOfferProductEditPopup
+                    productInput={draft}
+                    productOptions={draftProductOptions}
+                    selectedProduct={draftSelectedProduct}
+                    onChange={(changes) => setDraft((current) => (current ? { ...current, ...changes } : current))}
+                    onConfirm={handleSaveEdit}
+                    onClose={handleCloseEdit}
+                />
+            )}
+
+            {isAdding && draft && (
+                <BranchOfferProductAddPopup
+                    productInput={draft}
+                    productOptions={draftProductOptions}
+                    selectedProduct={draftSelectedProduct}
+                    onChange={(changes) => setDraft((current) => (current ? { ...current, ...changes } : current))}
+                    onConfirm={handleSaveAdd}
+                    onClose={handleCloseAdd}
+                />
+            )}
+
+            {deletingProduct && (
+                <BranchOfferProductDeletePopup
+                    productName={deletingProductName}
+                    onConfirm={handleConfirmDelete}
+                    onClose={handleCloseDelete}
+                />
+            )}
+        </>
     );
 }
 

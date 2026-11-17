@@ -33,6 +33,7 @@ import { BusinessCenter, ManageAccounts, NextPlanSharp } from "@mui/icons-materi
 import { ROUTES } from "../routes/Routes";
 import type { MaterialIcon } from "../types/common";
 import useNavigatePage from "../hooks/useNavigatePage";
+import { useGlobalContext } from "../pages/shared/AccessValidator";
 
 interface NavItem {
     label: string;
@@ -193,18 +194,29 @@ export function NavBar({ role }: NavBarProps) {
 // SUB-COMPONENTS
 // Logo and Branch Information
 function BrandSection() {
+    const { user } = useGlobalContext();
     const iconSize = "text-regular! lg:text-medium!! xl:text-big! 2xl:text-bigger!";
 
     return (
         <div className="flex flex-row items-center gap-3 shrink-0">
             <Icon icon={BuyBuyInIcon} variant="cream" size="bigger" iconClassName={iconSize} />
             <div className="h-9 w-px bg-slate-light/40" />
-            <div className="flex flex-row items-center gap-2 rounded-full bg-slate-medium/70 px-4 py-2 whitespace-nowrap">
-                <LocationOnIcon className="text-off-white! text-lg!" />
-                <Text variant="off-white" weight="bold" size="small">
-                    Sta. Mesa Branch
-                </Text>
-            </div>
+            {user?.role !== "SUPERADMIN" && (
+                <div className="flex flex-row items-center gap-2 rounded-full bg-slate-medium/70 px-4 py-2 whitespace-nowrap">
+                    <LocationOnIcon className="text-off-white! text-lg!" />
+                    <div>
+                        <Text variant="off-white" weight="bold" size="small">
+                            {user?.businessName || "Unknown Business"}
+                        </Text>
+
+                        {user?.role !== "HQADMIN" && (
+                            <Text variant="off-white" size="smaller">
+                                {user?.branchName || "Unknown Branch"}
+                            </Text>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -263,7 +275,7 @@ function DateTimeDisplay({ currentDateTime }: { currentDateTime: Date }) {
 
 // User Profile and Dropdown
 function UserProfileMenu({ roleLabel }: { roleLabel: string }) {
-    const user = useSyncExternalStore(InMemoryStore.subscribe, InMemoryStore.getUserContext);
+    const { user } = useGlobalContext();
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const profileDropdownRef = useRef<HTMLDivElement>(null);
 

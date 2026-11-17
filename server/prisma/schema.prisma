@@ -60,7 +60,7 @@ enum OfferType {
 
 enum DiscountType {
     PERCENTAGE
-    FIXEDVALUE
+    FIXED_VALUE
 }
 
 enum AccountStatusType {
@@ -147,6 +147,7 @@ model Business {
     products              Product[]
     suppliers             Supplier[]
     users                 User[]
+    branchWideOffers      BranchWideOffer[]
 }
 
 model Branch {
@@ -162,7 +163,7 @@ model Branch {
     branchInventoryItems    BranchInventoryItem[]
     transactions            Transaction[]
     users                   User[]
-    branchWideOfferBranches BranchWideOfferBranches[]
+    branchWideOfferBranches BranchWideOfferBranch[]
 }
 
 model BranchInventoryItem {
@@ -223,12 +224,14 @@ model TransactionItem {
     isBundle     Boolean
 
     // Many-to-one connections
-    transaction       Transaction?    @relation(fields: [transactionId], references: [id])
+    transaction       Transaction?     @relation(fields: [transactionId], references: [id])
     transactionId     Int?
-    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id])
-    branchWideOfferId Int
-    product           Product         @relation(fields: [productId], references: [id])
+    branchWideOffer   BranchWideOffer? @relation(fields: [branchWideOfferId], references: [id])
+    branchWideOfferId Int?
+    product           Product          @relation(fields: [productId], references: [id])
     productId         Int
+
+    @@index([branchWideOfferId])
 }
 
 model Supplier {
@@ -274,40 +277,50 @@ model BranchWideOfferProduct {
     discountType      DiscountType
 
     // Many-to-one connections
-    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id])
+    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id], onDelete: Cascade)
     branchWideOfferId Int
     product           Product         @relation(fields: [productId], references: [id])
     productId         Int
 
     // Junction table (composite key)
     @@id([branchWideOfferId, productId])
+    @@index([productId])
 }
 
 model BranchWideOffer {
     id                   Int             @id @default(autoincrement())
-    offerName            String
+    offerName            String          @db.VarChar(256)
     description          String
     startDate            DateTime
     endDate              DateTime
-    isExclusive          Boolean
+    isExclusive          Boolean         @default(false)
     offerStatus          OfferStatusType
     offerType            OfferType
-    discountType         DiscountType
-    overallDiscountValue Float
+    discountType         DiscountType?
+    overallDiscountValue Float?
+
+    // Many-to-one connections
+    business   Business? @relation(fields: [businessId], references: [id])
+    businessId Int?
 
     // One-to-many connections
-    branchWideOfferBranches BranchWideOfferBranches[]
+    branchWideOfferBranches BranchWideOfferBranch[]
     transactionItems        TransactionItem[]
     branchWideOfferProducts BranchWideOfferProduct[]
+
+    @@index([businessId])
+    @@index([offerStatus])
+    @@index([startDate, endDate])
 }
 
-model BranchWideOfferBranches {
+model BranchWideOfferBranch {
     // Many-to-one connections
     branch            Branch          @relation(fields: [branchId], references: [id])
     branchId          Int
-    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id])
+    branchWideOffer   BranchWideOffer @relation(fields: [branchWideOfferId], references: [id], onDelete: Cascade)
     branchWideOfferId Int
 
     // Junction table (composite key)
     @@id([branchId, branchWideOfferId])
+    @@index([branchWideOfferId])
 }

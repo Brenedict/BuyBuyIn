@@ -1,19 +1,23 @@
 // General Import
-import { useEffect, useMemo, useState } from "react";
-import { Form, Outlet, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { Form, Outlet, useLoaderData, useSearchParams } from "react-router";
 
 // Components
 import { Card } from "../../components/Card";
 import { Text } from "../../components/Text";
 import { Button } from "../../components/Button";
 import Table from "../../components/Table";
+import {
+    BranchOfferProductAddPopup,
+    BranchOfferProductDeletePopup,
+    BranchOfferProductEditPopup,
+} from "../../components/popups/hq-admin/BranchOffersPopups";
 
 import SearchInput from "../../components/inputs/SearchInput";
 import GeneralInput from "../../components/inputs/GeneralInput";
 import TextAreaInput from "../../components/inputs/TextAreaInput";
 import ChoiceInput from "../../components/inputs/ChoiceInput";
 import SelectInput from "../../components/inputs/SelectInput";
-import { EditDeleteButtons } from "../../components/partials/TablePartials";
 
 // Material UI Icons
 import AddIcon from "@mui/icons-material/Add";
@@ -25,32 +29,52 @@ import { ROUTES } from "../../routes/Routes";
 
 // Hooks
 import useNavigatePage from "../../hooks/useNavigatePage";
+import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+
+// API Services
+import type { HQBranchWideOffersPageData } from "../../api/branchWideOfferService";
+
+// BuyBuyIn Shared Imports
+import type {
+    BranchWideOfferEntry,
+    BranchWideOfferFormType,
+    BranchWideOfferListResponse,
+    BranchWideOfferOptionsResponse,
+    BranchWideOfferStatusType,
+} from "@buybuyin/shared/schema/branchWideOffer";
+import type { CatalogueProduct } from "@buybuyin/shared/schema/product";
 
 // Utils
 import { calculateDiscountedSubtotal, calculateSubtotal, formatDiscountValue } from "../../utils/offersUtils";
 import { formatFullDate } from "../../utils/dateUtils";
 
-// Test Data
-import { SAMPLE_OFFERS } from "../../TESTINGDATA/branchWideOfferData";
-import { SAMPLE_OVERALL_BRANCHES } from "../../TESTINGDATA/branchWideOfferData";
-import { useFormSearchParams } from "../../hooks/useFormSearchParams";
+type ProductInput = BranchWideOfferFormType["products"][number];
 
-interface OfferProps {
-    offerTitle: string;
-    startDate: string;
-    endDate: string;
-    status: "enabled" | "draft" | "disabled";
-    handleClick: () => void;
-}
+const getInitialProductInputs = (offer: BranchWideOfferEntry | null): ProductInput[] =>
+    offer?.products.map(({ productId, requiredQuantity, unitDiscountValue, discountType }) => ({
+        productId,
+        requiredQuantity,
+        unitDiscountValue,
+        discountType,
+    })) ?? [];
+
+const getStatusVariant = (status: BranchWideOfferStatusType): "enabled" | "disabled" | "draft" =>
+    status.toLowerCase() as "enabled" | "disabled" | "draft";
 
 // Main Page Exported
 export default function HQ_BranchWideOffers() {
+    const { list, options, offer } = useLoaderData<HQBranchWideOffersPageData>();
+
     return (
         <>
             <Card className="h-[calc(100vh-4rem)] flex flex-col">
                 <Card.Body className="flex gap-6 grow min-h-0">
-                    <OffersListSection />
-                    <OfferConfigurationSection />
+                    <OffersListSection list={list} />
+                    <OfferConfigurationSection
+                        key={`${offer?.id ?? "new"}-${list.summary.totalOffers}`}
+                        options={options}
+                        offer={offer}
+                    />
                 </Card.Body>
             </Card>
 
@@ -62,19 +86,34 @@ export default function HQ_BranchWideOffers() {
     );
 }
 
-function OfferCard({ offerTitle, startDate, endDate, status, handleClick }: OfferProps) {
-    const statusClass: Record<OfferProps["status"], string> = {
+function OfferCard({ offer }: { offer: BranchWideOfferEntry }) {
+    const navigate = useNavigatePage();
+
+    const statusClass: Record<"enabled" | "disabled" | "draft", string> = {
         enabled: "bg-crimson text-cream font-bold",
         disabled: "bg-slate-light text-cream font-bold",
         draft: "bg-slate-medium/90 text-cream font-bold",
     };
 
-    const shortenedTitle = offerTitle.length > 20 ? `${offerTitle.substring(0, 20)}...` : offerTitle;
+    const status = getStatusVariant(offer.offerStatus);
+    const shortenedTitle = offer.offerName.length > 20 ? `${offer.offerName.substring(0, 20)}...` : offer.offerName;
+    const editPath = ROUTES.HQ_ADMIN.branchOffersEdit(String(offer.id));
+    const deletePath = ROUTES.HQ_ADMIN.branchOffersDelete(String(offer.id));
+
+    const handleEdit = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        navigate(editPath, true);
+    };
+
+    const handleDelete = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        navigate(deletePath, true);
+    };
 
     return (
         <Card
             className="hover:opacity-80 active:opacity-100 hover:cursor-pointer hover:scale-99 transition-transform"
-            onClick={handleClick}
+            onClick={() => navigate(editPath, true)}
         >
             <Card.Body className="flex xl:flex-row md:flex-col gap-3 justify-between">
                 <div className="flex flex-col gap-3">
@@ -82,7 +121,7 @@ function OfferCard({ offerTitle, startDate, endDate, status, handleClick }: Offe
                         {shortenedTitle}
                     </Text>
                     <Text variant="slate-light">
-                        {startDate} - {endDate}
+                        {formatFullDate(new Date(offer.startDate))} - {formatFullDate(new Date(offer.endDate))}
                     </Text>
                     <div
                         className={`w-fit px-3 py-1 rounded-xl lg:text-normal md:text-small-description ${statusClass[status]}`}
@@ -91,18 +130,23 @@ function OfferCard({ offerTitle, startDate, endDate, status, handleClick }: Offe
                     </div>
                 </div>
                 <div className="flex h-fit gap-1 pt-1">
-                    {/* Overwritten Buttons for customized no background buttons */}
                     <Button
+                        type="button"
+                        aria-label="Edit offer"
                         variant="secondary"
                         rightIcon={CreateIcon}
                         size="normal"
                         className="p-1! bg-transparent! hover:bg-slate-dark!"
+                        onClick={handleEdit}
                     ></Button>
                     <Button
+                        type="button"
+                        aria-label="Delete offer"
                         variant="secondary"
                         rightIcon={DeleteOutlinedIcon}
                         size="normal"
                         className="p-1! bg-transparent! hover:bg-crimson!"
+                        onClick={handleDelete}
                     ></Button>
                 </div>
             </Card.Body>
@@ -110,108 +154,62 @@ function OfferCard({ offerTitle, startDate, endDate, status, handleClick }: Offe
     );
 }
 
-function OffersListSection() {
-    // Used for redirecting
-    const useNavigate = useNavigatePage();
-
-    const { values, submit } = useFormSearchParams({ search: "" });
+function OffersListSection({ list }: { list: BranchWideOfferListResponse }) {
+    const { values, handleChange } = useFormSearchParams({ search: "" });
 
     return (
         <div className="w-[25%] flex flex-col gap-4 h-full min-h-0">
-            <Form onSubmit={submit()}>
+            <Form onChange={handleChange}>
                 <SearchInput name="search" placeholder="Search Offers" defaultValue={values.search} />
             </Form>
             <section className="flex flex-col gap-6 pr-3 grow overflow-y-auto min-h-0 *:shrink-0">
-                {/* Generates the offer cards */}
-                {SAMPLE_OFFERS.filter((offer) =>
-                    offer.offerName.toLowerCase().includes(values.search.toLowerCase())
-                ).map((offer, i) => (
-                    <OfferCard
-                        offerTitle={offer.offerName}
-                        startDate={formatFullDate(new Date(offer.startDate))}
-                        endDate={formatFullDate(new Date(offer.endDate))}
-                        status={offer.offerStatus.toLocaleLowerCase() as OfferProps["status"]}
-                        handleClick={() => {
-                            useNavigate(ROUTES.HQ_ADMIN.branchOffersEdit(String(offer.id)), true);
-                        }}
-                    />
-                ))}
+                {list.items.length === 0 ? (
+                    <Text variant="slate-light">No offers found. Create one using the configuration form.</Text>
+                ) : (
+                    list.items.map((offer) => <OfferCard key={offer.id} offer={offer} />)
+                )}
             </section>
         </div>
     );
 }
 
-function ToggleSelectBranches() {
-    // Extracts the Branch Wide Offer Id from the URL Param
-    const { id } = useParams();
-
-    // Data containing all branches from a business
-    const testAllBranches = SAMPLE_OVERALL_BRANCHES;
-
-    // Extracting the branches only. The 'useMemo' is for caching.
-    const testOfferBranches = useMemo(
-        () => SAMPLE_OFFERS.find((offer) => String(offer.id) == id)?.branchWideOfferBranches,
-        [id]
-    );
-
-    return (
-        <Card dropShadow={false}>
-            <Card.Body>
-                {testAllBranches.map((branch, i) => {
-                    // Check the current branch from the overall list is checked in the current offer (means the current branch is selected)
-                    const isChecked = testOfferBranches?.some(
-                        (offerBranch) => String(offerBranch.branchId) === String(branch.branchId)
-                    );
-
-                    return (
-                        <ChoiceInput id={String(branch.branchId)} defaultChecked={isChecked}>
-                            {branch.location}
-                        </ChoiceInput>
-                    );
-                })}
-            </Card.Body>
-        </Card>
-    );
-}
-
-function ToggleOverallDiscountType() {
-    // Extracts the Branch Wide Offer Id from the URL Param
-    const { id } = useParams();
-
-    // Extracting the branches only. The 'useMemo' is for caching.
-    // @ts-ignore
-    const { discountType, overallDiscountValue } = useMemo(
-        () => SAMPLE_OFFERS.find((offer) => String(offer.id) == id),
-        [id]
-    );
-
-    // State variables
-    const [discountTypeInput, setDiscountTypeInput] = useState(discountType ?? "PERCENTAGE");
-    const [discountAmount, setdiscountAmount] = useState(overallDiscountValue ?? 0);
-
+function OffersOverallDiscountSection({
+    discountTypeInput,
+    setDiscountTypeInput,
+    discountAmount,
+    setDiscountAmount,
+}: {
+    discountTypeInput: "PERCENTAGE" | "FIXED_VALUE";
+    setDiscountTypeInput: (discountType: "PERCENTAGE" | "FIXED_VALUE") => void;
+    discountAmount: number;
+    setDiscountAmount: (discountAmount: number) => void;
+}) {
     return (
         <div className="grid grid-cols-2 gap-x-6">
             <SelectInput
-                name="discountTypeInput"
-                defaultValue={discountType ?? "PERCENTAGE"}
+                name="discountType"
+                defaultValue={discountTypeInput}
                 label="Discount Type"
                 options={{
                     Percentage: "PERCENTAGE",
                     "Fixed Value": "FIXED_VALUE",
                 }}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDiscountTypeInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setDiscountTypeInput(e.target.value as "PERCENTAGE" | "FIXED_VALUE")
+                }
             />
             <GeneralInput
                 type="number"
+                name="overallDiscountValue"
+                min={0}
                 placeholder="10"
-                defaultValue={overallDiscountValue ?? 0}
+                defaultValue={discountAmount}
                 label="Discount Value"
-                // TODO: Make the onChange work here
-                onChange={(e) => setdiscountAmount(Number(e.target.value))}
+                onChange={(e) => setDiscountAmount(Number(e.target.value))}
             />
             <Text>
-                WARNING: This will apply a{" "}
-                <span className="font-bold ">
+                Warning: This will apply a{" "}
+                <span className="font-bold">
                     {discountTypeInput === "PERCENTAGE" ? `${discountAmount}%` : `Php ${discountAmount}`} discount
                 </span>{" "}
                 to all products.
@@ -220,246 +218,489 @@ function ToggleOverallDiscountType() {
     );
 }
 
-function ToggleIndividualDiscountType() {
-    // Extracts the Branch Wide Offer Id from the URL Param
-    const { id } = useParams();
+function IncludedProductsSection({
+    catalogueProducts,
+    productInputs,
+    setProductInputs,
+}: {
+    catalogueProducts: CatalogueProduct[];
+    productInputs: ProductInput[];
+    setProductInputs: React.Dispatch<React.SetStateAction<ProductInput[]>>;
+}) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [isAdding, setIsAdding] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [draft, setDraft] = useState<ProductInput | null>(null);
+    const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
 
-    // Extracting the branches only.
-    const testSelectedProducts = useMemo(
-        () => SAMPLE_OFFERS.find((offer) => String(offer.id) == id)?.branchWideOfferProduct,
-        [id]
-    );
+    const usedProductIds = new Set(productInputs.map((product) => product.productId));
+    const firstAvailableProduct = catalogueProducts.find((product) => !usedProductIds.has(product.id));
 
-    // Test button handlers
-    const handleEdit = (id: string | number) => () => {
-        alert(`Edit: ${id}`);
+    const updateProductInput = (index: number, changes: Partial<ProductInput>) => {
+        setProductInputs((current) =>
+            current.map((productInput, productIndex) =>
+                productIndex === index ? { ...productInput, ...changes } : productInput
+            )
+        );
     };
 
-    const handleDelete = (id: string | number) => () => {
-        alert(`Delete: ${id}`);
+    const handleAddProduct = () => {
+        if (!firstAvailableProduct) {
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set("ERROR", "All products are already added");
+            setSearchParams(nextParams, { replace: true });
+            return;
+        }
+
+        setIsAdding(true);
+        setDraft({
+            productId: firstAvailableProduct.id,
+            requiredQuantity: 1,
+            unitDiscountValue: 0,
+            discountType: "PERCENTAGE",
+        });
     };
+
+    const handleCloseAdd = () => {
+        setIsAdding(false);
+        setDraft(null);
+    };
+
+    const handleSaveAdd = () => {
+        if (!draft) return;
+
+        setProductInputs((current) => [...current, draft]);
+        handleCloseAdd();
+    };
+
+    const handleRemoveProduct = (index: number) => {
+        setProductInputs((current) => current.filter((_, productIndex) => productIndex !== index));
+    };
+
+    const getSelectableProducts = (productId: number, excludeIndex: number | null) =>
+        catalogueProducts.filter(
+            (product) =>
+                product.id === productId ||
+                !productInputs.some(
+                    (otherInput, otherIndex) => otherIndex !== excludeIndex && otherInput.productId === product.id
+                )
+        );
+
+    const handleOpenEdit = (index: number) => {
+        const productInput = productInputs[index];
+
+        if (!productInput) return;
+
+        setEditingIndex(index);
+        setDraft({ ...productInput });
+    };
+
+    const handleCloseEdit = () => {
+        setEditingIndex(null);
+        setDraft(null);
+    };
+
+    const handleSaveEdit = () => {
+        if (editingIndex === null || !draft) return;
+
+        updateProductInput(editingIndex, draft);
+        handleCloseEdit();
+    };
+
+    const handleOpenDelete = (index: number) => setDeletingIndex(index);
+
+    const handleCloseDelete = () => setDeletingIndex(null);
+
+    const handleConfirmDelete = () => {
+        if (deletingIndex === null) return;
+
+        handleRemoveProduct(deletingIndex);
+        handleCloseDelete();
+    };
+
+    const draftSelectedProduct = draft
+        ? catalogueProducts.find((product) => product.id === draft.productId)
+        : undefined;
+
+    const draftProductOptions = draft
+        ? Object.fromEntries(
+              getSelectableProducts(draft.productId, isAdding ? null : editingIndex).map((product) => [
+                  product.productName,
+                  String(product.id),
+              ])
+          )
+        : {};
+
+    const deletingProduct = deletingIndex !== null ? productInputs[deletingIndex] : undefined;
+    const deletingProductName =
+        catalogueProducts.find((product) => product.id === deletingProduct?.productId)?.productName ?? "this product";
 
     return (
-        <Card dropShadow={false}>
-            <Card.Header
-                toggleRightButton
-                rightButton={
-                    <Button size="normal" variant="grey" leftIcon={AddIcon}>
-                        Add
-                    </Button>
-                }
-                bordered
-            >
-                <Text weight="bold" size="big">
-                    Included Products
-                </Text>
-            </Card.Header>
-            <Card.Body className="p-0! overflow-hidden!">
-                <Table pagination={{ maxItems: 5 }} className="rounded-none! border-0!">
-                    {/* Fixed table headers */}
-                    <Table.Row borderedBottom>
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Discounted Subtotal" />
-                        <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
-                    </Table.Row>
-
-                    {/* Dynamically maps out data */}
-                    {testSelectedProducts?.map((product, i) => (
-                        <Table.Row>
-                            <Table.Data isPadded={false} size="small" text={String(product.requiredQuantity)} />
-                            <Table.Data isPadded={false} size="small" text={String(product.id)} />
-                            <Table.Data isPadded={false} size="small" text={String(product.productName)} />
-                            <Table.Data isPadded={false} size="small" text={String(product.shelfPrice)} />
-                            <Table.Data
-                                isPadded={false}
-                                size="small"
-
-                                text={formatDiscountValue(
-                                    product.discountType as "FIXED_VALUE" | "PERCENTAGE",
-                                    product.unitDiscountValue
-                                )}
-                            />
-                            <Table.Data
-                                isPadded={false}
-                                size="small"
-                                text={calculateSubtotal(product.requiredQuantity, product.shelfPrice)}
-                            />
-                            <Table.Data
-                                isPadded={false}
-                                size="small"
-                                text={calculateDiscountedSubtotal(
-                                    product.discountType as "FIXED_VALUE" | "PERCENTAGE",
-                                    product.unitDiscountValue,
-                                    product.requiredQuantity,
-                                    product.shelfPrice
-                                )}
-                            />
-                            <Table.Data isPadded={false}>
-                                <EditDeleteButtons
-                                    id={1}
-                                    size="smallest"
-                                    handleEdit={handleEdit}
-                                    handleDelete={handleDelete}
+        <>
+            <Card dropShadow={false}>
+                <Card.Header
+                    toggleRightButton
+                    rightButton={
+                        <Button
+                            type="button"
+                            size="normal"
+                            variant="grey"
+                            leftIcon={AddIcon}
+                            onClick={handleAddProduct}
+                            disabled={catalogueProducts.length === 0}
+                        >
+                            Add
+                        </Button>
+                    }
+                    bordered
+                >
+                    <Text weight="bold" size="big">
+                        Included Products
+                    </Text>
+                </Card.Header>
+                <Card.Body className="p-0! overflow-hidden!">
+                    {catalogueProducts.length === 0 ? (
+                        <Text variant="slate-light" className="p-4">
+                            No products are available in the catalogue yet. Add a product before creating an individual
+                            offer.
+                        </Text>
+                    ) : (
+                        <Table className="rounded-none! border-0!">
+                            {/* Fixed table headers */}
+                            <Table.Row borderedBottom>
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Quantity" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Product ID" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Product Name" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Shelf Price" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Discount" />
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Subtotal" />
+                                <Table.Header
+                                    isPadded={false}
+                                    size="small"
+                                    className="px-3!"
+                                    text="Discounted Subtotal"
                                 />
-                            </Table.Data>
-                        </Table.Row>
-                    ))}
-                </Table>
-            </Card.Body>
-        </Card>
+                                <Table.Header isPadded={false} size="small" className="px-3!" text="Action" />
+                            </Table.Row>
+
+                            {productInputs.map((productInput, index) => {
+                                const selectedProduct = catalogueProducts.find(
+                                    (product) => product.id === productInput.productId
+                                );
+
+                                return (
+                                    <Table.Row key={productInput.productId}>
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            className="px-3!"
+                                            text={String(productInput.requiredQuantity)}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={String(productInput.productId)}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            className="px-3!"
+                                            text={selectedProduct?.productName ?? "—"}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={selectedProduct ? String(selectedProduct.shelfPrice) : "—"}
+                                            className="px-3!"
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            className="px-3!"
+                                            text={formatDiscountValue(
+                                                productInput.discountType,
+                                                productInput.unitDiscountValue
+                                            )}
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={
+                                                selectedProduct
+                                                    ? calculateSubtotal(
+                                                          productInput.requiredQuantity,
+                                                          selectedProduct.shelfPrice
+                                                      )
+                                                    : "—"
+                                            }
+                                            className="px-3!"
+                                        />
+                                        <Table.Data
+                                            isPadded={false}
+                                            size="small"
+                                            text={
+                                                selectedProduct
+                                                    ? calculateDiscountedSubtotal(
+                                                          productInput.discountType,
+                                                          productInput.unitDiscountValue,
+                                                          productInput.requiredQuantity,
+                                                          selectedProduct.shelfPrice
+                                                      )
+                                                    : "—"
+                                            }
+                                            className="px-3!"
+                                        />
+                                        <Table.Data isPadded={false} className="px-3!">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    size="small"
+                                                    onClick={() => handleOpenEdit(index)}
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="main"
+                                                    size="small"
+                                                    onClick={() => handleOpenDelete(index)}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </Table.Data>
+                                    </Table.Row>
+                                );
+                            })}
+                        </Table>
+                    )}
+                </Card.Body>
+            </Card>
+
+            {editingIndex !== null && draft && (
+                <BranchOfferProductEditPopup
+                    productInput={draft}
+                    productOptions={draftProductOptions}
+                    selectedProduct={draftSelectedProduct}
+                    onChange={(changes) => setDraft((current) => (current ? { ...current, ...changes } : current))}
+                    onConfirm={handleSaveEdit}
+                    onClose={handleCloseEdit}
+                />
+            )}
+
+            {isAdding && draft && (
+                <BranchOfferProductAddPopup
+                    productInput={draft}
+                    productOptions={draftProductOptions}
+                    selectedProduct={draftSelectedProduct}
+                    onChange={(changes) => setDraft((current) => (current ? { ...current, ...changes } : current))}
+                    onConfirm={handleSaveAdd}
+                    onClose={handleCloseAdd}
+                />
+            )}
+
+            {deletingProduct && (
+                <BranchOfferProductDeletePopup
+                    productName={deletingProductName}
+                    onConfirm={handleConfirmDelete}
+                    onClose={handleCloseDelete}
+                />
+            )}
+        </>
     );
 }
 
-function OfferConfigurationSection() {
-    // Extracts the Branch Wide Offer Id from the URL Param
-    const { id } = useParams();
+function OfferConfigurationSection({
+    options,
+    offer,
+}: {
+    options: BranchWideOfferOptionsResponse;
+    offer: BranchWideOfferEntry | null;
+}) {
+    const isEdit = offer !== null;
 
-    // Used for redirecting
-    const useNavigate = useNavigatePage();
+    const [selectBranches, setSelectBranches] = useState(offer?.isExclusive ?? false);
+    const [selectedBranchIds, setSelectedBranchIds] = useState<number[]>(
+        offer?.branches.map((branch) => branch.branchId) ?? []
+    );
+    const [isOverall, setIsOverall] = useState(offer?.offerType === "OVERALL");
+    const [discountTypeInput, setDiscountTypeInput] = useState<"PERCENTAGE" | "FIXED_VALUE">(
+        offer?.discountType ?? "PERCENTAGE"
+    );
+    const [discountAmount, setDiscountAmount] = useState(offer?.overallDiscountValue ?? 0);
+    const [productInputs, setProductInputs] = useState<ProductInput[]>(getInitialProductInputs(offer));
 
-    // Save offer navigation. Varies between create and edit view.
-    const saveOfferPopupNavigate = id ? ROUTES.HQ_ADMIN.branchOffersEditSave(id) : ROUTES.HQ_ADMIN.branchOffersSave;
-    const handleSave = () => useNavigate(saveOfferPopupNavigate, true);
+    const offerId = offer?.id;
 
-    // Extracting the test data. The 'useMemo' is for caching.
-    const testOffer = useMemo(() => SAMPLE_OFFERS.find((offer) => String(offer.id) == id), [id]);
-
-    // Checks if the current config is for selected branches only or for all
-    const isForSelectedBranches =
-        testOffer?.branchWideOfferBranches == undefined || testOffer?.branchWideOfferBranches.length <= 0
-            ? false
-            : true;
-
-    // Checks if the current config is discount for selected products only or for all
-    const isForOverallDiscount = testOffer?.offerType == "OVERALL";
-
-    // State variables used by inputs
-    const [toggleSelectedBranchList, setToggleSelectedBranchList] = useState(isForSelectedBranches);
-    const [toggleOverallDiscount, setToggleOverallDiscount] = useState(isForOverallDiscount);
-
-    // Sync state whenever the offer id changes (e.g. navigating between offers)
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
-        setToggleSelectedBranchList(isForSelectedBranches);
-        setToggleOverallDiscount(isForOverallDiscount);
-    }, [id, testOffer]);
+        setSelectBranches(offer?.isExclusive ?? false);
+        setSelectedBranchIds(offer?.branches.map((branch) => branch.branchId) ?? []);
+        setIsOverall(offer?.offerType === "OVERALL");
+        setDiscountTypeInput(offer?.discountType ?? "PERCENTAGE");
+        setDiscountAmount(offer?.overallDiscountValue ?? 0);
+        setProductInputs(getInitialProductInputs(offer));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [offerId]);
+    /* eslint-enable react-hooks/set-state-in-effect */
+
+    const toggleBranch = (branchId: number) => {
+        setSelectedBranchIds((current) =>
+            current.includes(branchId) ? current.filter((id) => id !== branchId) : [...current, branchId]
+        );
+    };
+
+    const navigate = useNavigatePage();
+
+    const formAction = isEdit
+        ? ROUTES.HQ_ADMIN.branchOffersEditSave(String(offer.id))
+        : ROUTES.HQ_ADMIN.branchOffersSave;
+
+    const handleAddOffer = () => navigate(ROUTES.HQ_ADMIN.branchOffers, true);
 
     return (
         <Card isGlass={false} className="w-[75%] h-full flex flex-col">
-            <Card.Header
-                toggleRightButton
-                rightButton={<Button onClick={handleSave}>Save Offer</Button>}
-                bordered
-                className="shrink-0"
-            >
-                <Text weight="bold" size="bigger">
-                    Offer Configuration - {`${id ? "Edit" : "Add "}`}
-                </Text>
-            </Card.Header>
-
-            <Card.Body className="flex flex-col gap-4 grow overflow-y-auto min-h-0 *:shrink-0">
-                <GeneralInput
-                    name="offerName"
-                    key={`offerName-${id}`}
-                    type="text"
-                    label="Offer Name"
-                    defaultValue={testOffer?.offerName}
-                    required
-                />
-                <TextAreaInput
-                    name="description"
-                    key={`description-${id}`}
-                    label="Description"
-                    defaultValue={testOffer?.description}
-                    required
-                />
-
-                {/* Date Range */}
-                <div className="flex gap-6 items-end">
-                    <GeneralInput
-                        name="startDate"
-                        key={`startDate-${id}`}
-                        type="date"
-                        label="Date Range"
-                        defaultValue={testOffer?.startDate}
-                        required
-                    />
-                    <GeneralInput
-                        name="endDate"
-                        key={`endDate-${id}`}
-                        type="date"
-                        defaultValue={testOffer?.endDate}
-                        required
-                    />
-                </div>
-
-                {/* Branch Selection */}
-                <div>
-                    <Text size="big" weight="bold" variant="brown">
-                        Branch Selection
-                    </Text>
-                    <div className="flex gap-6">
-                        <ChoiceInput
-                            type="radio"
-                            id="allBranches"
-                            name="selectBranch"
-                            className="w-fit!"
-                            checked={toggleSelectedBranchList == false}
-                            onChange={() => setToggleSelectedBranchList(false)}
-                        >
-                            All Branches
-                        </ChoiceInput>
-                        <ChoiceInput
-                            type="radio"
-                            id="selectedBranches"
-                            name="selectBranch"
-                            className="w-fit!"
-                            checked={toggleSelectedBranchList == true}
-                            onChange={() => setToggleSelectedBranchList(true)}
-                        >
-                            Select Branches
-                        </ChoiceInput>
-                    </div>
-                    {toggleSelectedBranchList && <ToggleSelectBranches key={id} />}
-                </div>
-
-                {/* Offer Type Selection */}
-                <ChoiceInput
-                    id="offerType"
-                    name="offerType"
-                    label="Offer Type"
-                    className="w-fit!"
-                    checked={toggleOverallDiscount}
-                    onChange={() => setToggleOverallDiscount((value) => !value)}
+            <Form method="post" action={formAction} className="flex flex-col grow min-h-0">
+                <Card.Header
+                    toggleRightButton
+                    rightButton={
+                        <div className="flex gap-2">
+                            {isEdit && (
+                                <Button type="button" variant="secondary" onClick={handleAddOffer}>
+                                    Add Offer
+                                </Button>
+                            )}
+                            <Button type="submit">Save Offer</Button>
+                        </div>
+                    }
+                    bordered
+                    className="shrink-0"
                 >
-                    All Product Discount (Overall)
-                </ChoiceInput>
+                    <Text weight="bold" size="bigger">
+                        Offer Configuration - {isEdit ? "Edit" : "Add"}
+                    </Text>
+                </Card.Header>
 
-                {/* Toggle for discounts: Overall or Selected Products */}
-                {toggleOverallDiscount ? (
-                    // All Products Discount
-                    <ToggleOverallDiscountType key={id} />
-                ) : (
-                    // Selected Products Discount
-                    <ToggleIndividualDiscountType key={id} />
-                )}
+                <Card.Body className="flex flex-col gap-4 grow overflow-y-auto min-h-0 *:shrink-0">
+                    <GeneralInput
+                        name="offerName"
+                        type="text"
+                        label="Offer Name"
+                        defaultValue={offer?.offerName}
+                        required
+                    />
+                    <TextAreaInput name="description" label="Description" defaultValue={offer?.description} required />
 
-                {/* Set status of offer */}
-                <SelectInput
-                    name="status"
-                    defaultValue="enabled"
-                    label="Status"
-                    options={{
-                        Enabled: "enabled",
-                        Disabled: "disabled",
-                        Draft: "draft",
-                    }}
-                />
-            </Card.Body>
+                    {/* Date Range */}
+                    <div className="flex gap-6 items-end">
+                        <GeneralInput
+                            name="startDate"
+                            type="date"
+                            label="Date Range"
+                            defaultValue={offer?.startDate}
+                            required
+                        />
+                        <GeneralInput name="endDate" type="date" defaultValue={offer?.endDate} required />
+                    </div>
+
+                    {/* Branch Selection */}
+                    <div>
+                        <Text size="big" weight="bold" variant="brown">
+                            Branch Selection
+                        </Text>
+                        <div className="flex gap-6">
+                            <ChoiceInput
+                                type="radio"
+                                id="allBranches"
+                                name="selectBranch"
+                                className="w-fit!"
+                                checked={selectBranches === false}
+                                onChange={() => {
+                                    setSelectBranches(false);
+                                    setSelectedBranchIds([]);
+                                }}
+                            >
+                                All Branches
+                            </ChoiceInput>
+                            <ChoiceInput
+                                type="radio"
+                                id="selectedBranches"
+                                name="selectBranch"
+                                className="w-fit!"
+                                checked={selectBranches === true}
+                                onChange={() => setSelectBranches(true)}
+                            >
+                                Select Branches
+                            </ChoiceInput>
+                        </div>
+                        {selectBranches && (
+                            <Card dropShadow={false}>
+                                <Card.Body>
+                                    {options.branches.length === 0 ? (
+                                        <Text variant="slate-light">No branches are available for this business.</Text>
+                                    ) : (
+                                        options.branches.map((branch) => (
+                                            <ChoiceInput
+                                                key={branch.branchId}
+                                                id={`branch-${branch.branchId}`}
+                                                checked={selectedBranchIds.includes(branch.branchId)}
+                                                onChange={() => toggleBranch(branch.branchId)}
+                                            >
+                                                {branch.location}
+                                            </ChoiceInput>
+                                        ))
+                                    )}
+                                </Card.Body>
+                            </Card>
+                        )}
+                    </div>
+
+                    {/* Offer Type Selection */}
+                    <ChoiceInput
+                        id="offerType"
+                        label="Offer Type"
+                        className="w-fit!"
+                        checked={isOverall}
+                        onChange={() => setIsOverall((value) => !value)}
+                    >
+                        All Product Discount (Overall)
+                    </ChoiceInput>
+
+                    {/* Toggle for discounts */}
+                    {isOverall ? (
+                        <OffersOverallDiscountSection
+                            discountTypeInput={discountTypeInput}
+                            setDiscountTypeInput={setDiscountTypeInput}
+                            discountAmount={discountAmount}
+                            setDiscountAmount={setDiscountAmount}
+                        />
+                    ) : (
+                        <IncludedProductsSection
+                            catalogueProducts={options.products}
+                            productInputs={productInputs}
+                            setProductInputs={setProductInputs}
+                        />
+                    )}
+
+                    {/* Set status of offer */}
+                    <SelectInput
+                        name="offerStatus"
+                        defaultValue={offer?.offerStatus ?? "DRAFT"}
+                        label="Status"
+                        options={{
+                            Enabled: "ENABLED",
+                            Disabled: "DISABLED",
+                            Draft: "DRAFT",
+                        }}
+                    />
+
+                    <input type="hidden" name="offerType" value={isOverall ? "OVERALL" : "INDIVIDUAL"} />
+                    <input type="hidden" name="isExclusive" value={String(selectBranches)} />
+                    <input type="hidden" name="branchIds" value={JSON.stringify(selectedBranchIds)} />
+                    <input type="hidden" name="products" value={JSON.stringify(productInputs)} />
+                </Card.Body>
+            </Form>
         </Card>
     );
 }

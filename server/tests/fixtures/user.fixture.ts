@@ -29,6 +29,7 @@ export const mockUser: UserCreate = {
     password: PASSWORD,
     firstName: "John",
     lastName: "Doe",
+    accountStatus: "ACTIVE",
 };
 
 export const mockHqAdmin: UserCreate = {

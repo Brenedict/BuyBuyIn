@@ -1,0 +1,46 @@
+
+# ==============================================================
+# Author: John Benedict Binas
+# Co-Authors: [Name]
+# Description: This file is created specifically for testing the registration workflow endpoints via direct API calls.
+# Note: This requires a running server (npm run dev:server).
+# ==============================================================
+
+### Account Creation Workflow
+# Requires a running server (npm run dev:server)
+
+@baseUrl = http://localhost:3000/api/v1/
+
+### STEP 1: Login as SUPERADMIN (required since this provides the access token for subsequent requests)
+# @name login
+POST {{baseUrl}}auth/login
+Content-Type: application/json
+
+{
+  "email": "superadmin@gmail.com",
+  "password": "password123"
+}
+
+
+### STEP 2: Register a BUSINESS entity (SUPERADMIN only)
+# @name businessEntity
+POST {{baseUrl}}registration/business-entity
+Authorization: Bearer {{login.response.body.accessToken}}
+Content-Type: application/json
+
+{
+    "name": "BuyBuyin HQ",
+    "location": "Manila"
+}
+
+### STEP 3: Register a SUBSCRIBER account (HQ ADMIN)
+# @name subscriberAccount
+POST {{baseUrl}}registration/subscriber-account
+Authorization: Bearer {{login.response.body.accessToken}}
+Content-Type: application/json
+
+{
+    "email": "johnsjbinas@gmail.com",
+    "firstName": "John",
+    "lastName": "Benedict"
+}

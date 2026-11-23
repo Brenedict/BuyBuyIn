@@ -19,7 +19,7 @@ const DEFAULT_VARIANT_OFFSET = 0;
 const BUTTON_VARIANT_OFFSET = 4;
 
 interface SelectInputProp extends LabelProp, Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "children"> {
-    name: string;
+    name?: string;
     options: Record<string, string>;
     defaultValue: string;
     variant?: "default" | "button";

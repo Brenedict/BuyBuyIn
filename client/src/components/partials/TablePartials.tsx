@@ -5,10 +5,13 @@ import { Button, type ButtonColorVariant } from "../Button";
 import Icon from "../Icon";
 import Table from "../Table";
 import { Text } from "../Text";
+
+// Materials UI Icons
 import DangerousIcon from "@mui/icons-material/Dangerous";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import MoreHorizOutlinedIcon from "@mui/icons-material/MoreHorizOutlined";
+import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 
 import { formatFullDate, formatShortDate, formatTime } from "../../utils/dateUtils";
 
@@ -238,6 +241,40 @@ export function EditDeleteButtons({
                     variant: "main",
                     leftIcon: DeleteForeverOutlinedIcon,
                     handleClick: handleDelete,
+                },
+            ]}
+            size={size}
+        />
+    );
+}
+
+// TODO: Currently i added a variant sa button na smallest, if the size here should have proper enumeration pasabi
+export function EditManageButtons({
+    id,
+    handleEdit,
+    handleManage,
+    size = "default",
+}: {
+    id: string | number;
+    handleEdit: ButtonActions["handleClick"];
+    handleManage: ButtonActions["handleClick"];
+    size?: "default" | "smallest";
+}) {
+    return (
+        <ActionButtons
+            id={id}
+            actions={[
+                {
+                    text: "Edit",
+                    variant: "secondary",
+                    leftIcon: DriveFileRenameOutlineOutlinedIcon,
+                    handleClick: handleEdit,
+                },
+                {
+                    text: "Manage",
+                    variant: "grey",
+                    leftIcon: ManageAccountsOutlinedIcon,
+                    handleClick: handleManage,
                 },
             ]}
             size={size}

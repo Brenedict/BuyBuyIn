@@ -64,10 +64,10 @@ enum DiscountType {
 }
 
 enum AccountStatusType {
-  UNVERIFIED
-  ACTIVE
-  SUSPENDED
-  DEACTIVATED
+    UNVERIFIED
+    ACTIVE
+    SUSPENDED
+    DEACTIVATED
 }
 
 model User {
@@ -93,7 +93,7 @@ model User {
 
     accountStatus AccountStatusType @default(UNVERIFIED)
 
-    resetToken String? @unique
+    resetToken          String?   @unique
     resetTokenExpiresAt DateTime?
 
     //One-to-many connections
@@ -224,14 +224,12 @@ model TransactionItem {
     isBundle     Boolean
 
     // Many-to-one connections
-    transaction       Transaction?     @relation(fields: [transactionId], references: [id])
-    transactionId     Int?
+    transaction       Transaction      @relation(fields: [transactionId], references: [id])
+    transactionId     Int
     branchWideOffer   BranchWideOffer? @relation(fields: [branchWideOfferId], references: [id])
     branchWideOfferId Int?
-    product           Product          @relation(fields: [productId], references: [id])
-    productId         Int
-
-    @@index([branchWideOfferId])
+    product           Product?         @relation(fields: [productId], references: [id])
+    productId         Int?
 }
 
 model Supplier {

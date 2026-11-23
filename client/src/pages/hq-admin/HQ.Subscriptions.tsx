@@ -121,7 +121,7 @@ function CurrentPlanSection() {
 }
 
 function BranchSubscriptionSection() {
-    const { values, submit } = useFormSearchParams({ search: "" });
+    const { values, handleChange } = useFormSearchParams({ search: "" });
 
     // Filters the branch list based on the search param
     const filteredBranches = useMemo(
@@ -149,7 +149,7 @@ function BranchSubscriptionSection() {
             </Card.Header>
 
             <Card.Body className="flex gap-4">
-                <Form onSubmit={submit()} className="grow">
+                <Form onChange={handleChange} className="grow">
                     <SearchInput
                         disabled={false}
                         hidden={false}

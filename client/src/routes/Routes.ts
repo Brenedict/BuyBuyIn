@@ -37,6 +37,7 @@ export const ROUTES = {
             manageUsersResendCashier: (id?: string) => `${base}/manage-users/cashier/${id}/resend`,
             manageUsersDeleteCashier: (id?: string) => `${base}/manage-users/cashier/${id}/delete`,
             branchOffers: `${base}/branch-offers`,
+            branchOffersView: (id?: string) => `${base}/branch-offers/${id}/view`,
             transactions: `${base}/transactions`,
         };
     })(),
@@ -68,6 +69,7 @@ export const ROUTES = {
             branchOffersSave: `${base}/branch-offers/save`,
             branchOffersEdit: (id?: string) => `${base}/branch-offers/${id}/edit`,
             branchOffersEditSave: (id?: string) => `${base}/branch-offers/${id}/edit/save`,
+            branchOffersDelete: (id?: string) => `${base}/branch-offers/${id}/delete`,
         };
     })(),
 

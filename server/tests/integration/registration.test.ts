@@ -962,7 +962,7 @@ describe("Registration routes", () => {
                 },
             });
 
-            await prisma.branchWideOfferBranches.create({
+            await prisma.branchWideOfferBranch.create({
                 data: { branchId: branchB.id, branchWideOfferId: offer.id },
             });
 
@@ -996,7 +996,7 @@ describe("Registration routes", () => {
 
             expect(await prisma.branch.findUnique({ where: { id: branchB.id } })).toBeNull();
             expect(await prisma.branchInventoryItem.count({ where: { branchId: branchB.id } })).toBe(0);
-            expect(await prisma.branchWideOfferBranches.count({ where: { branchId: branchB.id } })).toBe(0);
+            expect(await prisma.branchWideOfferBranch.count({ where: { branchId: branchB.id } })).toBe(0);
 
             // Users + transactions are orphaned (branchId nulled), not deleted.
             expect((await prisma.user.findUniqueOrThrow({ where: { id: cashier.id } })).branchId).toBeNull();

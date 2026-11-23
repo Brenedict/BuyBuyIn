@@ -15,17 +15,22 @@ const MONTH_NAMES = [
 
 const pad = (value: number) => value.toString().padStart(2, "0");
 
-// NOTE: Formats the date as "09/01/2026" 
+// NOTE: Formats the date as "09/01/2026"
 export function formatShortDate(date: Date): string {
     return `${pad(date.getMonth() + 1)}/${pad(date.getDate())}/${date.getFullYear()}`;
 }
 
-// NOTE: Formats the date as "September 1, 2026". 
+// NOTE: Formats the date as "September 1, 2026".
 export function formatFullDate(date: Date): string {
     return `${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
-// NOTE: Formats the time as "12:00 PM" (12-hour clock). 
+// NOTE: Formats the date as "Jun 12".
+export function formatMonthDay(date: Date): string {
+    return `${MONTH_NAMES[date.getMonth()].slice(0, 3)} ${date.getDate()}`;
+}
+
+// NOTE: Formats the time as "12:00 PM" (12-hour clock).
 export function formatTime(date: Date): string {
     const hours = date.getHours();
     const hour12 = hours % 12 === 0 ? 12 : hours % 12;
@@ -33,4 +38,3 @@ export function formatTime(date: Date): string {
 
     return `${hour12}:${pad(date.getMinutes())} ${period}`;
 }
-

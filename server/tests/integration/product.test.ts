@@ -481,7 +481,7 @@ describe("Product routes", () => {
                     isExclusive: false,
                     offerStatus: OfferStatusType.ENABLED,
                     offerType: OfferType.INDIVIDUAL,
-                    discountType: DiscountType.FIXEDVALUE,
+                    discountType: DiscountType.FIXED_VALUE,
                     overallDiscountValue: 10,
                 },
             });
